@@ -17,9 +17,9 @@ logging.basicConfig(level=logging.INFO)
 if __name__ == '__main__':
     app = QApplication([])
     app.setStyle('Windows')
-    app.setApplicationName("T-Shirt Cannon Driver Station")
+    app.setApplicationName("PRIMOS Driver Station")
     app.setApplicationVersion("1.0.0")
-    app.setWindowIcon(QtGui.QIcon("resources/rse.png"))
+    app.setWindowIcon(QtGui.QIcon("resources/icon.svg"))
     app.setQuitOnLastWindowClosed(True)
 
     myappid = 'rse.tshirt.cannon.station'  # arbitrary string
