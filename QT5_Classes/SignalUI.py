@@ -195,7 +195,18 @@ class DriverStationSignalWidget(QWidget):
 
             # Check os to see if it is windows or linux
             if os.name == 'nt':
-                network = subprocess.check_output("netsh wlan show interfaces")
+                info_error = ""
+                try:
+                    network = subprocess.check_output("netsh wlan show interfaces")
+                except subprocess.CalledProcessError as e:
+                    info_error = e.output
+                    try:
+                        network = subprocess.check_output("netsh lan show interfaces")
+                    except subprocess.CalledProcessError as e:
+                        info_error += e.output
+                        logging.error(f"Error getting network info: {info_error}")
+                        return
+
                 network = decode_netsh_output(network)
                 if "SSID" in network:
                     self.network_name_text = network["SSID"]

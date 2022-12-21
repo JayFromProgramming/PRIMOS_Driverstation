@@ -3,7 +3,8 @@ import traceback
 
 import paramiko
 import roslibpy
-import threading
+# import threading
+import multiprocessing
 import logging
 
 from ROS.RobotState import RobotState, SmartTopic
@@ -143,11 +144,11 @@ class ROSInterface:
         self.address = None
         self.port = None
         self.robot_state_monitor = RobotStateMonitor(self.client)
-        self.background_thread = None  # type: threading.Thread or None
+        self.background_thread = None
 
         self.target_topics = topic_to_name.keys()
         self.smart_topics = topic_targets
-        self.rosserial_thread = None  # type: threading.Thread or None
+        self.rosserial_thread = None  # type: multiprocessing.Process or None
         self.future_callbacks = []
 
     @property
@@ -167,11 +168,11 @@ class ROSInterface:
             self.port = port
             self.client = roslibpy.Ros(host=self.address, port=self.port)
             self.robot_state_monitor.set_client(self.client)
-            self.background_thread = threading.Thread(target=self._connect, daemon=True)
+            self.background_thread = multiprocessing.Process(target=self._connect())
             self.background_thread.start()
 
-            self.rosserial_thread = threading.Thread(target=ros_serial, daemon=True, args=(address,))
-            self.rosserial_thread.start()
+            # self.rosserial_thread = threading.Thread(target=ros_serial, daemon=True, args=(address,))
+            # self.rosserial_thread.start()
 
             # for smart_topic in self.smart_topics:
             #     smart_topic.connect()

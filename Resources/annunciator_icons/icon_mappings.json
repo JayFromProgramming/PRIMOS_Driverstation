@@ -1,0 +1,47 @@
+{
+  "battery_warning_light.svg": {
+    "hover_name": "Main Battery",
+    "ros_name": "main_battery_warning",
+    "annunciator_location": [0, 0]
+  },
+  "motor_temp.svg": {
+    "hover_name": "Motor Temperature",
+    "ros_name": "motor_temp",
+    "annunciator_location": [0, 1]
+  },
+  "suspension-actuators-warning-lights.svg": {
+    "hover_name": "Suspension Actuators",
+    "ros_name": "suspension_actuators",
+    "annunciator_location": [0, 2]
+  },
+  "suspension_in_transit_light.svg": {
+    "hover_name": "Suspension Transit",
+    "ros_name": "suspension_transit",
+    "annunciator_location": [0, 3]
+  },
+  "controller_temperature.svg": {
+    "hover_name": "Controller Temperature",
+    "ros_name": "controller_temp",
+    "annunciator_location": [0, 4]
+  },
+  "tilt_warning.svg": {
+    "hover_name": "Tilt Warning",
+    "ros_name": "tilt_warning",
+    "annunciator_location": [0, 0]
+  },
+  "check_engine.svg": {
+    "hover_name": "DriveTrail Master Caution",
+    "ros_name": "check_engine",
+    "annunciator_location": [1, 1]
+  },
+  "high_battery_charge.svg": {
+    "hover_name": "High Battery Charge",
+    "ros_name": "high_battery_charge",
+    "annunciator_location": [1, 2]
+  },
+  "steering_in_point.svg": {
+    "hover_name": "Steering In Point",
+    "ros_name": "steering_in_point",
+    "annunciator_location": [1, 3]
+  }
+}
