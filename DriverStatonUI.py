@@ -5,12 +5,12 @@ from PyQt5.QtWidgets import QMainWindow
 
 import controller
 from QT5_Classes.AnnunciatorUI import AnnunciatorUI
-from QT5_Classes.CannonUI import CannonUI
-from QT5_Classes.ConnectionUI import ConnectionUI
-from QT5_Classes.PointCloud2UI import PointCloud2UI
-from QT5_Classes.SignalUI import SignalUI
-from QT5_Classes.PioneerUI import PioneerUI
-from QT5_Classes.TopicStatusUI import TopicUI
+# from QT5_Classes.CannonUI import CannonUI
+# from QT5_Classes.ConnectionUI import ConnectionUI
+# from QT5_Classes.PointCloud2UI import PointCloud2UI
+# from QT5_Classes.SignalUI import SignalUI
+# from QT5_Classes.PioneerUI import PioneerUI
+# from QT5_Classes.TopicStatusUI import TopicUI
 # from QT5_Classes.WebcamUI import WebcamWindow
 from ROS.ROSInterface import ROSInterface
 from ROS.RobotState import RobotState
@@ -37,22 +37,24 @@ class DriverStationUI:
         self.window = QMainWindow()
         self.window.resize(1920, 1080)
 
-        self.connection_ui = ConnectionUI(self.robot, self.window)
-        self.pioneer_ui = PioneerUI(self.robot, parent=self.window)
+        # self.connection_ui = ConnectionUI(self.robot, self.window)
+        # self.pioneer_ui = PioneerUI(self.robot, parent=self.window)
         self.annunciator_ui = AnnunciatorUI(self.robot, parent=self.window)
 
-        self.topic_info = TopicUI(self.robot, self.window)
+        self.annunciator_ui.move(5, 10)
+
+        # self.topic_info = TopicUI(self.robot, self.window)
 
         # Move the pioneer UI to the bottom left
-        self.pioneer_ui.move(0, 480)
+        # self.pioneer_ui.move(0, 480)
 
         # Move the topic UI to the left of the signal info
-        self.topic_info.move(self.window.width() - self.topic_info.width(),
-                             self.window.height() - self.topic_info.height())
+        # self.topic_info.move(self.window.width() - self.topic_info.width(),
+        #                      self.window.height() - self.topic_info.height())
         # self.topic_info.move(self.window.width() - self.topic_info.width(), 20 + self.sonar_view.height())
 
         # Move the connection UI to left of the topic UI
-        self.connection_ui.move(self.topic_info.x() - self.connection_ui.width(), self.topic_info.y())
+        # self.connection_ui.move(self.topic_info.x() - self.connection_ui.width(), self.topic_info.y())
 
         self.window.show()
 
