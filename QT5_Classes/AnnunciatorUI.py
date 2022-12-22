@@ -57,7 +57,7 @@ class AnnunciatorIcon(QWidget):
 
         self.selected_color = "red"
         self.display_color = "red"
-        self.blink = True  # Blink the icon between the selected color and gray (does not work with the gray color)
+        self.blink = False  # Blink the icon between the selected color and gray (does not work with the gray color)
 
         # Remove the alpha channel
         # self.icon = self.icon.convertToFormat(QtGui.QImage.Format_RGB888)
