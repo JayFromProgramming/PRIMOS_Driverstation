@@ -47,9 +47,9 @@
     "annunciator_location": [1, 2],
     "auto_crop": true
   },
-  "steering_in_point.svg": {
-    "hover_name": "Steering In Point",
-    "ros_name": "steering_in_point",
+  "spot_turning.svg": {
+    "hover_name": "On-Spot Turning",
+    "ros_name": "spot_turning",
     "annunciator_location": [1, 3],
     "auto_crop": true
   },

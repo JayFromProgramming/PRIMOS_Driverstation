@@ -47,6 +47,7 @@ class AnnunciatorIcon(QWidget):
                 self.icon_offset_x = (size[0] - self.icons[color].width()) // 2
                 self.icon_offset_y = (size[1] - self.icons[color].height()) // 2
             else:
+                self.built = False
                 break
         else:
             self.built = True
@@ -54,7 +55,9 @@ class AnnunciatorIcon(QWidget):
 
         self.updated = False
 
-        self.selected_color = "gray"
+        self.selected_color = "red"
+        self.display_color = "red"
+        self.blink = True  # Blink the icon between the selected color and gray (does not work with the gray color)
 
         # Remove the alpha channel
         # self.icon = self.icon.convertToFormat(QtGui.QImage.Format_RGB888)
@@ -131,11 +134,18 @@ class AnnunciatorIcon(QWidget):
             self.icon_offset_y = (size[1] - self.icons[key].height()) // 2
 
     def update(self) -> None:
-        pass
+        if self.blink:
+            self.updated = True
+            if self.selected_color == "gray":
+                self.selected_color = self.display_color
+            else:
+                self.selected_color = "gray"
+        else:
+            self.selected_color = self.display_color
 
     # Set the tooltip to the hover text
     def enterEvent(self, event):
-        self.setToolTip(self.hover_text)
+        self.setToolTip(f"{self.hover_text}: No data")
         super().enterEvent(event)
 
     def set_color(self, color):
@@ -160,8 +170,8 @@ class AnnunciatorUI(QWidget):
 
         self.icon_size = (round(66 * 1), round(41 * 1))
 
-        self.icon_rows = 3
-        self.icon_cols = 5
+        self.icon_rows = 4
+        self.icon_cols = 6
         self.icon_surface_size = (self.icon_size[0] * self.icon_cols +
                                   AnnunciatorIcon.icon_gap_h * self.icon_cols,
                                   self.icon_size[1] * self.icon_rows +
