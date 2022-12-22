@@ -2,6 +2,7 @@ import multiprocessing
 import time
 import threading
 
+from PyQt5 import QtCore
 from PyQt5.QtWidgets import QMainWindow
 
 import controller
@@ -13,7 +14,10 @@ from QT5_Classes.AnnunciatorUI import AnnunciatorUI
 # from QT5_Classes.PioneerUI import PioneerUI
 # from QT5_Classes.TopicStatusUI import TopicUI
 # from QT5_Classes.WebcamUI import WebcamWindow
+from QT5_Classes.BatteryUI import BatteryUI
+from QT5_Classes.CommandsUI import CommandsUI
 from QT5_Classes.MotorStateUI import MotorStateUI
+from QT5_Classes.PoseUI import PoseUI
 from ROS.ROSInterface import ROSInterface
 from ROS.RobotState import RobotState
 
@@ -39,17 +43,24 @@ class DriverStationUI:
         self.window = QMainWindow()
         self.window.resize(1920, 1080)
 
-        # self.connection_ui = ConnectionUI(self.robot, self.window)
-        # self.pioneer_ui = PioneerUI(self.robot, parent=self.window)
         self.annunciator_ui = AnnunciatorUI(self.robot, parent=self.window)
-
+        self.battery_ui = BatteryUI(self.robot, parent=self.window)
         self.motor_overview = MotorStateUI(self.robot, parent=self.window)
+        self.pose_ui = PoseUI(self.robot, parent=self.window)
+        self.commands_ui = CommandsUI(self.robot, parent=self.window)
 
         self.motor_overview.move(5, self.window.height() - self.motor_overview.height() - 5)
         self.annunciator_ui.move(5, self.motor_overview.y() - self.annunciator_ui.height() - 5)
+        self.battery_ui.move(self.annunciator_ui.x() + self.annunciator_ui.width() + 5, self.annunciator_ui.y())
+        self.pose_ui.move(5, self.annunciator_ui.y() - self.pose_ui.height() - 5)
+
+        self.commands_ui.move(self.window.width() - self.commands_ui.width() - 5,
+                              self.window.height() - self.commands_ui.height() - 5)
 
         # self.topic_info = TopicUI(self.robot, self.window)
 
+        # Attach the resize event
+        self.window.resizeEvent = self.resizeEvent
         self.window.show()
 
         # threading.Thread(target=self.controller_read_loop).start()
@@ -110,3 +121,13 @@ class DriverStationUI:
         except Exception as e:
             logging.error(f"Error reading controller: {e}")
             self.robot.drive(0, 0)
+
+    # On resize adjust the positions of the widgets
+    def resizeEvent(self, event):
+        self.motor_overview.move(5, self.window.height() - self.motor_overview.height() - 5)
+        self.annunciator_ui.move(5, self.motor_overview.y() - self.annunciator_ui.height() - 5)
+        self.battery_ui.move(self.annunciator_ui.x() + self.annunciator_ui.width() + 5, self.annunciator_ui.y())
+        self.pose_ui.move(5, self.annunciator_ui.y() - self.pose_ui.height() - 5)
+
+        self.commands_ui.move(self.window.width() - self.commands_ui.width() - 5,
+                              self.window.height() - self.commands_ui.height() - 5)

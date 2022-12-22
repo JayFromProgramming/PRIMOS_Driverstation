@@ -28,7 +28,8 @@ class MotorStateUI(QWidget):
         self.motor_state_labels = []
         self.motor_state_header = QLabel("Motors", self.surface)
 
-        self.motor_state_header.setStyleSheet("font-weight: bold; font-size: 17px; border: 0px;")
+        self.motor_state_header.setStyleSheet("font-weight: bold; font-size: 17px; border: 0px; "
+                                              "background-color: transparent;")
         self.motor_state_header.setAlignment(Qt.Qt.AlignCenter)
         self.motor_state_header.move(round(self.width() / 2 - self.motor_state_header.width() / 2), 0)
         self.setStyleSheet("border: 1px solid black; border-radius: 5px; background-color: gray;")
