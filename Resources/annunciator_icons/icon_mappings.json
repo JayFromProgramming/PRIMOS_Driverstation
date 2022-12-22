@@ -8,73 +8,73 @@
   "motor_temp.svg": {
     "hover_name": "Motor Temperature",
     "ros_name": "motor_temp",
-    "annunciator_location": [0, 1],
+    "annunciator_location": [0, 2],
     "auto_crop": true
   },
   "suspension-actuators-warning-lights.svg": {
     "hover_name": "Suspension Actuators",
     "ros_name": "suspension_actuators",
-    "annunciator_location": [0, 2],
+    "annunciator_location": [1, 1],
     "auto_crop": true
   },
   "suspension_in_transit_light.svg": {
     "hover_name": "Suspension Transit",
     "ros_name": "suspension_transit",
-    "annunciator_location": [0, 3],
+    "annunciator_location": [0, 1],
     "auto_crop": true
   },
   "controller_temperature.svg": {
     "hover_name": "Controller Temperature",
     "ros_name": "controller_temp",
-    "annunciator_location": [0, 4],
+    "annunciator_location": [1, 2],
     "auto_crop": true
   },
   "tilt_warning.svg": {
     "hover_name": "Tilt Warning",
     "ros_name": "tilt_warning",
-    "annunciator_location": [1, 0],
+    "annunciator_location": [2, 1],
     "auto_crop": true
   },
   "check_engine.svg": {
     "hover_name": "DriveTrain Master Caution",
     "ros_name": "check_engine",
-    "annunciator_location": [1, 1],
+    "annunciator_location": [2, 2],
     "auto_crop": true
   },
   "high_battery_charge.svg": {
     "hover_name": "High Battery Charge",
     "ros_name": "high_battery_charge",
-    "annunciator_location": [1, 2],
+    "annunciator_location": [1, 0],
     "auto_crop": true
   },
   "spot_turning.svg": {
     "hover_name": "On-Spot Turning",
     "ros_name": "spot_turning",
-    "annunciator_location": [1, 3],
+    "annunciator_location": [3, 1],
     "auto_crop": true
   },
   "charging_light.svg": {
     "hover_name": "Charging",
     "ros_name": "charging",
-    "annunciator_location": [1, 4],
+    "annunciator_location": [3, 0],
     "auto_crop": true
   },
   "lane_departure.svg": {
     "hover_name": "Auto Trench",
     "ros_name": "auto_trench",
-    "annunciator_location": [2, 0],
+    "annunciator_location": [1, 3],
     "auto_crop": true
   },
   "battery-fault.svg": {
     "hover_name": "Battery Fault",
     "ros_name": "battery_fault",
-    "annunciator_location": [2, 1],
+    "annunciator_location": [2, 0],
     "auto_crop": true
   },
   "cruise-control-mode.svg": {
     "hover_name": "Cruise Control",
     "ros_name": "cruise_control",
-    "annunciator_location": [2, 2],
+    "annunciator_location": [0, 3],
     "auto_crop": true
   },
   "conveyor.svg": {

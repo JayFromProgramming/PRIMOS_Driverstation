@@ -1,11 +1,12 @@
 import json
 import logging
 import os
+import random
 import threading
 import multiprocessing
 
 from PyQt5 import QtGui, QtCore
-from PyQt5.QtWidgets import QWidget
+from PyQt5.QtWidgets import QWidget, QLabel
 
 
 class AnnunciatorIcon(QWidget):
@@ -26,7 +27,7 @@ class AnnunciatorIcon(QWidget):
             "red": None,
             "orange": None,
             "green": None,
-            "gray": None
+            "black": None
         }
 
         base_icon = QtGui.QImage(icon_file)
@@ -45,7 +46,7 @@ class AnnunciatorIcon(QWidget):
             if os.path.isfile("cache/tell_tails/" + self.ros_name + "_" + color + ".png"):
                 self.icons[color] = QtGui.QImage("cache/tell_tails/" + self.ros_name + "_" + color + ".png")
                 self.icon_offset_x = (size[0] - self.icons[color].width()) // 2
-                self.icon_offset_y = (size[1] - self.icons[color].height()) // 2
+                self.icon_offset_y = ((size[1] - self.icons[color].height()) // 2) + 17
             else:
                 self.built = False
                 break
@@ -55,8 +56,8 @@ class AnnunciatorIcon(QWidget):
 
         self.updated = False
 
-        self.selected_color = "red"
-        self.display_color = "red"
+        self.selected_color = "black"
+        self.display_color = "black"
         self.blink = False  # Blink the icon between the selected color and gray (does not work with the gray color)
 
         # Remove the alpha channel
@@ -131,15 +132,15 @@ class AnnunciatorIcon(QWidget):
             self.icons[key] = self.icons[key].scaled(size[0], size[1], QtCore.Qt.KeepAspectRatio,
                                                      QtCore.Qt.SmoothTransformation)
             self.icon_offset_x = (size[0] - self.icons[key].width()) // 2
-            self.icon_offset_y = (size[1] - self.icons[key].height()) // 2
+            self.icon_offset_y = ((size[1] - self.icons[key].height()) // 2) + 17
 
     def update(self) -> None:
         if self.blink:
             self.updated = True
-            if self.selected_color == "gray":
+            if self.selected_color == "black":
                 self.selected_color = self.display_color
             else:
-                self.selected_color = "gray"
+                self.selected_color = "black"
         else:
             self.selected_color = self.display_color
 
@@ -148,8 +149,9 @@ class AnnunciatorIcon(QWidget):
         self.setToolTip(f"{self.hover_text}: No data")
         super().enterEvent(event)
 
-    def set_color(self, color):
-        self.selected_color = color
+    def set(self, color, blink):
+        self.display_color = color
+        self.blink = blink
         self.updated = True
 
 
@@ -158,6 +160,7 @@ class AnnunciatorUI(QWidget):
     def __init__(self, robot, parent=None):
         super().__init__()
         super().setParent(parent)
+
         self.robot = robot
         self.parent = parent
 
@@ -175,12 +178,18 @@ class AnnunciatorUI(QWidget):
         self.icon_surface_size = (self.icon_size[0] * self.icon_cols +
                                   AnnunciatorIcon.icon_gap_h * self.icon_cols,
                                   self.icon_size[1] * self.icon_rows +
-                                  AnnunciatorIcon.icon_gap_v * self.icon_rows)
+                                  AnnunciatorIcon.icon_gap_v * self.icon_rows
+                                  + 20)
         self.icon_surface = QWidget(parent=self)
+        super().setFixedSize(self.icon_surface_size[0], self.icon_surface_size[1])
         # Set a boarder around the icon surface
-        self.icon_surface.setStyleSheet("border: 1px solid black;")
+
+        self.icon_surface.setStyleSheet("border: 1px solid black; border-radius: 5px; background-color: gray;")
         self.icon_surface.setFixedSize(*self.icon_surface_size)
+        self.header = QLabel("Tell Tails", parent=self)
+        self.header.setStyleSheet("font-size: 17px; font-weight: bold; color: black;")
         self.icon_surface.move(0, 0)
+        self.header.move(super().width() // 2 - self.header.width() // 2, 0)
         self.icon_surface.paintEvent = self.paintEvent
 
         # Check if the icon cache directory exists and create it if it doesn't
@@ -205,6 +214,11 @@ class AnnunciatorUI(QWidget):
 
     def update(self) -> None:
         # Update the annunciator icons
+
+        for icon in self.icons.values():
+            color = random.choice(["red", "green", "orange", "black"])
+            icon.set(color, False)
+
         for icon in self.icons.values():
             icon.update()
         should_redraw = False

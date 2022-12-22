@@ -16,7 +16,7 @@ class MotorStateUI(QWidget):
     def __init__(self, robot, parent=None):
         super().__init__()
         super().setParent(parent)
-        super().setFixedSize(1070, 600)
+        super().setFixedSize(1070, 385)
         self.robot = robot
         self.parent = parent
 
@@ -45,7 +45,7 @@ class MotorStateUI(QWidget):
             if info["type"] == "odrive":
                 motor = ODriveMotor(info["screen_name"], name, self.surface)
                 motor.move(5 + (info["pos"][0] * 355),
-                           20 + (info["pos"][1] * 55))
+                           40 + (info["pos"][1] * 55))
                 self.motor_state_labels.append(motor)
 
         # Setup the timer to update the labels
@@ -56,7 +56,7 @@ class MotorStateUI(QWidget):
     def update_loop(self):
         for motor in self.motor_state_labels:
             try:
-                motor.update(speed=random.randint(-1000, 1000), current=random.randint(-100, 100),
+                motor.update(speed=random.randint(-1000, 1000), current=random.randint(0, 25),
                              motor_temp=random.randint(0, 100), fet_temp=random.randint(0, 100))
             except Exception as e:
                 logging.error(f"motor_state_ui: {e}\n{traceback.format_exc()}")

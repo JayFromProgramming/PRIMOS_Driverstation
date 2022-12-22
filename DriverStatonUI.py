@@ -43,17 +43,16 @@ class DriverStationUI:
         # self.pioneer_ui = PioneerUI(self.robot, parent=self.window)
         self.annunciator_ui = AnnunciatorUI(self.robot, parent=self.window)
 
-        self.annunciator_ui.move(5, 10)
-
         self.motor_overview = MotorStateUI(self.robot, parent=self.window)
 
-        self.motor_overview.move(5, self.annunciator_ui.height() + 20)
+        self.motor_overview.move(5, self.window.height() - self.motor_overview.height() - 5)
+        self.annunciator_ui.move(5, self.motor_overview.y() - self.annunciator_ui.height() - 5)
 
         # self.topic_info = TopicUI(self.robot, self.window)
 
         self.window.show()
 
-        threading.Thread(target=self.controller_read_loop).start()
+        # threading.Thread(target=self.controller_read_loop).start()
         # multiprocessing.Process(target=self.controller_read_loop).start()
 
     # def run(self):
