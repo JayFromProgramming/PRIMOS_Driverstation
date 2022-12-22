@@ -1,0 +1,82 @@
+{
+    "front_left_drive": {
+      "type": "odrive",
+      "screen_name": "FL Drive",
+      "pos": [0, 0]
+    },
+    "front_right_drive": {
+      "type": "odrive",
+      "screen_name": "FR Drive",
+      "pos": [0, 1]
+    },
+    "rear_left_drive": {
+      "type": "odrive",
+      "screen_name": "RL Drive",
+      "pos": [0, 2]
+    },
+    "rear_right_drive": {
+      "type": "odrive",
+      "screen_name": "RR Drive",
+      "pos": [0, 3]
+    },
+    "conveyor": {
+      "type": "odrive",
+      "screen_name": "Conveyor",
+      "pos": [0, 4]
+    },
+    "trencher": {
+      "type": "odrive",
+      "screen_name": "Trencher",
+      "pos": [0, 5]
+    },
+    "front_left_vertical_actuator": {
+      "type": "odrive",
+      "screen_name": "FL Vert-Actuator",
+      "pos": [2, 0]
+    },
+    "front_right_vertical_actuator": {
+      "type": "odrive",
+      "screen_name": "FR Vert-Actuator",
+      "pos": [2, 1]
+    },
+    "rear_left_vertical_actuator": {
+      "type": "odrive",
+      "screen_name": "RL Vert-Actuator",
+      "pos": [2, 2]
+    },
+    "rear_right_vertical_actuator": {
+      "type": "odrive",
+      "screen_name": "RR Vert-Actuator",
+      "pos": [2, 3]
+    },
+    "hopper_door": {
+      "type": "odrive",
+      "screen_name": "Hopper Door",
+      "pos": [2, 4]
+    },
+    "hopper_shaker": {
+      "type": "odrive",
+      "screen_name": "Hopper Shaker",
+      "pos": [2, 5]
+    },
+    "front_left_steering_actuator": {
+      "type": "odrive",
+      "screen_name": "FL Steering",
+      "pos": [1, 0]
+    },
+    "front_right_steering_actuator": {
+      "type": "odrive",
+      "screen_name": "FR Steering",
+      "pos": [1, 1]
+    },
+    "rear_left_steering_actuator": {
+      "type": "odrive",
+      "screen_name": "RL Steering",
+      "pos": [1, 2]
+    },
+    "rear_right_steering_actuator": {
+      "type": "odrive",
+      "screen_name": "RR Steering",
+      "pos": [1, 3]
+    }
+}

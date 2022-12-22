@@ -11,47 +11,26 @@ from ROS.RobotState import RobotState, SmartTopic
 
 logging = logging.getLogger(__name__)
 
-topic_to_name = {
-    # "/usb_cam/camera_info": "camera_info",
-    # '/my_p3at/pose': 'pose',
-    # '/my_p3at/parameter_updates': 'param',
-    # '/my_p3at/parameter_descriptions': 'param',
-    "/my_p3at/battery_voltage": "battery_voltage",
-    # "/joint_states": "joint_states",
-    "/my_p3at/motors_state": "motors_state",
-    "/my_p3at/cmd_vel": "cmd_vel",
-    # "my_p3at/sonar": "sonar",
-    # "/my_p3at/sonar_pointcloud2": "sonar_pointcloud2",
-    "/pioneer/conn_stats": "conn_stats",
-    "/camera/image/compressed": "Img",
-    "/cannon/angle": "cannon_angle",
-    "/cannon/tanks/0": "cannon_tank_0",
-    "/cannon/tanks/1": "cannon_tank_1",
-    "/cannon/pneumatics": "pnemumatics",
-    "/ext/compressor/voltage": "compressor_voltage",
-}
-
 topic_targets = [
-    SmartTopic("battery_voltage", "/my_p3at/battery_voltage"),
-    SmartTopic("motors_state", "/my_p3at/motors_state", hidden=True),
+    SmartTopic("motor_state_info", "system_diagnostics/motors/info"),
     SmartTopic("cmd_vel", "/my_p3at/cmd_vel", allow_update=True),
-    SmartTopic("odometry", "/my_p3at/pose"),
-    SmartTopic("sonar", "/my_p3at/sonar"),
-    # SmartTopic("sonar_pointcloud2", "/my_p3at/sonar_pointcloud2"),
-    # SmartTopic("conn_stats", "/pioneer/conn_stats"),
-    SmartTopic("solenoids", "/pneumatics/solenoids"),
-    SmartTopic("cannon_angle", "/cannon/angle", allow_update=True),
-    # SmartTopic("diagnostics", "/diagnostics"),
-    SmartTopic("cannon_0_target_pressure", "/can0/set_pressure", allow_update=True, hidden=True),
-    SmartTopic("cannon_1_target_pressure", "/can1/set_pressure", allow_update=True, hidden=True),
-    SmartTopic("cannon_0_set_state", "/can0/set_state", allow_update=True, hidden=True),
-    SmartTopic("cannon_1_set_state", "/can1/set_state", allow_update=True, hidden=True),
-    SmartTopic("cannon_0_auto", "/can0/auto", hidden=True),
-    SmartTopic("cannon_1_auto", "/can1/auto", hidden=True),
-    SmartTopic("cannon_0_state", "/can0/state"),
-    SmartTopic("cannon_1_state", "/can1/state"),
-    SmartTopic("cannon_0_pressure", "/can0/pressure"),
-    SmartTopic("cannon_1_pressure", "/can1/pressure"),
+    # SmartTopic("odometry", "/my_p3at/pose"),
+    # SmartTopic("sonar", "/my_p3at/sonar"),
+    # # SmartTopic("sonar_pointcloud2", "/my_p3at/sonar_pointcloud2"),
+    # # SmartTopic("conn_stats", "/pioneer/conn_stats"),
+    # SmartTopic("solenoids", "/pneumatics/solenoids"),
+    # SmartTopic("cannon_angle", "/cannon/angle", allow_update=True),
+    # # SmartTopic("diagnostics", "/diagnostics"),
+    # SmartTopic("cannon_0_target_pressure", "/can0/set_pressure", allow_update=True, hidden=True),
+    # SmartTopic("cannon_1_target_pressure", "/can1/set_pressure", allow_update=True, hidden=True),
+    # SmartTopic("cannon_0_set_state", "/can0/set_state", allow_update=True, hidden=True),
+    # SmartTopic("cannon_1_set_state", "/can1/set_state", allow_update=True, hidden=True),
+    # SmartTopic("cannon_0_auto", "/can0/auto", hidden=True),
+    # SmartTopic("cannon_1_auto", "/can1/auto", hidden=True),
+    # SmartTopic("cannon_0_state", "/can0/state"),
+    # SmartTopic("cannon_1_state", "/can1/state"),
+    # SmartTopic("cannon_0_pressure", "/can0/pressure"),
+    # SmartTopic("cannon_1_pressure", "/can1/pressure"),
     # SmartTopic("compressor_voltage", "/ext/compressor/voltage"),
     # ImageHandler("Img", "/usb_cam/image_raw"),
 ]
@@ -146,7 +125,6 @@ class ROSInterface:
         self.robot_state_monitor = RobotStateMonitor(self.client)
         self.background_thread = None
 
-        self.target_topics = topic_to_name.keys()
         self.smart_topics = topic_targets
         self.rosserial_thread = None  # type: multiprocessing.Process or None
         self.future_callbacks = []

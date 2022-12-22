@@ -1,3 +1,4 @@
+import multiprocessing
 import time
 import threading
 
@@ -12,6 +13,7 @@ from QT5_Classes.AnnunciatorUI import AnnunciatorUI
 # from QT5_Classes.PioneerUI import PioneerUI
 # from QT5_Classes.TopicStatusUI import TopicUI
 # from QT5_Classes.WebcamUI import WebcamWindow
+from QT5_Classes.MotorStateUI import MotorStateUI
 from ROS.ROSInterface import ROSInterface
 from ROS.RobotState import RobotState
 
@@ -43,22 +45,16 @@ class DriverStationUI:
 
         self.annunciator_ui.move(5, 10)
 
+        self.motor_overview = MotorStateUI(self.robot, parent=self.window)
+
+        self.motor_overview.move(5, self.annunciator_ui.height() + 20)
+
         # self.topic_info = TopicUI(self.robot, self.window)
-
-        # Move the pioneer UI to the bottom left
-        # self.pioneer_ui.move(0, 480)
-
-        # Move the topic UI to the left of the signal info
-        # self.topic_info.move(self.window.width() - self.topic_info.width(),
-        #                      self.window.height() - self.topic_info.height())
-        # self.topic_info.move(self.window.width() - self.topic_info.width(), 20 + self.sonar_view.height())
-
-        # Move the connection UI to left of the topic UI
-        # self.connection_ui.move(self.topic_info.x() - self.connection_ui.width(), self.topic_info.y())
 
         self.window.show()
 
-        threading.Thread(target=self.controller_read_loop, daemon=True).start()
+        threading.Thread(target=self.controller_read_loop).start()
+        # multiprocessing.Process(target=self.controller_read_loop).start()
 
     # def run(self):
     #     """Draw the HUD until the program exits"""
