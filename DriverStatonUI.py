@@ -16,6 +16,8 @@ from QT5_Classes.AnnunciatorUI import AnnunciatorUI
 # from QT5_Classes.WebcamUI import WebcamWindow
 from QT5_Classes.BatteryUI import BatteryUI
 from QT5_Classes.CommandsUI import CommandsUI
+from QT5_Classes.DataLoggingUI import DataLoggingUI
+from QT5_Classes.HopperUI import HopperUI
 from QT5_Classes.MotorStateUI import MotorStateUI
 from QT5_Classes.PoseUI import PoseUI
 from ROS.ROSInterface import ROSInterface
@@ -48,6 +50,8 @@ class DriverStationUI:
         self.motor_overview = MotorStateUI(self.robot, parent=self.window)
         self.pose_ui = PoseUI(self.robot, parent=self.window)
         self.commands_ui = CommandsUI(self.robot, parent=self.window)
+        self.hopper_ui = HopperUI(self.robot, parent=self.window)
+        self.data_logging_ui = DataLoggingUI(self.robot, parent=self.window)
 
         self.motor_overview.move(5, self.window.height() - self.motor_overview.height() - 5)
         self.annunciator_ui.move(5, self.motor_overview.y() - self.annunciator_ui.height() - 5)
@@ -56,6 +60,9 @@ class DriverStationUI:
 
         self.commands_ui.move(self.window.width() - self.commands_ui.width() - 5,
                               self.window.height() - self.commands_ui.height() - 5)
+
+        self.hopper_ui.move(self.commands_ui.x(), self.commands_ui.y() - self.hopper_ui.height() - 5)
+        self.data_logging_ui.move(self.hopper_ui.x() + self.data_logging_ui.width() + 5, self.hopper_ui.y())
 
         # self.topic_info = TopicUI(self.robot, self.window)
 
