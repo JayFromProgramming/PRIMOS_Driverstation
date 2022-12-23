@@ -2,6 +2,7 @@ from PyQt5 import Qt
 from PyQt5.QtWidgets import QWidget, QLabel
 
 
+
 class CommandsUI(QWidget):
 
     def __init__(self, robot, parent=None):
@@ -20,3 +21,4 @@ class CommandsUI(QWidget):
                                           "background-color: transparent;")
         self.header.setAlignment(Qt.Qt.AlignCenter)
         self.header.move(round(self.width() / 2 - self.header.width() / 2), 0)
+

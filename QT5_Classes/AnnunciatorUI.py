@@ -214,10 +214,10 @@ class AnnunciatorUI(QWidget):
 
     def update(self) -> None:
         # Update the annunciator icons
-
-        for icon in self.icons.values():
-            color = random.choice(["red", "green", "orange", "black"])
-            icon.set(color, False)
+        #
+        # for icon in self.icons.values():
+        #     color = random.choice(["red", "green", "orange", "black"])
+        #     icon.set(color, False)
 
         for icon in self.icons.values():
             icon.update()

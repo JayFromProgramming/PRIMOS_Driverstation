@@ -20,3 +20,6 @@ class HopperUI(QWidget):
                                           " background-color: transparent;")
         self.header.setAlignment(Qt.Qt.AlignCenter)
         self.header.move(round(self.width() / 2 - self.header.width() / 2), 0)
+
+
+

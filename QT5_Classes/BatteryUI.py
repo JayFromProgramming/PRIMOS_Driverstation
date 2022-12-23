@@ -49,9 +49,23 @@ class BatteryUI(QWidget):
 
         self.battery_current_label = QLabel("Current:  XX.X A", self.surface)
         self.battery_current_label.setStyleSheet("font-weight: bold; font-size: 17px; border: 0px;"
-                                                    " background-color: transparent;")
+                                                 " background-color: transparent;")
         self.battery_current_label.move(10, 50)
 
+        self.used_capacity_label = QLabel("Used:  XX.X Ah", self.surface)
+        self.used_capacity_label.setStyleSheet("font-weight: bold; font-size: 17px; border: 0px;"
+                                               " background-color: transparent;")
+        self.remaining_capacity_label = QLabel("Remaining:  XX.X Ah", self.surface)
+        self.remaining_capacity_label.setStyleSheet("font-weight: bold; font-size: 17px; border: 0px;"
+                                                    " background-color: transparent;")
+
+        self.estimated_time_remaining_label = QLabel("ETR:  XX.X s", self.surface)
+        self.estimated_time_remaining_label.setStyleSheet("font-weight: bold; font-size: 17px; border: 0px;"
+                                                          " background-color: transparent;")
+
+        self.used_capacity_label.move(10, 70)
+        self.remaining_capacity_label.move(10, 90)
+        self.estimated_time_remaining_label.move(10, 110)
 
         # Setup the update timer
         self.timer = Qt.QTimer()
@@ -69,10 +83,10 @@ class BatteryUI(QWidget):
         self.graph.plot(self.battery_voltage_times, self.battery_voltage_samples, pen=pg.mkPen('r', width=2))
 
     def update(self):
-
         # Get time since program start
 
-        self.battery_voltage_times.append(time.process_time_ns() / 1000000000)  # Temporarily using time.time() until we get ROS time
+        self.battery_voltage_times.append(
+            time.process_time_ns() / 1000000000)  # Temporarily using time.time() until we get ROS time
 
         # Temporarily using random values until we get battery data
         self.battery_voltage_samples.append(random.randint(360, 520) / 10)
@@ -81,4 +95,3 @@ class BatteryUI(QWidget):
         if len(self.battery_voltage_times) > 120:
             self.battery_voltage_times.pop(0)
             self.battery_voltage_samples.pop(0)
-

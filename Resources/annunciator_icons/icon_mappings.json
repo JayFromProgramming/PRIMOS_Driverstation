@@ -82,5 +82,11 @@
     "ros_name": "conveyor",
     "annunciator_location": [2, 3],
     "auto_crop": true
+  },
+  "xbox_controller.svg": {
+    "hover_name": "Controller",
+    "ros_name": "xbox_controller",
+    "annunciator_location": [0, 4],
+    "auto_crop": true
   }
 }
