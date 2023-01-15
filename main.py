@@ -1,4 +1,6 @@
 import ctypes
+import multiprocessing
+import os
 import sys
 import asyncio
 import threading
@@ -12,23 +14,29 @@ import DriverStatonUI
 import logging
 import paramiko
 
+from ROS.ROSInterface import RobotStateMonitor
+from ROS.RobotState import RobotStateLoader, RobotStateReceiver
+
 logging.basicConfig(level=logging.INFO)
 
 if __name__ == '__main__':
+    print(f"Main started with PID {os.getpid()}")
     app = QApplication([])
     app.setStyle('Windows')
-    app.setApplicationName("PRIMOS Driver Station")
+    app.setApplicationName("PRIMROS Driver Station")
     app.setApplicationVersion("1.0.0")
     app.setWindowIcon(QtGui.QIcon("resources/icon.svg"))
     app.setQuitOnLastWindowClosed(True)
 
-    myappid = 'rse.tshirt.cannon.station'  # arbitrary string
+    myappid = 'pstdl.primrose.drivestation'  # arbitrary string
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
-    pioneer = ROSInterface.ROSInterface()  # MAC: a0:a8:cd:be:8d:2c
+    queue = multiprocessing.Queue()
+    primrose_ui = RobotStateReceiver(queue)
+    process = multiprocessing.Process(target=ROSInterface.ROSInterface, args=(queue,))
     # while pioneer.client.is_connecting:
     #     pass
-    gui = DriverStatonUI.DriverStationUI(pioneer)
+    gui = DriverStatonUI.DriverStationUI(primrose_ui, process)
     # threading.Thread(target=gui.run, daemon=True).start()
 
     app.exec_()

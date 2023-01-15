@@ -21,7 +21,7 @@ from QT5_Classes.HopperUI import HopperUI
 from QT5_Classes.MotorStateUI import MotorStateUI
 from QT5_Classes.PoseUI import PoseUI
 from ROS.ROSInterface import ROSInterface
-from ROS.RobotState import RobotState
+# from ROS.RobotState import RobotState
 
 import logging
 
@@ -30,12 +30,13 @@ logging = logging.getLogger(__name__)
 
 class DriverStationUI:
 
-    def __init__(self, robot: ROSInterface):
+    def __init__(self, robot: ROSInterface, ros_process):
 
         self.robot = robot
         self.last_redraw = 0  # type: int
 
-        self.robot_state = robot.robot_state_monitor.state_watcher  # type: RobotState
+        self.robot_state = robot
+        self.ros_process = ros_process.start()
         try:
             self.xbox_controller = controller.XboxController()
         except Exception as e:
@@ -44,6 +45,7 @@ class DriverStationUI:
 
         self.window = QMainWindow()
         self.window.resize(1920, 1080)
+        # self.window.showMaximized()
 
         self.annunciator_ui = AnnunciatorUI(self.robot, parent=self.window)
         self.battery_ui = BatteryUI(self.robot, parent=self.window)
@@ -138,3 +140,7 @@ class DriverStationUI:
 
         self.commands_ui.move(self.window.width() - self.commands_ui.width() - 5,
                               self.window.height() - self.commands_ui.height() - 5)
+
+        self.hopper_ui.move(self.commands_ui.x(), self.commands_ui.y() - self.hopper_ui.height() - 5)
+        self.data_logging_ui.move(self.hopper_ui.x() + self.data_logging_ui.width() + 5, self.hopper_ui.y())
+

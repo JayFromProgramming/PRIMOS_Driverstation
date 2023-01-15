@@ -52,7 +52,7 @@ class MotorStateUI(QWidget):
         # Setup the timer to update the labels
         self.update_timer = QTimer()
         self.update_timer.timeout.connect(self.update_loop)
-        self.update_timer.start(250)
+        self.update_timer.start(500)
 
     def update_loop(self):
         for motor in self.motor_state_labels:

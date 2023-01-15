@@ -149,10 +149,18 @@ class AnnunciatorIcon(QWidget):
         self.setToolTip(f"{self.hover_text}: No data")
         super().enterEvent(event)
 
-    def set(self, color, blink):
-        self.display_color = color
-        self.blink = blink
-        self.updated = True
+    def set(self, data):
+        self.setToolTip(f"{self.hover_text}: {data['hover_text']}")
+        match data["color"]:
+            case 0:
+                self.display_color = "red"
+            case 1:
+                self.display_color = "orange"
+            case 2:
+                self.display_color = "green"
+            case 3:
+                self.display_color = "black"
+        self.blink = data["flashing"]
 
 
 class AnnunciatorUI(QWidget):
@@ -163,6 +171,8 @@ class AnnunciatorUI(QWidget):
 
         self.robot = robot
         self.parent = parent
+
+        self.topic = self.robot.get_state("tell_tails")
 
         self.icons = {}
         self.icon_mappings = {}
@@ -201,7 +211,7 @@ class AnnunciatorUI(QWidget):
         # Setup the timer to update the annunciator icons
         self.timer = QtCore.QTimer()
         self.timer.timeout.connect(self.update)
-        self.timer.start(500)
+        self.timer.start(1000)
 
     def load_icons(self):
         # Icons are stored in the resources' folder under annunciator_icons
@@ -218,6 +228,16 @@ class AnnunciatorUI(QWidget):
         # for icon in self.icons.values():
         #     color = random.choice(["red", "green", "orange", "black"])
         #     icon.set(color, False)
+
+        data = self.robot.get_state("tell_tails")['tell_tails']
+        # Format the data so teh name is the key and all other data is in a dictionary
+        data = {item["name"]: item for item in data}
+
+        for icon in self.icons.values():
+            try:
+                icon.set(data[icon.ros_name])
+            except KeyError:
+                pass
 
         for icon in self.icons.values():
             icon.update()

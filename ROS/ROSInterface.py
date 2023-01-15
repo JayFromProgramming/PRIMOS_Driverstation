@@ -1,3 +1,5 @@
+import os
+import threading
 import time
 import traceback
 
@@ -7,32 +9,13 @@ import roslibpy
 import multiprocessing
 import logging
 
-from ROS.RobotState import RobotState, SmartTopic
+from ROS.RobotState import RobotStateLoader, SmartTopic
 
 logging = logging.getLogger(__name__)
 
 topic_targets = [
-    SmartTopic("motor_state_info", "system_diagnostics/motors/info"),
-    SmartTopic("cmd_vel", "/my_p3at/cmd_vel", allow_update=True),
-    # SmartTopic("odometry", "/my_p3at/pose"),
-    # SmartTopic("sonar", "/my_p3at/sonar"),
-    # # SmartTopic("sonar_pointcloud2", "/my_p3at/sonar_pointcloud2"),
-    # # SmartTopic("conn_stats", "/pioneer/conn_stats"),
-    # SmartTopic("solenoids", "/pneumatics/solenoids"),
-    # SmartTopic("cannon_angle", "/cannon/angle", allow_update=True),
-    # # SmartTopic("diagnostics", "/diagnostics"),
-    # SmartTopic("cannon_0_target_pressure", "/can0/set_pressure", allow_update=True, hidden=True),
-    # SmartTopic("cannon_1_target_pressure", "/can1/set_pressure", allow_update=True, hidden=True),
-    # SmartTopic("cannon_0_set_state", "/can0/set_state", allow_update=True, hidden=True),
-    # SmartTopic("cannon_1_set_state", "/can1/set_state", allow_update=True, hidden=True),
-    # SmartTopic("cannon_0_auto", "/can0/auto", hidden=True),
-    # SmartTopic("cannon_1_auto", "/can1/auto", hidden=True),
-    # SmartTopic("cannon_0_state", "/can0/state"),
-    # SmartTopic("cannon_1_state", "/can1/state"),
-    # SmartTopic("cannon_0_pressure", "/can0/pressure"),
-    # SmartTopic("cannon_1_pressure", "/can1/pressure"),
-    # SmartTopic("compressor_voltage", "/ext/compressor/voltage"),
-    # ImageHandler("Img", "/usb_cam/image_raw"),
+    SmartTopic("motor_state_info", "/system_diagnostics/motors/info"),
+    SmartTopic("tell_tails", "/system_diagnostics/tell_tails"),
 ]
 
 
@@ -65,10 +48,10 @@ def ros_serial(address="localhost", username="ubuntu", password="ubuntu"):
 
 class RobotStateMonitor:
 
-    def __init__(self, client):
+    def __init__(self, client, state_watcher):
         self.client = client
-        self.state_watcher = RobotState()
-
+        self.state_watcher = state_watcher
+        self.smart_topics = []
         self.cached_topics = {}
         self.setup_watchers()
 
@@ -97,6 +80,8 @@ class RobotStateMonitor:
     def setup_watchers(self):
         for smart_topic in topic_targets:
             self.state_watcher.add_watcher(smart_topic)
+            # self.state_watcher[smart_topic.disp_name] = smart_topic
+            self.smart_topics.append(smart_topic)  # Used so the garbage collector doesn't collect the topic
 
     # def setup_listener(self, name, topic):
     #     message_type = self.cached_topics[topic]["type"]
@@ -118,16 +103,20 @@ class ROSInterface:
     This class handles the connection to the ROS bridge and all the SmartTopics
     """
 
-    def __init__(self):
+    def __init__(self, queue):
+        print(f"ROSInterface started with PID {os.getpid()}")
         self.client = None  # type: roslibpy.Ros or None
         self.address = None
         self.port = None
-        self.robot_state_monitor = RobotStateMonitor(self.client)
+        self.robot_state = RobotStateLoader(queue)
+        self.robot_state_monitor = RobotStateMonitor(self.client, self.robot_state)
         self.background_thread = None
 
         self.smart_topics = topic_targets
         self.rosserial_thread = None  # type: multiprocessing.Process or None
         self.future_callbacks = []
+
+        self.connect("141.219.125.127", 9090)
 
     @property
     def is_connected(self):
@@ -146,8 +135,11 @@ class ROSInterface:
             self.port = port
             self.client = roslibpy.Ros(host=self.address, port=self.port)
             self.robot_state_monitor.set_client(self.client)
-            self.background_thread = multiprocessing.Process(target=self._connect())
-            self.background_thread.start()
+            self._connect()
+
+            # Make sure the process doesn't close
+            while True:
+                time.sleep(1)
 
             # self.rosserial_thread = threading.Thread(target=ros_serial, daemon=True, args=(address,))
             # self.rosserial_thread.start()
@@ -193,7 +185,7 @@ class ROSInterface:
             logging.error(f"Connection to ROS bridge failed: {e}")
             self.client.close()
         else:
-            self.robot_state_monitor = RobotStateMonitor(self.client)
+            self.robot_state_monitor = RobotStateMonitor(self.client, self.robot_state)
             print(f"Topics: {self.get_topics()}")
             print(f"Services: {self.get_services()}")
             print(f"Nodes: {self.get_nodes()}")
