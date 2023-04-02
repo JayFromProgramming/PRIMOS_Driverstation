@@ -14,8 +14,7 @@ import DriverStatonUI
 import logging
 import paramiko
 
-from ROS.ROSInterface import RobotStateMonitor
-from ROS.RobotState import RobotStateLoader, RobotStateReceiver
+from ROS.ROSInterface import ROSInterface
 
 logging.basicConfig(level=logging.INFO)
 
@@ -31,12 +30,11 @@ if __name__ == '__main__':
     myappid = 'pstdl.primrose.drivestation'  # arbitrary string
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
-    queue = multiprocessing.Queue()
-    primrose_ui = RobotStateReceiver(queue)
-    process = multiprocessing.Process(target=ROSInterface.ROSInterface, args=(queue,))
     # while pioneer.client.is_connecting:
     #     pass
-    gui = DriverStatonUI.DriverStationUI(primrose_ui, process)
+
+    ros = ROSInterface()
+    gui = DriverStatonUI.DriverStationUI(ros)
     # threading.Thread(target=gui.run, daemon=True).start()
 
     app.exec_()

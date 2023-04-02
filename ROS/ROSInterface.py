@@ -5,97 +5,16 @@ import traceback
 
 import paramiko
 import roslibpy
-# import threading
-import multiprocessing
+import threading
 import logging
 
-from ROS.RobotState import RobotStateLoader, SmartTopic
+from ROS.SmartTopic import SmartTopic
 
 logging = logging.getLogger(__name__)
 
 topic_targets = [
-    SmartTopic("motor_state_info", "/system_diagnostics/motors/info"),
-    SmartTopic("tell_tails", "/system_diagnostics/tell_tails"),
+    SmartTopic("primrose/cmd_vel", "geometry_msgs/Twist", publish=True),
 ]
-
-
-def ros_serial(address="localhost", username="ubuntu", password="ubuntu"):
-    logging.info("Connecting over SSH to %s", address)
-    ssh = paramiko.SSHClient()  # type: paramiko.SSHClient
-    ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())  # Set policy to auto add host key
-    try:
-        ssh.connect(address, port=22, username=username, password=password)  # Connect to server
-    except Exception as e:
-        logging.error(f"SSH connection failed: {e}")
-        return False
-    else:
-        # Execute the ros start.py script
-        print("Starting ROSSERIAL to interface with the arduino")
-        stdin, stdout, stderr = ssh.exec_command("rosrun rosserial_python serial_node.py _port:=/dev/ttyACM0")
-        while not stdout.channel.exit_status_ready():
-            if stdout.channel.recv_ready():
-                print(stdout.channel.recv(1024).decode("utf-8"), end="")
-            if stderr.channel.recv_stderr_ready():
-                print(stderr.channel.recv_stderr(1024).decode("utf-8"), end="")
-
-        if stdout.channel.recv_exit_status() != 0:
-            logging.error("SSH command failed")
-            return False
-
-        ssh.close()
-        return True
-
-
-class RobotStateMonitor:
-
-    def __init__(self, client, state_watcher):
-        self.client = client
-        self.state_watcher = state_watcher
-        self.smart_topics = []
-        self.cached_topics = {}
-        self.setup_watchers()
-
-    def _load_topics(self):
-        logging.info("RobotStateMonitor: Loading topics")
-        topic_dict = {}
-        for topic in self.client.get_topics():
-            if topic in self.cached_topics:
-                continue
-            topic_type = self.client.get_topic_type(topic)
-            topic_dict[topic] = {"name": topic, "type": topic_type}
-            logging.info(f"Loaded topic {topic} of type {topic_type}")
-        self.cached_topics = topic_dict
-        logging.info("RobotStateMonitor: Loaded topics")
-
-    def set_client(self, client):
-        self.client = client
-        for smart_topic in topic_targets:
-            smart_topic.set_client(self.client)
-
-    def unsub_all(self):
-        logging.info("Unsubscribing from all topics")
-        for smart_topic in self.state_watcher.states():
-            smart_topic.unsub()
-
-    def setup_watchers(self):
-        for smart_topic in topic_targets:
-            self.state_watcher.add_watcher(smart_topic)
-            # self.state_watcher[smart_topic.disp_name] = smart_topic
-            self.smart_topics.append(smart_topic)  # Used so the garbage collector doesn't collect the topic
-
-    # def setup_listener(self, name, topic):
-    #     message_type = self.cached_topics[topic]["type"]
-    #     logging.info(f"Setting up listener for {topic} of type {message_type}")
-    #     self.state_watcher.add_watcher
-
-    def get_state(self, name):
-        return self.state_watcher.state(name)
-
-    def get_states(self):
-        return self.state_watcher.states()
-
-    def is_state_available(self, name):
-        return name in self.state_watcher.states()
 
 
 class ROSInterface:
@@ -103,20 +22,17 @@ class ROSInterface:
     This class handles the connection to the ROS bridge and all the SmartTopics
     """
 
-    def __init__(self, queue):
-        print(f"ROSInterface started with PID {os.getpid()}")
+    def __init__(self):
         self.client = None  # type: roslibpy.Ros or None
         self.address = None
         self.port = None
-        self.robot_state = RobotStateLoader(queue)
-        self.robot_state_monitor = RobotStateMonitor(self.client, self.robot_state)
+
         self.background_thread = None
 
         self.smart_topics = topic_targets
-        self.rosserial_thread = None  # type: multiprocessing.Process or None
         self.future_callbacks = []
 
-        self.connect("141.219.125.127", 9090)
+        threading.Thread(target=self.establish_connection, daemon=True).start()
 
     @property
     def is_connected(self):
@@ -128,13 +44,15 @@ class ROSInterface:
         else:
             self.future_callbacks.append(callback)
 
+    def establish_connection(self):
+        self.connect(address="141.219.126.94", port=9090)
+
     def connect(self, address, port):
         try:
             logging.info("Connecting to ROS bridge")
             self.address = address
             self.port = port
             self.client = roslibpy.Ros(host=self.address, port=self.port)
-            self.robot_state_monitor.set_client(self.client)
             self._connect()
 
             # Make sure the process doesn't close
@@ -156,27 +74,17 @@ class ROSInterface:
             del self.client  # Force garbage collection of the client
             self.client = None
             # self.client = roslibpy.Ros(host=self.address, port=self.port)
-            self.robot_state_monitor.set_client(self.client)
         except Exception as e:
             logging.error(f"Failed to disconnect: {e} {traceback.format_exc()}")
 
     def terminate(self):
         logging.info("Terminating ROSInterface")
-        self.robot_state_monitor.unsub_all()
+        # self.robot_state_monitor.unsub_all()
         if self.client is not None:
             self.client.terminate()
             del self.client
         self.client = None
         # self.robot_state_monitor.set_client(self.client)
-
-    def _maintain_connection(self):
-        # self._connect()
-        # while True:
-        #     time.sleep(1)
-        #     if not self.client.is_connected:
-        #         logging.info("Connection to ROS bridge lost, reconnecting")
-        #         self._connect()
-        pass
 
     def _connect(self):
         try:
@@ -185,27 +93,17 @@ class ROSInterface:
             logging.error(f"Connection to ROS bridge failed: {e}")
             self.client.close()
         else:
-            self.robot_state_monitor = RobotStateMonitor(self.client, self.robot_state)
+            logging.info("Connected to ROS bridge")
             print(f"Topics: {self.get_topics()}")
             print(f"Services: {self.get_services()}")
             print(f"Nodes: {self.get_nodes()}")
+            for smart_topic in self.smart_topics:
+                smart_topic.connect(self.client)
             for callback in self.future_callbacks:
                 self.client.on_ready(callback)
 
-    def _setup_publisher(self, topic, message_type="std_msgs/String"):
-        publisher = roslibpy.Topic(self.client, topic, message_type)
-        publisher.advertise()
-        logging.info(f" Publisher setup for topic: {topic}")
-        return publisher
-
-    def get_state(self, name):
-        return self.robot_state_monitor.get_state(name)
-
-    def get_smart_topics(self):
-        return self.robot_state_monitor.get_states()
-
     def drive(self, forward=0.0, turn=0.0):
-        state = self.get_state("cmd_vel")
+        state = self.get_state("primrose/cmd_vel")
         state.value = {"linear": {"x": forward, "y": 0, "z": 0},
                        "angular": {"x": 0, "y": 0, "z": turn}}
         # logging.info(f"Driving forward: {forward}, turn: {turn}")
@@ -240,3 +138,9 @@ class ROSInterface:
         service = roslibpy.Service(self.client, name, service_type)
         request = roslibpy.ServiceRequest(args)
         service.call(request, callback=callback, errback=errback, timeout=timeout)
+
+    def get_state(self, name):
+        for smart_topic in self.smart_topics:
+            if smart_topic.name == name:
+                return smart_topic
+        return None
