@@ -8,12 +8,14 @@ import roslibpy
 import threading
 import logging
 
-from ROS.SmartTopic import SmartTopic
+from ROS.RobotState import SmartTopic
 
 logging = logging.getLogger(__name__)
 
 topic_targets = [
-    SmartTopic("primrose/cmd_vel", "geometry_msgs/Twist", publish=True),
+    SmartTopic("primrose/cmd_vel", "geometry_msgs/Twist", allow_update=True),
+    SmartTopic("/mciu/LoadCells/Hopper/control", allow_update=True),
+    SmartTopic("/mciu/LoadCells/Hopper/output", allow_update=False),
 ]
 
 
@@ -45,7 +47,7 @@ class ROSInterface:
             self.future_callbacks.append(callback)
 
     def establish_connection(self):
-        self.connect(address="141.219.126.94", port=9090)
+        self.connect(address="141.219.122.11", port=9090)
 
     def connect(self, address, port):
         try:
@@ -98,7 +100,8 @@ class ROSInterface:
             print(f"Services: {self.get_services()}")
             print(f"Nodes: {self.get_nodes()}")
             for smart_topic in self.smart_topics:
-                smart_topic.connect(self.client)
+                smart_topic.set_client(self.client)
+                # smart_topic.connect()
             for callback in self.future_callbacks:
                 self.client.on_ready(callback)
 
@@ -141,6 +144,6 @@ class ROSInterface:
 
     def get_state(self, name):
         for smart_topic in self.smart_topics:
-            if smart_topic.name == name:
+            if smart_topic.disp_name == name:
                 return smart_topic
         return None

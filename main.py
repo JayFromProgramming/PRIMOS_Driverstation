@@ -32,9 +32,10 @@ if __name__ == '__main__':
 
     # while pioneer.client.is_connecting:
     #     pass
-
-    ros = ROSInterface()
-    gui = DriverStatonUI.DriverStationUI(ros)
+    pioneer = ROSInterface()  # MAC: a0:a8:cd:be:8d:2c
+    # while pioneer.client.is_connecting:
+    #     pass
+    gui = DriverStatonUI.DriverStationUI(pioneer)
     # threading.Thread(target=gui.run, daemon=True).start()
 
     app.exec_()
@@ -43,3 +44,4 @@ if __name__ == '__main__':
     #     pass
     pioneer.terminate()
     # Set qt event loop
+

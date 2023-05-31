@@ -2,7 +2,7 @@ from PyQt5 import Qt
 from PyQt5.QtWidgets import QWidget, QPushButton, QLabel
 
 
-class MotorCalibrationCluster(QWidget):
+class SensorCalibrationCluster(QWidget):
 
     def __init__(self, robot, parent=None):
         super().__init__(parent)
@@ -14,35 +14,44 @@ class MotorCalibrationCluster(QWidget):
 
         self.surface.setStyleSheet("border: 1px solid black; border-radius: 5px; background-color: white;")
 
-        self.header = QLabel("Motor Calibrations", self.surface)
+        self.header = QLabel("Sensor Calibrations", self.surface)
         self.header.setStyleSheet("font-weight: bold; font-size: 15px; border: 0px; "
                                   "background-color: transparent;")
         self.header.setAlignment(Qt.Qt.AlignCenter)
         self.header.move(round(self.width() / 2 - self.header.width() / 2) - 5, 0)
 
-        self.open_button = QPushButton("Motors", self)
+        self.open_button = QPushButton("Hopper Tare", self)
         self.open_button.setFixedSize(80, 25)
         self.open_button.move(10, 20)
-        self.open_button.clicked.connect(self.motors)
+        self.open_button.clicked.connect(self.hopper)
 
-        self.close_button = QPushButton("Suspension", self)
+        self.close_button = QPushButton("Suspen Tar", self)
         self.close_button.setFixedSize(80, 25)
         self.close_button.move(100, 20)
         self.close_button.clicked.connect(self.suspension)
 
-        self.close_button = QPushButton("Steering", self)
+        self.close_button = QPushButton("IMU Level", self)
         self.close_button.setFixedSize(80, 25)
         self.close_button.move(190, 20)
-        self.close_button.clicked.connect(self.steering)
+        self.close_button.clicked.connect(self.imu)
 
-    def motors(self):
-        self.robot.execute_service("mciu/calibrate_motors")
+    def hopper(self):
+        try:
+            self.robot.get_state('/mciu/Hopper/loadcells/control').value = [0]
+        except Exception as e:
+            print(e)
 
     def suspension(self):
-        self.robot.execute_service("mciu/home_suspension")
+        try:
+            self.robot.get_state('/mciu/Suspension/loadcells/control').value = [0]
+        except Exception as e:
+            print(e)
 
-    def steering(self):
-        self.robot.execute_service("mciu/home_steering")
+    def imu(self):
+        try:
+            self.robot.get_state('/mciu/IMU/level').value = [0]
+        except Exception as e:
+            print(e)
 
     def update(self):
         pass

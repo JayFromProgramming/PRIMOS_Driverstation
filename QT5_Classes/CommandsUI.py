@@ -2,7 +2,8 @@ from PyQt5 import Qt
 from PyQt5.QtWidgets import QWidget, QLabel
 
 from QT5_Classes.CommandUIClusters.HopperControls import HopperDoorControls, HopperLoadSensors
-from QT5_Classes.CommandUIClusters.MotorCalibControl import CalibrationCluster
+from QT5_Classes.CommandUIClusters.MotorCalibControl import MotorCalibrationCluster
+from QT5_Classes.CommandUIClusters.SensorResets import SensorCalibrationCluster
 from QT5_Classes.CommandUIClusters.SteeringModesCluster import SteeringModesCluster
 
 
@@ -27,10 +28,13 @@ class CommandsUI(QWidget):
         self.steering_mode_cluster = SteeringModesCluster(self.robot, self)
         self.hopper_door_cluster = HopperDoorControls(self.robot, self)
         self.hopper_load_cluster = HopperLoadSensors(self.robot, self)
-        self.calibration_cluster = CalibrationCluster(self.robot, self)
+        self.motor_calibration_cluster = MotorCalibrationCluster(self.robot, self)
+        self.sensor_calibration_cluster = SensorCalibrationCluster(self.robot, self)
 
         self.steering_mode_cluster.move(10, 40)
         self.hopper_door_cluster.move(10, self.steering_mode_cluster.y() + self.steering_mode_cluster.height() + 5)
         self.hopper_load_cluster.move(10, self.hopper_door_cluster.y() + self.hopper_door_cluster.height() + 5)
-        self.calibration_cluster.move(10, self.hopper_load_cluster.y() + self.hopper_load_cluster.height() + 5)
+        self.motor_calibration_cluster.move(10, self.hopper_load_cluster.y() + self.hopper_load_cluster.height() + 5)
+        self.sensor_calibration_cluster.move(10, self.motor_calibration_cluster.y() +
+                                             self.motor_calibration_cluster.height() + 5)
 
