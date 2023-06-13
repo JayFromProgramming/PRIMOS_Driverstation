@@ -1,6 +1,8 @@
 from PyQt5 import Qt
 from PyQt5.QtWidgets import QWidget, QPushButton, QLabel
 
+modules = ["Front_Left", "Front_Right", "Rear_Left", "Rear_Right"]
+
 
 class MotorCalibrationCluster(QWidget):
 
@@ -36,13 +38,34 @@ class MotorCalibrationCluster(QWidget):
         self.close_button.clicked.connect(self.steering)
 
     def motors(self):
-        self.robot.execute_service("mciu/calibrate_motors")
+        try:
+
+            for quarter_module in modules:
+                self.robot.get_state(f"/mciu/{quarter_module}/odrive/input").value = [2]
+
+            for quarter_module in modules:
+                self.robot.get_state(f"/mciu/{quarter_module}/odrive/input").value = [3, 2]
+
+            # for quarter_module in modules:
+            #     self.robot.get_state(f"/mciu/{quarter_module}/odrive/input").value = [4, int(16900 * 2/3)]
+
+        except Exception as e:
+            print(e)
 
     def suspension(self):
-        self.robot.execute_service("mciu/home_suspension")
+        try:
+            for quarter_module in modules:
+                self.robot.get_state(f"/mciu/{quarter_module}/odrive/input").value = [0]
+        except Exception as e:
+            print(e)
 
     def steering(self):
-        self.robot.execute_service("mciu/home_steering")
+        try:
+            print(f"Homing steering motors...")
+            for quarter_module in modules:
+                self.robot.get_state(f"/mciu/{quarter_module}/actuators/input").value = [3, 1]
+        except Exception as e:
+            print(e)
 
     def update(self):
         pass

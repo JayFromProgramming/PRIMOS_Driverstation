@@ -13,9 +13,17 @@ from ROS.RobotState import SmartTopic
 logging = logging.getLogger(__name__)
 
 topic_targets = [
-    SmartTopic("primrose/cmd_vel", "geometry_msgs/Twist", allow_update=True),
-    SmartTopic("/mciu/LoadCells/Hopper/control", allow_update=True),
-    SmartTopic("/mciu/LoadCells/Hopper/output", allow_update=False),
+    SmartTopic("/driv/cmd_vel", topic_type="geometry_msgs/Twist", allow_update=True),
+    SmartTopic("/mciu/Hopper/loadcells/control", allow_update=True),
+    SmartTopic("/mciu/Suspension/loadcells/control", allow_update=True),
+    SmartTopic("/mciu/Front_Left/actuators/input", allow_update=True),
+    SmartTopic("/mciu/Front_Right/actuators/input", allow_update=True),
+    SmartTopic("/mciu/Rear_Left/actuators/input", allow_update=True),
+    SmartTopic("/mciu/Rear_Right/actuators/input", allow_update=True),
+    SmartTopic("/mciu/Front_Left/odrive/input", allow_update=True),
+    SmartTopic("/mciu/Front_Right/odrive/input", allow_update=True),
+    SmartTopic("/mciu/Rear_Left/odrive/input", allow_update=True),
+    SmartTopic("/mciu/Rear_Right/odrive/input", allow_update=True),
 ]
 
 

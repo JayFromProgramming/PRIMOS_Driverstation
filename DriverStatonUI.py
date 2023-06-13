@@ -42,7 +42,7 @@ class DriverStationUI:
         self.window.resizeEvent = self.resizeEvent
         self.window.show()
 
-        # threading.Thread(target=self.controller_read_loop).start()
+        threading.Thread(target=self.controller_read_loop).start()
         # multiprocessing.Process(target=self.controller_read_loop).start()
 
     # def run(self):
@@ -56,23 +56,48 @@ class DriverStationUI:
 
     def controller_read_loop(self):
         """Loop for the joystick"""
+        modules = ["Front_Left", "Front_Right", "Rear_Left", "Rear_Right"]
         # Read the controller while the window is open
-        try:
-            while True:
+        while True:
+            try:
                 # Apply deadbands to the joystick
-                forward = self.xbox_controller.LeftJoystickY * -1
-                if abs(forward) < 0.15:
-                    forward = 0
+                forward = self.xbox_controller.LeftJoystickY * -0.6
+                if abs(forward) > 0.05:
+                    try:
+                        self.robot.get_state(f"/mciu/Front_Left/odrive/input").value = [4, int((forward * 10000))]
+                        self.robot.get_state(f"/mciu/Front_Right/odrive/input").value = [4, int((-forward * 10000))]
+                        self.robot.get_state(f"/mciu/Rear_Left/odrive/input").value = [4, int((forward * 10000))]
+                        self.robot.get_state(f"/mciu/Rear_Right/odrive/input").value = [4, int((-forward * 10000))]
+                    except Exception as e:
+                        logging.error(f"Error writing to ROS: {e}")
+                else:
+                    try:
+                        for quarter_modules in modules:
+                            self.robot.get_state(f"/mciu/{quarter_modules}/odrive/input").value = [4, 0]
+                    except Exception as e:
+                        logging.error(f"Error writing to ROS: {e}")
                 turn = self.xbox_controller.LeftJoystickX * -1
                 if abs(turn) < 0.15:
                     turn = 0
 
-                self.robot.drive(forward, turn)
+                if self.xbox_controller.B:
+                    try:
+                        for quarter_modules in modules:
+                            self.robot.get_state(f"/mciu/{quarter_modules}/odrive/input").value = [0]
+                    except Exception as e:
+                        logging.error(f"Error writing to ROS: {e}")
+                elif self.xbox_controller.A:
+                    try:
+                        for quarter_modules in modules:
+                            self.robot.get_state(f"/mciu/{quarter_modules}/odrive/input").value = [3, 2]
+                    except Exception as e:
+                        logging.error(f"Error writing to ROS: {e}")
 
                 time.sleep(0.1)
-        except Exception as e:
-            logging.error(f"Error reading controller: {e}")
-            self.robot.drive(0, 0)
+            except Exception as e:
+                logging.error(f"Error reading controller: {e}")
+
+                time.sleep(5)
 
     # On resize adjust the positions of the widgets
     def resizeEvent(self, event):
