@@ -24,6 +24,8 @@ topic_targets = [
     SmartTopic("/mciu/Front_Right/odrive/input", allow_update=True),
     SmartTopic("/mciu/Rear_Left/odrive/input", allow_update=True),
     SmartTopic("/mciu/Rear_Right/odrive/input", allow_update=True),
+    SmartTopic("/mciu/Trencher/odrive/input", allow_update=True),
+    SmartTopic("/mciu/Conveyor/odrive/input", allow_update=True),
 ]
 
 

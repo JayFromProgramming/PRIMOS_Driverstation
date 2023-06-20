@@ -41,13 +41,10 @@ class MotorCalibrationCluster(QWidget):
         try:
 
             for quarter_module in modules:
-                self.robot.get_state(f"/mciu/{quarter_module}/odrive/input").value = [2]
+                self.robot.get_state(f"/mciu/{quarter_module}/odrive/input").value = [5]
 
-            for quarter_module in modules:
-                self.robot.get_state(f"/mciu/{quarter_module}/odrive/input").value = [3, 2]
-
-            # for quarter_module in modules:
-            #     self.robot.get_state(f"/mciu/{quarter_module}/odrive/input").value = [4, int(16900 * 2/3)]
+            self.robot.get_state(f"/mciu/Conveyor/odrive/input").value = [5]
+            self.robot.get_state(f"/mciu/Trencher/odrive/input").value = [5]
 
         except Exception as e:
             print(e)

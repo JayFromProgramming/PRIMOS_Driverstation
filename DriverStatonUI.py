@@ -61,24 +61,14 @@ class DriverStationUI:
         while True:
             try:
                 # Apply deadbands to the joystick
-                forward = self.xbox_controller.LeftJoystickY * -0.6
-                if abs(forward) > 0.05:
-                    try:
-                        self.robot.get_state(f"/mciu/Front_Left/odrive/input").value = [4, int((forward * 10000))]
-                        self.robot.get_state(f"/mciu/Front_Right/odrive/input").value = [4, int((-forward * 10000))]
-                        self.robot.get_state(f"/mciu/Rear_Left/odrive/input").value = [4, int((forward * 10000))]
-                        self.robot.get_state(f"/mciu/Rear_Right/odrive/input").value = [4, int((-forward * 10000))]
-                    except Exception as e:
-                        logging.error(f"Error writing to ROS: {e}")
-                else:
-                    try:
-                        for quarter_modules in modules:
-                            self.robot.get_state(f"/mciu/{quarter_modules}/odrive/input").value = [4, 0]
-                    except Exception as e:
-                        logging.error(f"Error writing to ROS: {e}")
-                turn = self.xbox_controller.LeftJoystickX * -1
-                if abs(turn) < 0.15:
-                    turn = 0
+                forward = self.xbox_controller.LeftJoystickY if abs(self.xbox_controller.LeftJoystickY) > 0.15 else 0
+                turn = self.xbox_controller.LeftJoystickX if abs(self.xbox_controller.LeftJoystickX) > 0.15 else 0
+
+                try:
+                    self.robot.get_state("/driv/cmd_vel").value = \
+                        {"linear": {"x": forward, "y": 0, "z": 0}, "angular": {"x": 0, "y": 0, "z": turn}}
+                except Exception as e:
+                    logging.error(f"Error writing to ROS: {e}")
 
                 if self.xbox_controller.B:
                     try:
@@ -93,6 +83,24 @@ class DriverStationUI:
                     except Exception as e:
                         logging.error(f"Error writing to ROS: {e}")
 
+                # Trencher controls
+                if self.xbox_controller.LeftTrigger > 0.6:  # Arming trigger
+                    try:
+                        self.robot.get_state("/mciu/Trencher/odrive/input").value = [3, 2, 2]
+                    except Exception as e:
+                        logging.error(f"Error writing to ROS: {e}")
+                else:
+                    try:
+                        self.robot.get_state("/mciu/Trencher/odrive/input").value = [0]
+                    except Exception as e:
+                        logging.error(f"Error writing to ROS: {e}")
+                if self.xbox_controller.RightTrigger > 0.1:
+                    try:
+                        val = (self.xbox_controller.RightTrigger * 33.3333) * 100
+                        self.robot.get_state("/mciu/Trencher/odrive/input").value = [4, int(val)]
+                    except Exception as e:
+                        logging.error(f"Error writing to ROS: {e}")
+
                 time.sleep(0.1)
             except Exception as e:
                 logging.error(f"Error reading controller: {e}")
@@ -102,4 +110,3 @@ class DriverStationUI:
     # On resize adjust the positions of the widgets
     def resizeEvent(self, event):
         pass
-
