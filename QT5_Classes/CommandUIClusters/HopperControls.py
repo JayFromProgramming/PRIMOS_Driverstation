@@ -36,7 +36,10 @@ class HopperDoorControls(QWidget):
         self.close_button.clicked.connect(self.close_door)
 
     def open_door(self):
-        self.robot.execute_custom_service("hopper_door", "primos/switch_action", 1)
+        try:
+            self.robot.execute_custom_service("/trch/arm", {"in_": True}, "primrose_trch/set_armed")
+        except Exception as e:
+            print(e)
 
     def stop_door(self):
         self.robot.execute_custom_service("hopper_door", "primos/switch_action", 2)

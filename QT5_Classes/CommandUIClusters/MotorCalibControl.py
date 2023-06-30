@@ -46,6 +46,7 @@ class MotorCalibrationCluster(QWidget):
             self.robot.get_state(f"/mciu/Conveyor/odrive/input").value = [5]
             self.robot.get_state(f"/mciu/Trencher/odrive/input").value = [5]
 
+            print("Sent motor calibration command...")
         except Exception as e:
             print(e)
 
@@ -60,7 +61,11 @@ class MotorCalibrationCluster(QWidget):
         try:
             print(f"Homing steering motors...")
             for quarter_module in modules:
-                self.robot.get_state(f"/mciu/{quarter_module}/actuators/input").value = [3, 1]
+                print(f"Sending homing command to {quarter_module}...")
+                self.robot.get_state(f"/mciu/{quarter_module}/actuators/input").value = [1, 3, 0]
+                self.robot.get_state(f"/mciu/{quarter_module}/actuators/input").value = [1, 3, 1]
+
+                # self.robot.get_state(f"/mciu/{quarter_module}/actuators/input").value = [2, 6000, 1]
         except Exception as e:
             print(e)
 
