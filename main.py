@@ -14,12 +14,21 @@ import DriverStatonUI
 import logging
 import paramiko
 
+import argparse
+
 from ROS.ROSInterface import ROSInterface
 
 logging.basicConfig(level=logging.INFO)
 
 if __name__ == '__main__':
-    print(f"Main started with PID {os.getpid()}")
+
+    parser = argparse.ArgumentParser(description='PRIMROSE Driver Station')
+    parser.add_argument('--ros-address', type=str, default="141.219.122.11", help='ROS Bridge IP Address')
+    parser.add_argument('--ros-port', type=int, default=9090, help='ROS Bridge Port')
+
+    args = parser.parse_args()
+
+    print(f"Main started with PID {os.getpid()} Address: {args.ros_address}:{args.ros_port}")
     app = QApplication([])
     app.setStyle('Windows')
     app.setApplicationName("PRIMROS Driver Station")
@@ -32,7 +41,7 @@ if __name__ == '__main__':
 
     # while pioneer.client.is_connecting:
     #     pass
-    pioneer = ROSInterface()  # MAC: a0:a8:cd:be:8d:2c
+    pioneer = ROSInterface(args)  # MAC: a0:a8:cd:be:8d:2c
     # while pioneer.client.is_connecting:
     #     pass
     gui = DriverStatonUI.DriverStationUI(pioneer)

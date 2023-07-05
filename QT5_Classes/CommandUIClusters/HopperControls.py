@@ -1,6 +1,7 @@
 from PyQt5 import Qt
 from PyQt5.QtWidgets import QWidget, QPushButton, QLabel
 
+from loguru import logger as logging
 
 class HopperDoorControls(QWidget):
 
@@ -41,19 +42,19 @@ class HopperDoorControls(QWidget):
         try:
             self.robot.get_state('/mciu/Hopper/door').value = [2]
         except Exception as e:
-            print(e)
+            logging.error(e)
 
     def stop_door(self):
         try:
             self.robot.get_state('/mciu/Hopper/door').value = [1]
         except Exception as e:
-            print(e)
+            logging.error(e)
 
     def close_door(self):
         try:
             self.robot.get_state('/mciu/Hopper/door').value = [0]
         except Exception as e:
-            print(e)
+            logging.error(e)
 
     def update(self):
         pass
@@ -78,27 +79,27 @@ class HopperLoadSensors(QWidget):
         self.header.move(round(self.width() / 2 - self.header.width() / 2) - 10, 0)
 
         self.tare_button = QPushButton("Hopper Tare", self)
-        self.tare_button.setFixedSize(80, 25)
+        self.tare_button.setFixedSize(125, 25)
         self.tare_button.move(10, 20)
-        self.tare_button.clicked.connect(self.tare_sensors)
+        self.tare_button.clicked.connect(self.tare_hopper)
 
-        self.tare_button = QPushButton("Suspen Tar", self)
-        self.tare_button.setFixedSize(80, 25)
-        self.tare_button.move(100, 20)
-        self.tare_button.clicked.connect(self.shake_sensors)
+        self.tare_button = QPushButton("Suspension Tar", self)
+        self.tare_button.setFixedSize(125, 25)
+        self.tare_button.move(145, 20)
+        self.tare_button.clicked.connect(self.tare_suspension)
 
-        self.tare_button = QPushButton("InOp", self)
-        self.tare_button.setFixedSize(80, 25)
-        self.tare_button.move(190, 20)
+        # self.tare_button = QPushButton("InOp", self)
+        # self.tare_button.setFixedSize(80, 25)
+        # self.tare_button.move(190, 20)
 
-    def tare_sensors(self):
+    def tare_hopper(self):
         try:
             self.robot.get_state('/mciu/Hopper/loadcells/control').value = [1]
         except Exception as e:
-            print(e)
+            logging.error(e)
 
-    def shake_sensors(self):
+    def tare_suspension(self):
         try:
             self.robot.get_state('/mciu/Suspension/loadcells/control').value = [1]
         except Exception as e:
-            print(e)
+            logging.error(e)

@@ -1,6 +1,7 @@
 from PyQt5 import Qt
 from PyQt5.QtWidgets import QWidget, QLabel
 
+from QT5_Classes.CommandUIClusters.BatteryCharge import BatteryCharge
 from QT5_Classes.CommandUIClusters.EStopButton import EStopButton
 from QT5_Classes.CommandUIClusters.EStopControls import AutomaticEStopControls
 from QT5_Classes.CommandUIClusters.HopperControls import HopperDoorControls, HopperLoadSensors
@@ -17,8 +18,8 @@ class CommandsUI(QWidget):
         self.robot = robot
 
         self.surface = QWidget(self)
-        self.surface.setFixedSize(830, 380)
-        super().setFixedSize(830, 385)
+        self.surface.setFixedSize(870, 380)
+        super().setFixedSize(870, 380)
 
         self.surface.setStyleSheet("border: 1px solid black; border-radius: 5px; background-color: gray;")
 
@@ -36,6 +37,7 @@ class CommandsUI(QWidget):
         self.auto_estop_controls = AutomaticEStopControls(self.robot, self)
         self.estop_button = EStopButton(self.robot, self)
         self.trencher = TrencherControls(self.robot, self)
+        self.battery = BatteryCharge(self.robot, self)
 
         # Column 1
         self.steering_mode_cluster.move(10, 40)
@@ -52,3 +54,5 @@ class CommandsUI(QWidget):
         self.trencher.move(self.auto_estop_controls.x(),
                            self.estop_button.y() + self.estop_button.height() + 5)
 
+        # Column 3
+        self.battery.move(self.auto_estop_controls.x() + self.auto_estop_controls.width() + 5, 40)

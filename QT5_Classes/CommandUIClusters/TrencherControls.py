@@ -21,18 +21,18 @@ class TrencherControls(QWidget):
         self.header.move(round(self.width() / 2 - self.header.width() / 2) - 5, 0)
 
         self.open_button = QPushButton("Arm", self)
-        self.open_button.setFixedSize(80, 25)
+        self.open_button.setFixedSize(125, 25)
         self.open_button.move(10, 20)
         self.open_button.clicked.connect(self.arm)
 
         self.close_button = QPushButton("Disarm", self)
-        self.close_button.setFixedSize(80, 25)
-        self.close_button.move(100, 20)
+        self.close_button.setFixedSize(125, 25)
+        self.close_button.move(145, 20)
         self.close_button.clicked.connect(self.disarm)
 
-        self.close_button = QPushButton("InOp", self)
-        self.close_button.setFixedSize(80, 25)
-        self.close_button.move(190, 20)
+        # self.close_button = QPushButton("InOp", self)
+        # self.close_button.setFixedSize(80, 25)
+        # self.close_button.move(190, 20)
         # self.close_button.clicked.connect(self.imu)
 
     def arm(self):

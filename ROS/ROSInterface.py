@@ -1,3 +1,4 @@
+import argparse
 import os
 import threading
 import time
@@ -10,7 +11,7 @@ import logging
 
 from ROS.RobotState import SmartTopic
 
-logging = logging.getLogger(__name__)
+from loguru import logger as logging
 
 topic_targets = [
     SmartTopic("/driv/cmd_vel", topic_type="geometry_msgs/Twist", allow_update=True),
@@ -28,6 +29,7 @@ topic_targets = [
     SmartTopic("/mciu/Conveyor/odrive/input", allow_update=True),
     SmartTopic("/driv/Trencher/throttle", allow_update=True),
     SmartTopic("/mciu/estop_controller", allow_update=True),
+    SmartTopic("/mciu/battery_monitor", allow_update=True),
 ]
 
 
@@ -36,10 +38,10 @@ class ROSInterface:
     This class handles the connection to the ROS bridge and all the SmartTopics
     """
 
-    def __init__(self):
+    def __init__(self, arguments: argparse.Namespace):
         self.client = None  # type: roslibpy.Ros or None
-        self.address = None
-        self.port = None
+        self.address = arguments.ros_address
+        self.port = arguments.ros_port
 
         self.background_thread = None
 
@@ -59,7 +61,7 @@ class ROSInterface:
             self.future_callbacks.append(callback)
 
     def establish_connection(self):
-        self.connect(address="141.219.122.11", port=9090)
+        self.connect(address=self.address, port=self.port)
 
     def connect(self, address, port):
         try:
