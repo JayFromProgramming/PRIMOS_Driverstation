@@ -1,6 +1,8 @@
 from PyQt5 import Qt
 from PyQt5.QtWidgets import QWidget, QPushButton, QLabel
 
+from loguru import logger as logging
+
 
 class EStopButton(QWidget):
 
@@ -27,6 +29,8 @@ class EStopButton(QWidget):
         self.estop_button.setFixedSize(260, 40)
         self.estop_button.move(10, 5)
         self.estop_button.clicked.connect(self.estop)
+        # self.estop_button.setDisabled(True)
+
 
     def estop(self):
         # Create a confirmation dialog box and wait for the user to confirm
@@ -34,7 +38,7 @@ class EStopButton(QWidget):
         try:
             self.robot.get_state('/mciu/estop_controller').value = 0
         except Exception as e:
-            print(e)
+            logging.error(e)
 
     def update(self):
         pass

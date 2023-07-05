@@ -31,7 +31,7 @@ if __name__ == '__main__':
     print(f"Main started with PID {os.getpid()} Address: {args.ros_address}:{args.ros_port}")
     app = QApplication([])
     app.setStyle('Windows')
-    app.setApplicationName("PRIMROSE Driver Station")
+    app.setApplicationName("PRIMROSE Driver Station - Initializing...")
     app.setApplicationVersion("1.0.0")
     app.setWindowIcon(QtGui.QIcon("resources/icon.svg"))
     app.setQuitOnLastWindowClosed(True)

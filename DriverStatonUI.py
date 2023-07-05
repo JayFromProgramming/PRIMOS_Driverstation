@@ -23,11 +23,7 @@ class DriverStationUI:
         self.last_redraw = 0  # type: int
 
         self.robot_state = robot
-        try:
-            self.xbox_controller = controller.XboxController()
-        except Exception as e:
-            logging.error(f"Error initializing controller: {e}")
-            self.xbox_controller = None
+        self.xbox_controller = controller.XboxController()
 
         self.window = QMainWindow()
         self.armed = False
@@ -58,10 +54,12 @@ class DriverStationUI:
             # logging.error("Lost connection to ROS bridge")
             # Update the name of the window to indicate the connection status
             self.window.setWindowTitle(f"PRIMROSE Driver Station - Disconnected")
+        elif self.robot.is_connected and not self.xbox_controller.connected:
+            # Update the name of the window to indicate the connection status
+            self.window.setWindowTitle(f"PRIMROSE DRiver Station - No Controller")
         else:
             # Update the name of the window to indicate the connection status
-            self.window.setWindowTitle(f"PRIMROSE DRiver Station - Connected")
-
+            self.window.setWindowTitle(f"PRIMROSE Driver Station - Connected")
 
     def controller_read_loop(self):
         """Loop for the joystick"""

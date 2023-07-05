@@ -25,16 +25,29 @@ class LaserPowerControls(QWidget):
         self.turn_on_button.setFixedSize(125, 25)
         self.turn_on_button.move(10, 20)
         self.turn_on_button.clicked.connect(self.on)
+        self.turn_on_button.setEnabled(False)
 
         self.turn_off_button = QPushButton("Turn Off", self)
         self.turn_off_button.setFixedSize(125, 25)
         self.turn_off_button.move(145, 20)
         self.turn_off_button.clicked.connect(self.off)
+        self.turn_off_button.setEnabled(False)
 
         # self.close_button = QPushButton("-5%", self)
         # self.close_button.setFixedSize(80, 25)
         # self.close_button.move(190, 20)
         # self.close_button.clicked.connect(self.decrease_charge)
+
+        self.robot.attach_on_connect_callback(self.on_robot_connected)
+        self.robot.attach_on_disconnect_callback(self.on_robot_disconnected)
+
+    def on_robot_connected(self):
+        self.turn_on_button.setEnabled(True)
+        self.turn_off_button.setEnabled(True)
+
+    def on_robot_disconnected(self):
+        self.turn_on_button.setEnabled(False)
+        self.turn_off_button.setEnabled(False)
 
     def on(self):
         # Create a confirmation dialog box and wait for the user to confirm

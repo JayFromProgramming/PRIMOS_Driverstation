@@ -24,16 +24,22 @@ class BatteryCharge(QWidget):
         self.open_button.setFixedSize(80, 25)
         self.open_button.move(10, 20)
         self.open_button.clicked.connect(self.increase_charge)
+        self.open_button.setDisabled(True)
 
         self.close_button = QPushButton("Charge", self)
         self.close_button.setFixedSize(80, 25)
         self.close_button.move(100, 20)
         self.close_button.clicked.connect(self.set_fully_charged)
+        self.close_button.setDisabled(True)
 
         self.close_button = QPushButton("-5%", self)
         self.close_button.setFixedSize(80, 25)
         self.close_button.move(190, 20)
         self.close_button.clicked.connect(self.decrease_charge)
+        self.close_button.setDisabled(True)
+
+        self.robot.attach_on_connect_callback(self.on_robot_connection)
+        self.robot.attach_on_disconnect_callback(self.on_robot_disconnection)
 
     def set_fully_charged(self):
         # Create a confirmation dialog box and wait for the user to confirm
@@ -57,4 +63,14 @@ class BatteryCharge(QWidget):
 
     def update(self):
         pass
+
+    def on_robot_connection(self):
+        self.open_button.setDisabled(False)
+        self.close_button.setDisabled(False)
+        self.close_button.setDisabled(False)
+
+    def on_robot_disconnection(self):
+        self.open_button.setDisabled(True)
+        self.close_button.setDisabled(True)
+        self.close_button.setDisabled(True)
 

@@ -1,6 +1,8 @@
 from PyQt5 import Qt
 from PyQt5.QtWidgets import QWidget, QPushButton, QLabel
 
+from loguru import logger as logging
+
 
 class TrencherControls(QWidget):
 
@@ -20,20 +22,28 @@ class TrencherControls(QWidget):
         self.header.setAlignment(Qt.Qt.AlignCenter)
         self.header.move(round(self.width() / 2 - self.header.width() / 2) - 5, 0)
 
-        self.open_button = QPushButton("Arm", self)
-        self.open_button.setFixedSize(125, 25)
-        self.open_button.move(10, 20)
-        self.open_button.clicked.connect(self.arm)
+        self.arm_button = QPushButton("Arm", self)
+        self.arm_button.setFixedSize(125, 25)
+        self.arm_button.move(10, 20)
+        self.arm_button.clicked.connect(self.arm)
+        self.arm_button.setEnabled(False)
 
-        self.close_button = QPushButton("Disarm", self)
-        self.close_button.setFixedSize(125, 25)
-        self.close_button.move(145, 20)
-        self.close_button.clicked.connect(self.disarm)
+        self.disarm_button = QPushButton("Disarm", self)
+        self.disarm_button.setFixedSize(125, 25)
+        self.disarm_button.move(145, 20)
+        self.disarm_button.clicked.connect(self.disarm)
+        self.disarm_button.setEnabled(False)
 
-        # self.close_button = QPushButton("InOp", self)
-        # self.close_button.setFixedSize(80, 25)
-        # self.close_button.move(190, 20)
-        # self.close_button.clicked.connect(self.imu)
+        self.robot.attach_on_connect_callback(self.on_robot_connected)
+        self.robot.attach_on_disconnect_callback(self.on_robot_disconnected)
+
+    def on_robot_connected(self):
+        self.arm_button.setEnabled(True)
+        self.disarm_button.setEnabled(True)
+
+    def on_robot_disconnected(self):
+        self.arm_button.setEnabled(False)
+        self.disarm_button.setEnabled(False)
 
     def arm(self):
         self.robot.execute_custom_service("/trch/arm", {"in_": True}, "primrose_trch/set_armed")
@@ -41,7 +51,7 @@ class TrencherControls(QWidget):
             self.robot.get_state("/mciu/Trencher/odrive/input").value = [3, 2, 2]
             self.robot.get_state("/mciu/Conveyor/odrive/input").value = [3, 2, 2]
         except Exception as e:
-            print(e)
+            logging.error(e)
 
     def disarm(self):
         self.robot.execute_custom_service("/trch/arm", {"in_": False}, "primrose_trch/set_armed")
@@ -49,7 +59,7 @@ class TrencherControls(QWidget):
             self.robot.get_state("/mciu/Trencher/odrive/input").value = [0]
             self.robot.get_state("/mciu/Conveyor/odrive/input").value = [0]
         except Exception as e:
-            print(e)
+            logging.error(e)
 
     def update(self):
         pass

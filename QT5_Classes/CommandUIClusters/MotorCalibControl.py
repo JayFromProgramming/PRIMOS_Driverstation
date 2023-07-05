@@ -26,16 +26,19 @@ class MotorCalibrationCluster(QWidget):
         self.open_button.setFixedSize(80, 25)
         self.open_button.move(10, 20)
         self.open_button.clicked.connect(self.motors)
+        self.open_button.setEnabled(False)
 
         self.close_button = QPushButton("Suspension", self)
         self.close_button.setFixedSize(80, 25)
         self.close_button.move(100, 20)
         self.close_button.clicked.connect(self.suspension)
+        self.close_button.setEnabled(False)
 
         self.close_button = QPushButton("Steering", self)
         self.close_button.setFixedSize(80, 25)
         self.close_button.move(190, 20)
         self.close_button.clicked.connect(self.steering)
+        self.close_button.setEnabled(False)
 
     def motors(self):
         try:

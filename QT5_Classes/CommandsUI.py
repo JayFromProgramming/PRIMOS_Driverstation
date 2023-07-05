@@ -15,9 +15,10 @@ from QT5_Classes.CommandUIClusters.TrencherControls import TrencherControls
 
 class CommandsUI(QWidget):
 
-    def __init__(self, robot, parent=None):
+    def __init__(self, robot, parent=None, xbox_controller=None):
         super().__init__(parent)
         self.robot = robot
+        self.xbox_controller = xbox_controller
 
         self.surface = QWidget(self)
         self.surface.setFixedSize(870, 380)

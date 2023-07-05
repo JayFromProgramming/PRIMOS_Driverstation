@@ -48,11 +48,20 @@ class ROSInterface:
         self.smart_topics = topic_targets
         self.future_callbacks = []
 
+        self.on_connect_callbacks = []  # type: list[callable]
+        self.on_disconnect_callbacks = []  # type: list[callable]
+
         threading.Thread(target=self.establish_connection, daemon=True).start()
 
     @property
     def is_connected(self):
         return self.client.is_connected if self.client is not None else False
+
+    def attach_on_connect_callback(self, callback):
+        self.on_connect_callbacks.append(callback)
+
+    def attach_on_disconnect_callback(self, callback):
+        self.on_disconnect_callbacks.append(callback)
 
     def hook_on_ready(self, callback):
         if self.client is not None:
@@ -61,13 +70,11 @@ class ROSInterface:
             self.future_callbacks.append(callback)
 
     def establish_connection(self):
-        self.connect(address=self.address, port=self.port)
+        self.connect()
 
-    def connect(self, address, port):
+    def connect(self):
         try:
-            logging.info("Connecting to ROS bridge")
-            self.address = address
-            self.port = port
+            logging.info(f"Attempting to connect to ROS bridge at {self.address}:{self.port}")
             self.client = roslibpy.Ros(host=self.address, port=self.port)
             self._connect()
 
@@ -109,10 +116,16 @@ class ROSInterface:
             logging.error(f"Connection to ROS bridge failed: {e}")
             self.client.close()
         else:
-            logging.info("Connected to ROS bridge")
-            print(f"Topics: {self.get_topics()}")
-            print(f"Services: {self.get_services()}")
-            print(f"Nodes: {self.get_nodes()}")
+            logging.info(f"Connection to ROS bridge at {self.address}:{self.port} successful")
+            logging.debug(f"ROS topics: {self.client.get_topics()}")
+            logging.debug(f"ROS services: {self.client.get_services()}")
+            logging.debug(f"ROS nodes: {self.client.get_nodes()}")
+            for callback in self.on_connect_callbacks:
+                try:
+                    callback()
+                except Exception as e:
+                    logging.error(f"Error in on_connect_callback: {e}")
+                    logging.exception(e)
             for smart_topic in self.smart_topics:
                 smart_topic.set_client(self.client)
                 # smart_topic.connect()

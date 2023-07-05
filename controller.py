@@ -4,13 +4,14 @@ import math
 import time
 import threading
 
+from loguru import logger as logging
 
 class XboxController(object):
     MAX_TRIG_VAL = math.pow(2, 8)
     MAX_JOY_VAL = math.pow(2, 15)
 
     def __init__(self):
-
+        self.connected = False
         self.LeftJoystickY = 0
         self.LeftJoystickX = 0
         self.RightJoystickY = 0
@@ -44,12 +45,38 @@ class XboxController(object):
         rb = self.RightBumper
         return [x, y, a, b, rb]
 
+    def on_disconnect(self):
+        self.connected = False
+        # Set all inputs to 0
+        self.LeftJoystickY = 0
+        self.LeftJoystickX = 0
+        self.RightJoystickY = 0
+        self.RightJoystickX = 0
+        self.LeftTrigger = 0
+        self.RightTrigger = 0
+        self.LeftBumper = 0
+        self.RightBumper = 0
+        self.A = 0
+        self.X = 0
+        self.Y = 0
+        self.B = 0
+        self.LeftThumb = 0
+        self.RightThumb = 0
+        self.Back = 0
+        self.Start = 0
+        self.LeftDPad = 0
+        self.RightDPad = 0
+        self.UpDPad = 0
+        self.DownDPad = 0
+
     def _monitor_controller(self):
         while True:
             try:
                 events = get_gamepad()
+                self.connected = True
             except inputs.UnpluggedError:
                 events = []
+                self.on_disconnect()
             for event in events:
                 if event.code == 'ABS_Y':
                     self.LeftJoystickY = event.state / XboxController.MAX_JOY_VAL  # normalize between -1 and 1
@@ -91,3 +118,5 @@ class XboxController(object):
                     self.UpDPad = event.state
                 elif event.code == 'BTN_TRIGGER_HAPPY4':
                     self.DownDPad = event.state
+                else:
+                    logging.warning(f"Joystick returned unknown event: {event.code}")
