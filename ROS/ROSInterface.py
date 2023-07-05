@@ -27,6 +27,7 @@ topic_targets = [
     SmartTopic("/mciu/Trencher/odrive/input", allow_update=True),
     SmartTopic("/mciu/Conveyor/odrive/input", allow_update=True),
     SmartTopic("/driv/Trencher/throttle", allow_update=True),
+    SmartTopic("/mciu/estop_controller", allow_update=True),
 ]
 
 

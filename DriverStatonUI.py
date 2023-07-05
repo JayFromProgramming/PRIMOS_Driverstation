@@ -103,6 +103,7 @@ class DriverStationUI:
                         logging.error(f"Error writing to ROS: {e}")
 
                 if self.xbox_controller.RightTrigger > -0.1 and self.xbox_controller.LeftTrigger > 0.6:
+                    self.robot.get_state("/mciu/Conveyor/odrive/input").value = [4, 5000]
                     try:
                         if self.xbox_controller.LeftBumper:  # Reverse Trencher
                             self.robot.get_state("/driv/Trencher/throttle").value = int(self.xbox_controller.RightTrigger * 100)
@@ -113,6 +114,7 @@ class DriverStationUI:
                 else:
                     try:
                         self.robot.get_state("/driv/Trencher/throttle").value = 0
+                        self.robot.get_state("/mciu/Conveyor/odrive/input").value = [4, 0]
                     except Exception as e:
                         logging.error(f"Error writing to ROS: {e}")
 

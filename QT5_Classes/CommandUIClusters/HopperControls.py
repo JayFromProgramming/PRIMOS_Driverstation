@@ -36,16 +36,24 @@ class HopperDoorControls(QWidget):
         self.close_button.clicked.connect(self.close_door)
 
     def open_door(self):
+        # Create a confirmation dialog box and wait for the user to confirm
+        # If the user confirms, then send the commmand to actuate the door
         try:
-            self.robot.execute_custom_service("/trch/arm", {"in_": True}, "primrose_trch/set_armed")
+            self.robot.get_state('/mciu/Hopper/door').value = [2]
         except Exception as e:
             print(e)
 
     def stop_door(self):
-        self.robot.execute_custom_service("hopper_door", "primos/switch_action", 2)
+        try:
+            self.robot.get_state('/mciu/Hopper/door').value = [1]
+        except Exception as e:
+            print(e)
 
     def close_door(self):
-        self.robot.execute_custom_service("hopper_door", "primos/switch_action", 3)
+        try:
+            self.robot.get_state('/mciu/Hopper/door').value = [0]
+        except Exception as e:
+            print(e)
 
     def update(self):
         pass
@@ -63,18 +71,18 @@ class HopperLoadSensors(QWidget):
 
         self.surface.setStyleSheet("border: 1px solid black; border-radius: 5px; background-color: white;")
 
-        self.header = QLabel("Weight Sensors", self.surface)
+        self.header = QLabel("Load Cell Resets", self.surface)
         self.header.setStyleSheet("font-weight: bold; font-size: 15px; border: 0px; "
                                   "background-color: transparent;")
         self.header.setAlignment(Qt.Qt.AlignCenter)
         self.header.move(round(self.width() / 2 - self.header.width() / 2) - 10, 0)
 
-        self.tare_button = QPushButton("Tare", self)
+        self.tare_button = QPushButton("Hopper Tare", self)
         self.tare_button.setFixedSize(80, 25)
         self.tare_button.move(10, 20)
         self.tare_button.clicked.connect(self.tare_sensors)
 
-        self.tare_button = QPushButton("Shake", self)
+        self.tare_button = QPushButton("Suspen Tar", self)
         self.tare_button.setFixedSize(80, 25)
         self.tare_button.move(100, 20)
         self.tare_button.clicked.connect(self.shake_sensors)
@@ -84,7 +92,13 @@ class HopperLoadSensors(QWidget):
         self.tare_button.move(190, 20)
 
     def tare_sensors(self):
-        self.robot.execute_service("hopper_tare_sensors")
+        try:
+            self.robot.get_state('/mciu/Hopper/loadcells/control').value = [1]
+        except Exception as e:
+            print(e)
 
     def shake_sensors(self):
-        self.robot.execute_service("hopper_shake_sensors")
+        try:
+            self.robot.get_state('/mciu/Suspension/loadcells/control').value = [1]
+        except Exception as e:
+            print(e)
