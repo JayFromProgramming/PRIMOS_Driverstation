@@ -83,7 +83,7 @@ class HopperLoadSensors(QWidget):
         self.tare_button.move(10, 20)
         self.tare_button.clicked.connect(self.tare_hopper)
 
-        self.tare_button = QPushButton("Suspension Tar", self)
+        self.tare_button = QPushButton("Suspension Tare", self)
         self.tare_button.setFixedSize(125, 25)
         self.tare_button.move(145, 20)
         self.tare_button.clicked.connect(self.tare_suspension)

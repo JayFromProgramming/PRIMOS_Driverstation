@@ -44,20 +44,24 @@ class DriverStationUI:
         self.window.show()
 
         threading.Thread(target=self.controller_read_loop).start()
+
+        # Start the timer for the connection check loop
+        self.connection_check_timer = QtCore.QTimer()
+        self.connection_check_timer.timeout.connect(self.connection_check_loop)
+        self.connection_check_timer.start(1000)
         # threading.Thread(target=self.connection_check_loop).start()
         # multiprocessing.Process(target=self.controller_read_loop).start()
 
     def connection_check_loop(self):
         """Loop to check the connection to the ROS bridge"""
-        while True:
-            if not self.robot.is_connected:
-                logging.error("Lost connection to ROS bridge")
-                # Update the name of the window to indicate the connection status
-                self.window.setWindowTitle(f"PRIMROSE Driver Station - Disconnected")
-            else:
-                # Update the name of the window to indicate the connection status
-                self.window.setWindowTitle(f"PRIMROSE DRiver Station - Connected")
-            time.sleep(1)
+        if not self.robot.is_connected:
+            # logging.error("Lost connection to ROS bridge")
+            # Update the name of the window to indicate the connection status
+            self.window.setWindowTitle(f"PRIMROSE Driver Station - Disconnected")
+        else:
+            # Update the name of the window to indicate the connection status
+            self.window.setWindowTitle(f"PRIMROSE DRiver Station - Connected")
+
 
     def controller_read_loop(self):
         """Loop for the joystick"""
