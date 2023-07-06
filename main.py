@@ -51,18 +51,9 @@ if __name__ == '__main__':
     myappid = 'pstdl.primrose.drivestation'  # arbitrary string
     ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
-    # while pioneer.client.is_connecting:
-    #     pass
-    primrose = ROSInterface(args)  # MAC: a0:a8:cd:be:8d:2c
-    # while pioneer.client.is_connecting:
-    #     pass
+    primrose = ROSInterface(args)
     gui = DriverStatonUI.DriverStationUI(primrose)
-    # threading.Thread(target=gui.run, daemon=True).start()
-
     app.exec_()
-    # gui.run()
-    # while pioneer.client.is_connected:
-    #     pass
     primrose.disconnect()
     # Terminate the process PID
     os.kill(os.getpid(), 9)

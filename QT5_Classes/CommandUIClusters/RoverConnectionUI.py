@@ -23,7 +23,7 @@ class RoverConnectionUI(QWidget):
         self.header.move(round(self.width() / 2 - self.header.width() / 2) - 5, 0)
 
         # This element contains no controls, it just displays the connection status
-        self.target_address = QLabel(f"<pre>Addr:   {self.robot.address}:{self.robot.port}</pre>", self)
+        self.target_address = QLabel(f"<pre>Target: {self.robot.address}:{self.robot.port}</pre>", self)
         self.target_address.setStyleSheet("color: black; font-size: 13px; font-weight: bold;")
         # self.target_address.setFixedSize(100, 25)
         self.target_address.move(10, 16)

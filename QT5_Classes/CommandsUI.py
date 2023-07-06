@@ -11,6 +11,7 @@ from QT5_Classes.CommandUIClusters.MotorCalibControl import MotorCalibrationClus
 from QT5_Classes.CommandUIClusters.RoverConnectionUI import RoverConnectionUI
 from QT5_Classes.CommandUIClusters.SensorResets import SensorCalibrationCluster
 from QT5_Classes.CommandUIClusters.SteeringModesCluster import SteeringModesCluster
+from QT5_Classes.CommandUIClusters.SuspensionHeight import SuspensionHeight
 from QT5_Classes.CommandUIClusters.TrencherControls import TrencherControls
 
 
@@ -45,6 +46,7 @@ class CommandsUI(QWidget):
         self.battery = BatteryCharge(self.robot, self)
         self.laser_power = LaserPowerControls(self.robot, self)
         self.drivetrain = DriveTrainControls(self.robot, self)
+        self.suspension = SuspensionHeight(self.robot, self)
 
         # Column 1
         self.steering_mode_cluster.move(10, 40)
@@ -67,3 +69,4 @@ class CommandsUI(QWidget):
         self.battery.move(self.auto_estop_controls.x() + self.auto_estop_controls.width() + 5, 40)
         self.laser_power.move(self.battery.x(), self.battery.y() + self.battery.height() + 5)
         self.drivetrain.move(self.battery.x(), self.laser_power.y() + self.laser_power.height() + 5)
+        self.suspension.move(self.battery.x(), self.drivetrain.y() + self.drivetrain.height() + 5)

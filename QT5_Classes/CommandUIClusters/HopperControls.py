@@ -119,12 +119,30 @@ class HopperLoadSensors(QWidget):
 
     def tare_hopper(self):
         try:
-            self.robot.get_state('/mciu/Hopper/loadcells/control').value = [1]
+            # Create a confirmation dialog box and when the users confirms, reset the load cells (don't block while waiting)
+            confirmation_box = self.ConfirmationBox(self)
+            confirmation_box.exec_()
+            if confirmation_box.result() == Qt.QMessageBox.Yes:
+                self.robot.get_state('/mciu/Hopper/tare').value = [1]
         except Exception as e:
             logging.error(e)
 
     def tare_suspension(self):
         try:
-            self.robot.get_state('/mciu/Suspension/loadcells/control').value = [1]
+            # Create a confirmation dialog box and when the users confirms, reset the load cells (don't block while waiting)
+            confirmation_box = self.ConfirmationBox(self)
+            confirmation_box.exec_()
+            if confirmation_box.result() == Qt.QMessageBox.Yes:
+                self.robot.get_state('/mciu/Suspension/tare').value = [1]
         except Exception as e:
             logging.error(e)
+
+    class ConfirmationBox(Qt.QMessageBox):
+
+        def __init__(self, parent=None):
+            super().__init__(parent)
+
+            self.setText("Are you sure you want to reset the load cells?")
+            self.setStandardButtons(Qt.QMessageBox.Yes | Qt.QMessageBox.No)
+            self.setDefaultButton(Qt.QMessageBox.No)
+            self.setWindowTitle("Tare Load Cells")

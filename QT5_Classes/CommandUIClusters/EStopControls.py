@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QWidget, QPushButton, QLabel
 
 from loguru import logger as logging
 
+
 class AutomaticEStopControls(QWidget):
 
     def __init__(self, robot, parent=None):
@@ -46,7 +47,11 @@ class AutomaticEStopControls(QWidget):
         # Create a confirmation dialog box and wait for the user to confirm
         # If the user confirms, then send the commmand to actuate the door
         try:
-            self.robot.get_state('/mciu/estop_controller').value = 1
+            # Open a confirmation dialog box
+            confirm = self.ConfirmationBox()
+            confirm.exec_()
+            if confirm.result() == Qt.QMessageBox.Yes:
+                self.robot.get_state('/mciu/estop_controller').value = 1
         except Exception as e:
             logging.error(e)
 
@@ -74,3 +79,14 @@ class AutomaticEStopControls(QWidget):
         self.enable_auto_button.setEnabled(False)
         self.reset_estop_button.setEnabled(False)
         self.disable_auto_button.setEnabled(False)
+
+
+    class ConfirmationBox(Qt.QMessageBox):
+
+        def __init__(self, parent=None):
+            super().__init__(parent)
+
+            self.setText("Are you sure you want to clear the E-Stop?")
+            self.setStandardButtons(Qt.QMessageBox.Yes | Qt.QMessageBox.No)
+            self.setDefaultButton(Qt.QMessageBox.No)
+            self.setWindowTitle("Clear E-Stop")

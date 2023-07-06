@@ -96,7 +96,7 @@ class ROSInterface:
             logging.info(f"Attempting to connect to ROS bridge at {self.address}:{self.port}")
             self.client = roslibpy.Ros(host=self.address, port=self.port)
             self.twister = self.client.factory
-            self.twister.set_max_delay(30)
+            self.twister.set_max_delay(5)
             self.client.on_ready(self.on_ready)
             self._connect()
 
