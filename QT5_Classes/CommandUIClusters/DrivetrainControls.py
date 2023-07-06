@@ -31,7 +31,7 @@ class DriveTrainControls(QWidget):
         self.enable_button.setFixedSize(80, 25)
         self.enable_button.move(10, 20)
         self.enable_button.clicked.connect(self.enable)
-        self.enable_button.setEnabled(True)
+        self.enable_button.setEnabled(False)
 
         self.disable_button = QPushButton("Disable", self)
         self.disable_button.setFixedSize(80, 25)
