@@ -62,17 +62,14 @@ class DriveTrainControls(QWidget):
         # Create a confirmation dialog box and wait for the user to confirm
         # If the user confirms, then send the commmand to actuate the door
         try:
-            for quarter_module in Enumerators.quarter_modules:
-                self.robot.get_state(f'/mciu/{quarter_module}/odrive/input').value = \
-                    [Enumerators.ODriveCommands.SET_CLOSED_LOOP, Enumerators.ODriveInputModes.VEL_RAMP]
+            self.robot.execute_custom_service("/unknown", {"in_": True}, "primrose_trch/set_armed")
         except Exception as e:
             logging.error(e)
             ErrorBox(self, title="Internal Error", message="Error enabling drivetrain", error=e)
 
     def disable(self):
         try:
-            for quarter_module in Enumerators.quarter_modules:
-                self.robot.get_state(f'/mciu/{quarter_module}/odrive/input').value = [Enumerators.ODriveCommands.IDLE]
+            self.robot.execute_custom_service("/unknown", {"in_": True}, "primrose_trch/set_armed")
         except Exception as e:
             logging.error(e)
             ErrorBox(self, title="Internal Error", message="Error disabling drivetrain", error=e)

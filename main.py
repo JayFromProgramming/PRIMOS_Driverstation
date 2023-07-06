@@ -49,7 +49,9 @@ if __name__ == '__main__':
     app.setQuitOnLastWindowClosed(True)
 
     myappid = 'pstdl.primrose.drivestation'  # arbitrary string
-    ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
+    # Check if the OS is Windows
+    if os.name == 'nt':
+        ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
     primrose = ROSInterface(args)
     gui = DriverStatonUI.DriverStationUI(primrose)

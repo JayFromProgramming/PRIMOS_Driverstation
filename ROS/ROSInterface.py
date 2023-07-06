@@ -48,6 +48,8 @@ class ROSInterface:
 
         self.background_thread = None
 
+        self.connection_ready = False
+
         self.smart_topics = topic_targets
         self.future_callbacks = []
 
@@ -59,7 +61,11 @@ class ROSInterface:
 
     @property
     def is_connected(self):
-        return self.client.is_connected if self.client is not None else False
+        return self.connection_ready
+
+    @property
+    def is_connecting(self):
+        return self.connection_ready is False and self.client.is_connected
 
     def attach_on_connect_callback(self, callback):
         self.on_connect_callbacks.append(callback)
@@ -86,6 +92,17 @@ class ROSInterface:
             # smart_topic.connect()
         for callback in self.future_callbacks:
             self.client.on_ready(callback)
+        self.connection_ready = True
+
+    def on_close(self, event):
+        self.connection_ready = False
+        logging.info(f"Connection to ROS bridge at {self.address}:{self.port} was lost")
+        for callback in self.on_disconnect_callbacks:
+            try:
+                callback()
+            except Exception as e:
+                logging.error(f"Error in on_disconnect_callback: {e}")
+                logging.exception(e)
 
     def establish_connection(self):
         self.connection_thread = threading.Thread(target=self.connect, daemon=True)
@@ -98,11 +115,12 @@ class ROSInterface:
             self.twister = self.client.factory
             self.twister.set_max_delay(5)
             self.client.on_ready(self.on_ready)
+            # self.client.on("close", self.on_close)
             self._connect()
 
             # Make sure the process doesn't close
-            while True:
-                time.sleep(1)
+            # while True:
+            #     time.sleep(1)
 
             # self.rosserial_thread = threading.Thread(target=ros_serial, daemon=True, args=(address,))
             # self.rosserial_thread.start()
@@ -130,7 +148,7 @@ class ROSInterface:
         logging.info("Terminating ROSInterface")
         if self.client is not None:
             try:
-                self.client.terminate()
+                self.client.close()
             except roslibpy.core.RosTimeoutError:
                 logging.error(f"Unable to disconnect from ROS bridge")
             else:

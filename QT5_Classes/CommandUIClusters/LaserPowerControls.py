@@ -3,6 +3,9 @@ from PyQt5.QtWidgets import QWidget, QPushButton, QLabel
 
 from loguru import logger as logging
 
+from QT5_Classes.ErrorBox import ErrorBox
+
+
 class LaserPowerControls(QWidget):
 
     def __init__(self, robot, parent=None):
@@ -56,12 +59,13 @@ class LaserPowerControls(QWidget):
             self.robot.get_state('/mciu/accessory_power').value = [0, 1]
         except Exception as e:
             logging.error(e)
+            ErrorBox(self, title="Internal Error", message="Unable to command laser power on", error=e)
 
     def off(self):
         try:
             self.robot.get_state('/mciu/accessory_power').value = [0, 0]
         except Exception as e:
-            logging.error(e)
+            ErrorBox(self, title="Internal Error", message="Unable to command laser power off", error=e)
 
     def update(self):
         pass

@@ -41,6 +41,9 @@ class RoverConnectionUI(QWidget):
         if self.robot.is_connected:
             self.connection_status.setText("<pre>Status: Connected</pre>")
             self.connection_status.setStyleSheet("color: green; font-size: 13px; font-weight: bold;")
+        elif self.robot.is_connecting:
+            self.connection_status.setText("<pre>Status: Connecting...</pre>")
+            self.connection_status.setStyleSheet("color: orange; font-size: 13px; font-weight: bold;")
         else:
             self.connection_status.setText("<pre>Status: Disconnected</pre>")
             self.connection_status.setStyleSheet("color: red; font-size: 13px; font-weight: bold;")
