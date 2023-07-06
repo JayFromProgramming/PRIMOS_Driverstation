@@ -47,21 +47,21 @@ class SteeringModesCluster(QWidget):
 
     def in_point_steering(self):
         try:
-            self.robot.execute_custom_service("steering_mode", "primos/switch_action", 1)
+            self.robot.execute_custom_service("/", {"in_": True}, "primrose_trch/set_armed")
         except Exception as e:
             logging.error(e)
             ErrorBox(self, title="Service Error", message="Was unable to execute steering_mode service.", error=e)
 
     def fused_steering(self):
         try:
-            self.robot.execute_custom_service("steering_mode", "primos/switch_action", 2)
+            self.robot.execute_custom_service("/trch/arm", {"in_": True}, "primrose_trch/set_armed")
         except Exception as e:
             logging.error(e)
             ErrorBox(self, title="Service Error", message="Was unable to execute steering_mode service.", error=e)
 
     def tank_steering(self):
         try:
-            self.robot.execute_custom_service("steering_mode", "primos/switch_action", 3)
+            self.robot.execute_custom_service("/trch/arm", {"in_": True}, "primrose_trch/set_armed")
         except Exception as e:
             logging.error(e)
             ErrorBox(self, title="Service Error", message="Was unable to execute steering_mode service.", error=e)
