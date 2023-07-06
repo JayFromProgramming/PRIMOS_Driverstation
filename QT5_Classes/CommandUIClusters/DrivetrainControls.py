@@ -3,6 +3,8 @@ from PyQt5.QtWidgets import QWidget, QPushButton, QLabel
 
 from loguru import logger as logging
 
+from Resources import Enumerators
+
 
 class DriveTrainControls(QWidget):
 
@@ -25,20 +27,20 @@ class DriveTrainControls(QWidget):
         self.enable_button = QPushButton("Enable", self)
         self.enable_button.setFixedSize(80, 25)
         self.enable_button.move(10, 20)
-        self.enable_button.clicked.connect(self.open_door)
+        self.enable_button.clicked.connect(self.enable)
         self.enable_button.setEnabled(False)
 
         self.disable_button = QPushButton("Disable", self)
         self.disable_button.setFixedSize(80, 25)
         self.disable_button.move(100, 20)
-        self.disable_button.clicked.connect(self.stop_door)
+        self.disable_button.clicked.connect(self.disable)
         self.disable_button.setEnabled(False)
 
         self.calibrate_button = QPushButton("Calibrate", self)
         self.calibrate_button.setFixedSize(80, 25)
         self.calibrate_button.move(190, 20)
-        self.calibrate_button.clicked.connect(self.close_door)
-        self.calibrate_button.setEnabled(False)
+        self.calibrate_button.clicked.connect(self.calibrate)
+        self.calibrate_button.setEnabled(True)
 
         self.robot.attach_on_connect_callback(self.on_robot_connection)
         self.robot.attach_on_disconnect_callback(self.on_robot_disconnection)
@@ -53,25 +55,40 @@ class DriveTrainControls(QWidget):
         self.disable_button.setEnabled(False)
         self.calibrate_button.setEnabled(False)
 
-    def open_door(self):
+    def enable(self):
         # Create a confirmation dialog box and wait for the user to confirm
         # If the user confirms, then send the commmand to actuate the door
         try:
-            self.robot.get_state('/mciu/Hopper/door').value = [2]
+            for quarter_module in Enumerators.quarter_modules:
+                self.robot.get_state(f'/mciu/{quarter_module}/odrive/input').value = \
+                    [Enumerators.ODriveCommands.SET_CLOSED_LOOP, Enumerators.ODriveInputModes.VEL_RAMP]
         except Exception as e:
             logging.error(e)
 
-    def stop_door(self):
+    def disable(self):
         try:
-            self.robot.get_state('/mciu/Hopper/door').value = [1]
+            for quarter_module in Enumerators.quarter_modules:
+                self.robot.get_state(f'/mciu/{quarter_module}/odrive/input').value = [Enumerators.ODriveCommands.IDLE]
         except Exception as e:
             logging.error(e)
 
-    def close_door(self):
+    def calibrate(self):
         try:
-            self.robot.get_state('/mciu/Hopper/door').value = [0]
+            confirmation_box = self.ConfirmationBox()
+            confirmation_box.exec_()
+            if confirmation_box.result() == Qt.QMessageBox.Yes:
+                for quarter_module in Enumerators.quarter_modules:
+                    self.robot.get_state(f'/mciu/{quarter_module}/odrive/input').value = [Enumerators.ODriveCommands.BEGIN_CALIBRATION]
         except Exception as e:
             logging.error(e)
 
-    def update(self):
-        pass
+    class ConfirmationBox(Qt.QMessageBox):
+
+        def __init__(self, parent=None):
+            super().__init__(parent)
+
+            self.setText("Are you sure you want to begin drive motor calibration?")
+            self.setDetailedText("All drive wheels must be off the ground to run the calibration sequence.")
+            self.setStandardButtons(Qt.QMessageBox.Yes | Qt.QMessageBox.No)
+            self.setDefaultButton(Qt.QMessageBox.No)
+            self.setWindowTitle("Calibration Confirmation")

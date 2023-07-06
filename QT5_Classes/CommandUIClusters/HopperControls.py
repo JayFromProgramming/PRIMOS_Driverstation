@@ -3,6 +3,9 @@ from PyQt5.QtWidgets import QWidget, QPushButton, QLabel
 
 from loguru import logger as logging
 
+from QT5_Classes.CommandUIClusters.ConfirmationBox import ConfirmationBox
+
+
 class HopperDoorControls(QWidget):
 
     def __init__(self, robot, parent=None):
@@ -98,7 +101,7 @@ class HopperLoadSensors(QWidget):
         self.hopper_tare_button.setFixedSize(125, 25)
         self.hopper_tare_button.move(10, 20)
         self.hopper_tare_button.clicked.connect(self.tare_hopper)
-        self.hopper_tare_button.setDisabled(True)
+        self.hopper_tare_button.setDisabled(False)
 
         self.suspen_tare_button = QPushButton("Suspension Tare", self)
         self.suspen_tare_button.setFixedSize(125, 25)
@@ -120,7 +123,11 @@ class HopperLoadSensors(QWidget):
     def tare_hopper(self):
         try:
             # Create a confirmation dialog box and when the users confirms, reset the load cells (don't block while waiting)
-            confirmation_box = self.ConfirmationBox(self)
+            confirmation_box = ConfirmationBox(self, title="Load Cell Reset",
+                                               message="Are you sure you want to reset the hopper load cells?",
+                                               detailed_message="Resetting the load cells will set the current load as the "
+                                                                "zero point. This will cause the hopper to think that "
+                                                                "it is carrying no load. This action is irreversible.")
             confirmation_box.exec_()
             if confirmation_box.result() == Qt.QMessageBox.Yes:
                 self.robot.get_state('/mciu/Hopper/tare').value = [1]
@@ -130,19 +137,13 @@ class HopperLoadSensors(QWidget):
     def tare_suspension(self):
         try:
             # Create a confirmation dialog box and when the users confirms, reset the load cells (don't block while waiting)
-            confirmation_box = self.ConfirmationBox(self)
+            confirmation_box = ConfirmationBox(self, title="Load Cell Reset",
+                                               message="Are you sure you want to reset the suspension load cells?",
+                                               detailed_message="Resetting the load cells will set the current load as the "
+                                                                "zero point. This will cause the suspension to think that "
+                                                                "it is carrying no load. This action is irreversible.")
             confirmation_box.exec_()
             if confirmation_box.result() == Qt.QMessageBox.Yes:
                 self.robot.get_state('/mciu/Suspension/tare').value = [1]
         except Exception as e:
             logging.error(e)
-
-    class ConfirmationBox(Qt.QMessageBox):
-
-        def __init__(self, parent=None):
-            super().__init__(parent)
-
-            self.setText("Are you sure you want to reset the load cells?")
-            self.setStandardButtons(Qt.QMessageBox.Yes | Qt.QMessageBox.No)
-            self.setDefaultButton(Qt.QMessageBox.No)
-            self.setWindowTitle("Tare Load Cells")

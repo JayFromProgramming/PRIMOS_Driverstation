@@ -3,6 +3,8 @@ from PyQt5.QtWidgets import QWidget, QPushButton, QLabel
 
 from loguru import logger as logging
 
+from Resources import Enumerators
+
 
 class EStopButton(QWidget):
 
@@ -31,15 +33,13 @@ class EStopButton(QWidget):
         self.estop_button.clicked.connect(self.estop)
         # self.estop_button.setDisabled(True)
 
-
     def estop(self):
         # Create a confirmation dialog box and wait for the user to confirm
         # If the user confirms, then send the commmand to actuate the door
         try:
-            self.robot.get_state('/mciu/estop_controller').value = 0
+            self.robot.get_state('/mciu/estop_controller').value = Enumerators.EStopCommands.TRIGGER
         except Exception as e:
             logging.error(e)
 
     def update(self):
         pass
-

@@ -10,9 +10,7 @@ from QT5_Classes.CommandsUI import CommandsUI
 from ROS.ROSInterface import ROSInterface
 # from ROS.RobotState import RobotState
 
-import logging
-
-logging = logging.getLogger(__name__)
+from loguru import logger as logging
 
 
 class DriverStationUI:
@@ -23,6 +21,7 @@ class DriverStationUI:
         self.last_redraw = 0  # type: int
 
         self.robot_state = robot
+        logging.info("Initializing Driver Station UI")
         self.xbox_controller = controller.XboxController()
 
         self.window = QMainWindow()
