@@ -89,7 +89,6 @@ class ROSInterface:
                 logging.exception(e)
         for smart_topic in self.smart_topics:
             smart_topic.set_client(self.client)
-            # smart_topic.connect()
         for callback in self.future_callbacks:
             self.client.on_ready(callback)
         self.connection_ready = True
@@ -115,7 +114,7 @@ class ROSInterface:
             self.twister = self.client.factory
             self.twister.set_max_delay(5)
             self.client.on_ready(self.on_ready)
-            # self.client.on("close", self.on_close)
+            self.client.on("close", self.on_close)
             self._connect()
 
             # Make sure the process doesn't close
@@ -144,25 +143,32 @@ class ROSInterface:
             if self.connection_thread.is_alive():
                 logging.info("Terminating ROSInterface connection thread")
                 self.connection_thread.join(5)
-        # self.robot_state_monitor.unsub_all()
+        logging.info("Unsubscribing from all topics, and unadvertizing all publishers")
+        for smart_topic in self.smart_topics:
+            smart_topic.unsub()
         logging.info("Terminating ROSInterface")
-        if self.client is not None:
-            try:
-                self.client.close()
-            except roslibpy.core.RosTimeoutError:
-                logging.error(f"Unable to disconnect from ROS bridge")
-            else:
-                logging.info(f"Disconnected from ROS bridge at {self.address}:{self.port}")
+        # if self.client is not None:
+        #     try:
+        #         self.client.terminate()
+        #     except roslibpy.core.RosTimeoutError:
+        #         logging.error(f"Unable to disconnect from ROS bridge")
+        #     else:
+        #         logging.info(f"Disconnected from ROS bridge at {self.address}:{self.port}")
 
     def _connect(self):
-        while not self.client.is_connected:
-            try:
-                self.client.run()
-            except roslibpy.core.RosTimeoutError:
-                logging.error(f"Connection to ROS bridge at {self.address}:{self.port} timed out, retrying...")
-            except Exception as e:
-                logging.error(f"Connection to ROS bridge failed: {e}")
-                logging.exception(e)
+        try:
+            self.client.run()
+        except roslibpy.core.RosTimeoutError:
+            logging.error(f"Initial connection attempt to the ROS bridge timed out, automatic retry is enabled")
+            for callback in self.on_connect_callbacks:
+                try:
+                    callback()
+                except Exception as e:
+                    logging.error(f"Error in on_connect_callback: {e}")
+                    logging.exception(e)
+        except Exception as e:
+            logging.error(f"Connection to ROS bridge failed: {e}")
+            logging.exception(e)
 
     def get_services(self):
         return self.client.get_services()

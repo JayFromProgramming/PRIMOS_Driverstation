@@ -1,4 +1,3 @@
-
 from PyQt5 import Qt
 from PyQt5.QtWidgets import QWidget, QPushButton, QLabel
 
@@ -26,7 +25,7 @@ class ControllerConnectionUI(QWidget):
 
         # This element contains no controls, it just displays the current connection status of the xbox controller
         # it displays if the controller is connected and when the
-        self.target_address = QLabel(f"<pre>No XBOX Controller Detected</pre>", self)
+        self.target_address = QLabel(f"<pre>Layout: No Controller</pre>", self)
         self.target_address.setStyleSheet("color: black; font-size: 13px; font-weight: bold;")
         # self.target_address.setFixedSize(100, 25)
         self.target_address.move(10, 16)
@@ -42,10 +41,58 @@ class ControllerConnectionUI(QWidget):
 
     def connection_check_loop(self):
         if self.controller.connected:
-            self.target_address.setText(f"<pre>{self.controller.usb_name}</pre>")
+            self.target_address.setText(f"<pre>Layout: {self.controller.mapping}</pre>")
             # logging.debug(f"Controller {self.controller.usb_name} is connected")
             self.connection_status.setText("<pre>Status: Connected</pre>")
             self.connection_status.setStyleSheet("color: green; font-size: 13px; font-weight: bold;")
         else:
             self.connection_status.setText("<pre>Status: Disconnected</pre>")
             self.connection_status.setStyleSheet("color: red; font-size: 13px; font-weight: bold;")
+
+
+class ControllerMappingUI(QWidget):
+
+    def __init__(self, robot, parent=None, controller=None):
+        super().__init__(parent)
+        self.robot = robot
+
+        self.surface = QWidget(self)
+        self.surface.setFixedSize(280, 50)
+        super().setFixedSize(280, 50)
+
+        self.surface.setStyleSheet("border: 1px solid black; border-radius: 5px; background-color: white;")
+
+        self.header = QLabel("Controller Mappings", self.surface)
+        self.header.setStyleSheet("font-weight: bold; font-size: 15px; border: 0px; "
+                                  "background-color: transparent;")
+        self.header.setAlignment(Qt.Qt.AlignCenter)
+        self.header.move(round(self.width() / 2 - self.header.width() / 2) - 20, 0)
+
+        self.auto_button = QPushButton("Driving", self)
+        self.auto_button.setFixedSize(80, 25)
+        self.auto_button.move(10, 20)
+        self.auto_button.clicked.connect(self.driving)
+        # self.auto_button.setEnabled(False)
+
+        self.manual_button = QPushButton("Excavating", self)
+        self.manual_button.setFixedSize(80, 25)
+        self.manual_button.move(100, 20)
+        self.manual_button.clicked.connect(self.excavating)
+        # self.manual_button.setEnabled(False)
+
+        self.disable_button = QPushButton("Unused", self)
+        self.disable_button.setFixedSize(80, 25)
+        self.disable_button.move(190, 20)
+        self.disable_button.clicked.connect(self.unused)
+        # self.disable_button.setEnabled(False)
+
+        self.controller = controller
+
+    def driving(self):
+        self.controller.set_mapping("driving")
+
+    def excavating(self):
+        self.controller.set_mapping("excavating")
+
+    def unused(self):
+        self.controller.set_mapping("unused")

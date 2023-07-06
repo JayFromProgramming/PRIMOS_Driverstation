@@ -3,6 +3,8 @@ from PyQt5.QtWidgets import QWidget, QPushButton, QLabel
 
 from loguru import logger as logging
 
+from QT5_Classes.ErrorBox import ErrorBox
+
 
 class TrencherControls(QWidget):
 
@@ -46,20 +48,18 @@ class TrencherControls(QWidget):
         self.disarm_button.setEnabled(False)
 
     def arm(self):
-        self.robot.execute_custom_service("/trch/arm", {"in_": True}, "primrose_trch/set_armed")
         try:
-            self.robot.get_state("/mciu/Trencher/odrive/input").value = [3, 2, 2]
-            self.robot.get_state("/mciu/Conveyor/odrive/input").value = [3, 2, 2]
+            self.robot.execute_custom_service("/trch/arm", {"in_": True}, "primrose_trch/set_armed")
         except Exception as e:
             logging.error(e)
+            ErrorBox(self, title="Service Error", message="Could not arm trencher.", error=e)
 
     def disarm(self):
-        self.robot.execute_custom_service("/trch/arm", {"in_": False}, "primrose_trch/set_armed")
         try:
-            self.robot.get_state("/mciu/Trencher/odrive/input").value = [0]
-            self.robot.get_state("/mciu/Conveyor/odrive/input").value = [0]
+            self.robot.execute_custom_service("/trch/arm", {"in_": False}, "primrose_trch/set_armed")
         except Exception as e:
             logging.error(e)
+            ErrorBox(self, title="Service Error", message="Could not disarm trencher.", error=e)
 
     def update(self):
         pass

@@ -34,6 +34,7 @@ if __name__ == '__main__':
                         required=True if target_address is None else False)
     parser.add_argument('--ros-port', type=int, default=target_port, help='ROS Bridge Port',
                         required=True if target_port is None else False)
+    parser.add_argument('-always-on-top', action='store_true', help='Enable always on top mode')
     args = parser.parse_args()
 
     # Save the new target address and port
@@ -54,7 +55,7 @@ if __name__ == '__main__':
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
     primrose = ROSInterface(args)
-    gui = DriverStatonUI.DriverStationUI(primrose)
+    gui = DriverStatonUI.DriverStationUI(primrose, args)
     app.exec_()
     primrose.disconnect()
     # Terminate the process PID

@@ -46,11 +46,22 @@ class SteeringModesCluster(QWidget):
         self.robot.attach_on_disconnect_callback(self.on_robot_disconnected)
 
     def in_point_steering(self):
+
+        def on_success(response):
+            self.on_point_steering_button.setEnabled(True)
+
+        def on_failure(error):
+            ErrorBox(self, title="Service Error", message="Was unable to execute steering_mode service.", error=error)
+            self.on_point_steering_button.setEnabled(True)
+
         try:
-            self.robot.execute_custom_service("/", {"in_": True}, "primrose_trch/set_armed")
+            self.robot.execute_custom_service("/", {"in_": True}, "primrose_trch/set_armed",
+                                              callback=on_success, errback=on_failure)
+            self.on_point_steering_button.setEnabled(False)
         except Exception as e:
             logging.error(e)
             ErrorBox(self, title="Service Error", message="Was unable to execute steering_mode service.", error=e)
+            self.on_point_steering_button.setEnabled(True)
 
     def fused_steering(self):
         try:

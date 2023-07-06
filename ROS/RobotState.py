@@ -10,8 +10,7 @@ import roslibpy
 import logging
 from PIL import Image
 
-logging = logging.getLogger(__name__)
-
+from loguru import logger as logging
 
 class SmartTopic:
 
@@ -141,7 +140,7 @@ class SmartTopic:
             self._publisher.advertise()
         if self.is_single and self.topic_type != "geometry_msgs/Twist":
             msg = roslibpy.Message({"data": updated_values})
-            logging.debug(f"Publishing {updated_values} to {self.topic_name}")
+            # logging.debug(f"Publishing {updated_values} to {self.topic_name}")
         else:
             # If the value is not a single value, but a list of values or a dictionary
             # Then we need to update the values in the dictionary and publish the entire dictionary

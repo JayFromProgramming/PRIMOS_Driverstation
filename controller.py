@@ -14,6 +14,7 @@ class XboxController(object):
         self.connected = False
         self.last_update = time.time()
         self.usb_name = "Unknown"
+        self._mapping = "Unknown"  # Set externally and used externally
         self.LeftJoystickY = 0
         self.LeftJoystickX = 0
         self.RightJoystickY = 0
@@ -46,6 +47,13 @@ class XboxController(object):
         b = self.X  # b=1, x=2
         rb = self.RightBumper
         return [x, y, a, b, rb]
+
+    def set_mapping(self, mapping):
+        self._mapping = mapping
+
+    @property
+    def mapping(self):
+        return self._mapping
 
     def on_disconnect(self):
         self.connected = False

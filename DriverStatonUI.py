@@ -1,3 +1,4 @@
+import argparse
 import multiprocessing
 import time
 import threading
@@ -15,7 +16,7 @@ from loguru import logger as logging
 
 class DriverStationUI:
 
-    def __init__(self, robot: ROSInterface):
+    def __init__(self, robot: ROSInterface, args: argparse.Namespace):
 
         self.robot = robot
         self.last_redraw = 0  # type: int
@@ -35,7 +36,14 @@ class DriverStationUI:
         self.commands_ui.move(0, 0)
 
         # Attach the resize event
-        self.window.resizeEvent = self.resizeEvent
+        # self.window.resizeEvent = self.resizeEvent
+        # Disable resizing and maximize button
+        self.window.setFixedSize(self.window.width(), self.window.height())
+        self.window.setWindowFlag(QtCore.Qt.WindowMaximizeButtonHint, False)
+
+        if args.always_on_top:
+            self.window.setWindowFlag(QtCore.Qt.WindowStaysOnTopHint, True)
+
         self.window.show()
 
         threading.Thread(target=self.controller_read_loop).start()
