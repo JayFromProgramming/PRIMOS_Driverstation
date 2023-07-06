@@ -157,9 +157,9 @@ class ROSInterface:
 
     def execute_service(self, name, callback=None, errback=None, timeout=5):
         if self.client is None:
-            raise Exception("No ROS client")
+            raise ConnectionAbortedError("No ROS client")
         if not self.client.is_connected:
-            raise Exception("Not connected to ROS bridge")
+            raise ConnectionError("Not connected to ROS bridge")
         # if name not in self.client.get_services():
         #     raise Exception(f"Service {name} not available")
         service = roslibpy.Service(self.client, name, 'std_srvs/Empty')
@@ -168,9 +168,9 @@ class ROSInterface:
 
     def execute_custom_service(self, name, args: dict, service_type, callback=None, errback=None, timeout=5):
         if self.client is None:
-            raise Exception("No ROS client")
+            raise ConnectionAbortedError("No ROS client")
         if not self.client.is_connected:
-            raise Exception("Not connected to ROS bridge")
+            raise ConnectionError("Not connected to ROS bridge")
         # if name not in self.client.get_services():
         #     raise Exception(f"Service {name} not available")
         service = roslibpy.Service(self.client, name, service_type)

@@ -3,6 +3,8 @@ from PyQt5.QtWidgets import QWidget, QPushButton, QLabel
 
 from loguru import logger as logging
 
+from QT5_Classes.ErrorBox import ErrorBox
+
 
 class SteeringModesCluster(QWidget):
 
@@ -44,13 +46,25 @@ class SteeringModesCluster(QWidget):
         self.robot.attach_on_disconnect_callback(self.on_robot_disconnected)
 
     def in_point_steering(self):
-        self.robot.execute_custom_service("steering_mode", "primos/switch_action", 1)
+        try:
+            self.robot.execute_custom_service("steering_mode", "primos/switch_action", 1)
+        except Exception as e:
+            logging.error(e)
+            ErrorBox(self, title="Service Error", message="Was unable to execute steering_mode service.", error=e)
 
     def fused_steering(self):
-        self.robot.execute_custom_service("steering_mode", "primos/switch_action", 2)
+        try:
+            self.robot.execute_custom_service("steering_mode", "primos/switch_action", 2)
+        except Exception as e:
+            logging.error(e)
+            ErrorBox(self, title="Service Error", message="Was unable to execute steering_mode service.", error=e)
 
     def tank_steering(self):
-        self.robot.execute_custom_service("steering_mode", "primos/switch_action", 3)
+        try:
+            self.robot.execute_custom_service("steering_mode", "primos/switch_action", 3)
+        except Exception as e:
+            logging.error(e)
+            ErrorBox(self, title="Service Error", message="Was unable to execute steering_mode service.", error=e)
 
     def update(self):
         pass

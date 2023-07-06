@@ -12,6 +12,8 @@ class XboxController(object):
 
     def __init__(self):
         self.connected = False
+        self.last_update = time.time()
+        self.usb_name = "Unknown"
         self.LeftJoystickY = 0
         self.LeftJoystickX = 0
         self.RightJoystickY = 0
@@ -75,9 +77,12 @@ class XboxController(object):
                 events = get_gamepad()
                 self.connected = True
             except inputs.UnpluggedError:
+                logging.warning("Controller disconnected")
                 events = []
                 self.on_disconnect()
+                time.sleep(5)
             for event in events:
+                self.last_update = time.time()
                 if event.code == 'ABS_Y':
                     self.LeftJoystickY = event.state / XboxController.MAX_JOY_VAL  # normalize between -1 and 1
                 elif event.code == 'ABS_X':
@@ -118,5 +123,8 @@ class XboxController(object):
                     self.UpDPad = event.state
                 elif event.code == 'BTN_TRIGGER_HAPPY4':
                     self.DownDPad = event.state
+                elif event.code == 'SYN_REPORT':
+                    self.usb_name = event.device
                 else:
                     logging.warning(f"Joystick returned unknown event: {event.code}")
+            time.sleep(1/60)

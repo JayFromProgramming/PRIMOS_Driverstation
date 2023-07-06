@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QWidget, QPushButton, QLabel
 
 from loguru import logger as logging
 
+from QT5_Classes.ErrorBox import ErrorBox
 from Resources import Enumerators
 
 
@@ -40,6 +41,7 @@ class EStopButton(QWidget):
             self.robot.get_state('/mciu/estop_controller').value = Enumerators.EStopCommands.TRIGGER
         except Exception as e:
             logging.error(e)
+            ErrorBox(self, message="Unable to send estop command!", error=e)
 
     def update(self):
         pass

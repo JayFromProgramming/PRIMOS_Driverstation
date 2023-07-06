@@ -3,6 +3,8 @@ from PyQt5.QtWidgets import QWidget, QPushButton, QLabel
 
 from loguru import logger as logging
 
+from QT5_Classes.ConfirmationBox import ConfirmationBox
+
 
 class BatteryCharge(QWidget):
 
@@ -47,10 +49,17 @@ class BatteryCharge(QWidget):
         # Create a confirmation dialog box and wait for the user to confirm
         # If the user confirms, then send the commmand to actuate the door
         try:
-            confirm = self.ConfirmationBox()
+            confirm = ConfirmationBox(self, title="Confirm Battery Charge",
+                                      message="Are you sure you want to mark the battery as fully charged?",
+                                      detailed_message="This will reset the estimated battery charge to 100%,"
+                                      " this action is irreversible and should only be run after each charge cycle.")
+
             confirm.exec_()
             if confirm.result() == Qt.QMessageBox.Yes:
+                logging.info("Sending command to set battery charge to 100%")
                 self.robot.get_state('/mciu/battery_monitor').value = 1
+            else:
+                logging.info("Operator cancelled the command to set battery charge to 100%")
         except Exception as e:
             logging.error(e)
 
@@ -78,13 +87,3 @@ class BatteryCharge(QWidget):
         self.add_charge_button.setDisabled(True)
         self.charge_button.setDisabled(True)
         self.del_charge_button.setDisabled(True)
-
-    class ConfirmationBox(Qt.QMessageBox):
-
-        def __init__(self, parent=None):
-            super().__init__(parent)
-
-            self.setText("Are you sure you want to mark the battery as fully charged?")
-            self.setStandardButtons(Qt.QMessageBox.Yes | Qt.QMessageBox.No)
-            self.setDefaultButton(Qt.QMessageBox.No)
-            self.setWindowTitle("Reset Battery Charge")

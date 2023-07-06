@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QWidget, QPushButton, QLabel
 
 from loguru import logger as logging
 
-from QT5_Classes.CommandUIClusters.ConfirmationBox import ConfirmationBox
+from QT5_Classes.ConfirmationBox import ConfirmationBox
 
 
 class HopperDoorControls(QWidget):
@@ -59,7 +59,10 @@ class HopperDoorControls(QWidget):
         # Create a confirmation dialog box and wait for the user to confirm
         # If the user confirms, then send the commmand to actuate the door
         try:
-            self.robot.get_state('/mciu/Hopper/door').value = [2]
+            confirm = ConfirmationBox(self, title="Open Hopper Door", message="Are you sure you want to open the hopper door?",
+                                      detailed_message="This one is pretty self explanatory.")
+            if confirm.exec_():
+                self.robot.get_state('/mciu/Hopper/door').value = [2]
         except Exception as e:
             logging.error(e)
 
@@ -101,7 +104,7 @@ class HopperLoadSensors(QWidget):
         self.hopper_tare_button.setFixedSize(125, 25)
         self.hopper_tare_button.move(10, 20)
         self.hopper_tare_button.clicked.connect(self.tare_hopper)
-        self.hopper_tare_button.setDisabled(False)
+        self.hopper_tare_button.setDisabled(True)
 
         self.suspen_tare_button = QPushButton("Suspension Tare", self)
         self.suspen_tare_button.setFixedSize(125, 25)

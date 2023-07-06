@@ -29,7 +29,7 @@ class DriverStationUI:
 
         # self.window.showMaximized()
 
-        self.commands_ui = CommandsUI(self.robot, parent=self.window)
+        self.commands_ui = CommandsUI(self.robot, parent=self.window, xbox_controller=self.xbox_controller)
         self.window.resize(self.commands_ui.width(), self.commands_ui.height())
 
         self.commands_ui.move(0, 0)
@@ -66,6 +66,8 @@ class DriverStationUI:
         # Read the controller while the window is open
         while True:
             try:
+                if not self.robot.is_connected:
+                    continue
                 # Apply deadbands to the joystick
                 forward = self.xbox_controller.LeftJoystickY if abs(self.xbox_controller.LeftJoystickY) > 0.15 else 0
                 turn = self.xbox_controller.RightJoystickX if abs(self.xbox_controller.RightJoystickX) > 0.15 else 0

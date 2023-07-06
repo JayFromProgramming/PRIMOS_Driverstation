@@ -3,7 +3,7 @@ from PyQt5.QtWidgets import QWidget, QPushButton, QLabel
 
 from loguru import logger as logging
 
-from QT5_Classes.CommandUIClusters.ConfirmationBox import ConfirmationBox
+from QT5_Classes.ConfirmationBox import ConfirmationBox
 from Resources import Enumerators
 
 
@@ -35,13 +35,13 @@ class AutomaticEStopControls(QWidget):
         self.reset_estop_button.setFixedSize(80, 25)
         self.reset_estop_button.move(100, 20)
         self.reset_estop_button.clicked.connect(self.reset_estop)
-        self.reset_estop_button.setEnabled(True)
+        self.reset_estop_button.setEnabled(False)
 
         self.disable_auto_button = QPushButton("Disable", self)
         self.disable_auto_button.setFixedSize(80, 25)
         self.disable_auto_button.move(190, 20)
         self.disable_auto_button.clicked.connect(self.disable_auto)
-        self.disable_auto_button.setEnabled(True)
+        self.disable_auto_button.setEnabled(False)
 
         self.robot.attach_on_connect_callback(self.on_robot_connection)
         self.robot.attach_on_disconnect_callback(self.on_robot_disconnection)
@@ -72,6 +72,7 @@ class AutomaticEStopControls(QWidget):
             confirm.exec_()
             if confirm.result() == Qt.QMessageBox.Yes:
                 self.robot.get_state('/mciu/estop_controller').value = Enumerators.EStopCommands.DISABLE_AUTO
+                logging.info("Automatic E-Stop disabled by operator")
         except Exception as e:
             logging.error(e)
 
