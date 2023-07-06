@@ -20,23 +20,23 @@ class BatteryCharge(QWidget):
         self.header.setAlignment(Qt.Qt.AlignCenter)
         self.header.move(round(self.width() / 2 - self.header.width() / 2) - 5, 0)
 
-        self.open_button = QPushButton("+5%", self)
-        self.open_button.setFixedSize(80, 25)
-        self.open_button.move(10, 20)
-        self.open_button.clicked.connect(self.increase_charge)
-        self.open_button.setDisabled(True)
+        self.add_charge_button = QPushButton("+5%", self)
+        self.add_charge_button.setFixedSize(80, 25)
+        self.add_charge_button.move(10, 20)
+        self.add_charge_button.clicked.connect(self.increase_charge)
+        self.add_charge_button.setDisabled(True)
 
-        self.close_button = QPushButton("Charge", self)
-        self.close_button.setFixedSize(80, 25)
-        self.close_button.move(100, 20)
-        self.close_button.clicked.connect(self.set_fully_charged)
-        self.close_button.setDisabled(True)
+        self.charge_button = QPushButton("Charge", self)
+        self.charge_button.setFixedSize(80, 25)
+        self.charge_button.move(100, 20)
+        self.charge_button.clicked.connect(self.set_fully_charged)
+        self.charge_button.setDisabled(True)
 
-        self.close_button = QPushButton("-5%", self)
-        self.close_button.setFixedSize(80, 25)
-        self.close_button.move(190, 20)
-        self.close_button.clicked.connect(self.decrease_charge)
-        self.close_button.setDisabled(True)
+        self.del_charge_button = QPushButton("-5%", self)
+        self.del_charge_button.setFixedSize(80, 25)
+        self.del_charge_button.move(190, 20)
+        self.del_charge_button.clicked.connect(self.decrease_charge)
+        self.del_charge_button.setDisabled(True)
 
         self.robot.attach_on_connect_callback(self.on_robot_connection)
         self.robot.attach_on_disconnect_callback(self.on_robot_disconnection)
@@ -65,12 +65,12 @@ class BatteryCharge(QWidget):
         pass
 
     def on_robot_connection(self):
-        self.open_button.setDisabled(False)
-        self.close_button.setDisabled(False)
-        self.close_button.setDisabled(False)
+        self.add_charge_button.setDisabled(False)
+        self.charge_button.setDisabled(False)
+        self.del_charge_button.setDisabled(False)
 
     def on_robot_disconnection(self):
-        self.open_button.setDisabled(True)
-        self.close_button.setDisabled(True)
-        self.close_button.setDisabled(True)
+        self.add_charge_button.setDisabled(True)
+        self.charge_button.setDisabled(True)
+        self.del_charge_button.setDisabled(True)
 

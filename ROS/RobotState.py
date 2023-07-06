@@ -67,15 +67,6 @@ class SmartTopic:
             logging.info(f"Acquired type {topic_type} for topic {self.topic_name}")
             self.connect()
 
-    def _recheck_exists(self):
-        """If the topic didn't exist at ready this loop runs to try to see if it has appeared"""
-        return
-        time.sleep(5 + random.randint(0, 5))
-        if not self.exists and self.client.is_connected:
-            self.client.get_topic_type(self.topic_name, self._topic_type_callback)
-        else:
-            logging.info(f"Topic recheck has been cancelled for {self.topic_name}")
-
     def connect(self):
         if self.topic_type is None:
             # Get the type of the topic from the ROS master
@@ -83,7 +74,6 @@ class SmartTopic:
             if self.topic_type == "":
                 self.exists = False
                 logging.error(f"Topic {self.topic_name} does not exist")
-                threading.Thread(target=self._recheck_exists, daemon=True).start()
                 return
             else:
                 logging.info(f"Acquired type {self.topic_type} for topic {self.topic_name}")
@@ -94,11 +84,12 @@ class SmartTopic:
                                         compression=self._compression)
         self._listener.subscribe(self._update)
         if self.allow_update:
+            logging.info(f"Creating publisher for {self.disp_name}")
             self._publisher = roslibpy.Topic(self.client, self.topic_name, self.topic_type)
-            # self._publisher.advertise()
-            logging.info(f"{self.disp_name} connected to {self.topic_name} of type {self.topic_type}, publishing enabled")
+            self._publisher.advertise()
         else:
-            logging.info(f"{self.disp_name} connected to {self.topic_name} of type {self.topic_type}, publishing disabled")
+            self._publisher = None
+            logging.info(f"Listener for {self.disp_name} created")
 
     def _update(self, message):
         """
@@ -141,31 +132,31 @@ class SmartTopic:
 
     @value.setter
     def value(self, updated_values):
-        if self.allow_update:
-            # logging.info(f"Updating {self.disp_name} with {updated_values} -> {self.value}")
-            if not self.exists:
-                # logging.error(f"Topic {self.topic_name} does not exist")
-                return
-            if self.is_single and self.topic_type != "geometry_msgs/Twist":
-                msg = roslibpy.Message({"data": updated_values})
-                logging.debug(f"Publishing {updated_values} to {self.topic_name}")
-            else:
-                # If the value is not a single value, but a list of values or a dictionary
-                # Then we need to update the values in the dictionary and publish the entire dictionary
-                # Generate an instance of the message type
-                if self.has_data:
-                    # If we have data, then we can use the current value as a template
-                    msg = roslibpy.Message(self.value)
-                else:
-                    # Otherwise, we need to create a blank message
-                    msg = roslibpy.Message({})
-                # Update the values in the message
-                for key, value in updated_values.items():
-                    msg[key] = value
-
-            self._publisher.publish(msg)
+        if self.client is None or not self.client.is_connected:
+            return
+        if self._publisher is None:
+            # Create a publisher for the topic if there was an attempt to publish to it
+            logging.info(f"Creating publisher for {self.disp_name}")
+            self._publisher = roslibpy.Topic(self.client, self.topic_name, self.topic_type)
+            self._publisher.advertise()
+        if self.is_single and self.topic_type != "geometry_msgs/Twist":
+            msg = roslibpy.Message({"data": updated_values})
+            logging.debug(f"Publishing {updated_values} to {self.topic_name}")
         else:
-            raise Exception("This topic is not allowed to be updated")
+            # If the value is not a single value, but a list of values or a dictionary
+            # Then we need to update the values in the dictionary and publish the entire dictionary
+            # Generate an instance of the message type
+            if self.has_data:
+                # If we have data, then we can use the current value as a template
+                msg = roslibpy.Message(self.value)
+            else:
+                # Otherwise, we need to create a blank message
+                msg = roslibpy.Message({})
+            # Update the values in the message
+            for key, value in updated_values.items():
+                msg[key] = value
+
+        self._publisher.publish(msg)
 
     def get_update_rate(self) -> float:
         """Returns the current update rate of the topic in Hz"""

@@ -9,6 +9,8 @@ import roslibpy
 import threading
 import logging
 
+# from roslibpy.core import RosTimeoutError
+
 from ROS.RobotState import SmartTopic
 
 from loguru import logger as logging
@@ -40,6 +42,7 @@ class ROSInterface:
 
     def __init__(self, arguments: argparse.Namespace):
         self.client = None  # type: roslibpy.Ros or None
+        self.twister = None
         self.address = arguments.ros_address
         self.port = arguments.ros_port
 
@@ -51,7 +54,8 @@ class ROSInterface:
         self.on_connect_callbacks = []  # type: list[callable]
         self.on_disconnect_callbacks = []  # type: list[callable]
 
-        threading.Thread(target=self.establish_connection, daemon=True).start()
+        self.connection_thread = None  # type: threading.Thread
+        self.establish_connection()
 
     @property
     def is_connected(self):
@@ -64,18 +68,36 @@ class ROSInterface:
         self.on_disconnect_callbacks.append(callback)
 
     def hook_on_ready(self, callback):
-        if self.client is not None:
+        self.future_callbacks.append(callback)
+
+    def on_ready(self):
+        logging.info(f"Connection to ROS bridge at {self.address}:{self.port} established")
+        logging.debug(f"ROS topics: {self.client.get_topics()}")
+        logging.debug(f"ROS services: {self.client.get_services()}")
+        logging.debug(f"ROS nodes: {self.client.get_nodes()}")
+        for callback in self.on_connect_callbacks:
+            try:
+                callback()
+            except Exception as e:
+                logging.error(f"Error in on_connect_callback: {e}")
+                logging.exception(e)
+        for smart_topic in self.smart_topics:
+            smart_topic.set_client(self.client)
+            # smart_topic.connect()
+        for callback in self.future_callbacks:
             self.client.on_ready(callback)
-        else:
-            self.future_callbacks.append(callback)
 
     def establish_connection(self):
-        self.connect()
+        self.connection_thread = threading.Thread(target=self.connect, daemon=True)
+        self.connection_thread.start()
 
     def connect(self):
         try:
             logging.info(f"Attempting to connect to ROS bridge at {self.address}:{self.port}")
             self.client = roslibpy.Ros(host=self.address, port=self.port)
+            self.twister = self.client.factory
+            self.twister.set_max_delay(30)
+            self.client.on_ready(self.on_ready)
             self._connect()
 
             # Make sure the process doesn't close
@@ -94,49 +116,35 @@ class ROSInterface:
     def disconnect(self):
         try:
             self.terminate()
-            del self.client  # Force garbage collection of the client
             self.client = None
             # self.client = roslibpy.Ros(host=self.address, port=self.port)
         except Exception as e:
             logging.error(f"Failed to disconnect: {e} {traceback.format_exc()}")
 
     def terminate(self):
-        logging.info("Terminating ROSInterface")
+        if self.connection_thread is not None:
+            if self.connection_thread.is_alive():
+                logging.info("Terminating ROSInterface connection thread")
+                self.connection_thread.join(5)
         # self.robot_state_monitor.unsub_all()
+        logging.info("Terminating ROSInterface")
         if self.client is not None:
-            self.client.terminate()
-            del self.client
-        self.client = None
-        # self.robot_state_monitor.set_client(self.client)
+            try:
+                self.client.terminate()
+            except roslibpy.core.RosTimeoutError:
+                logging.error(f"Unable to disconnect from ROS bridge")
+            else:
+                logging.info(f"Disconnected from ROS bridge at {self.address}:{self.port}")
 
     def _connect(self):
-        try:
-            self.client.run()
-        except Exception as e:
-            logging.error(f"Connection to ROS bridge failed: {e}")
-            self.client.close()
-        else:
-            logging.info(f"Connection to ROS bridge at {self.address}:{self.port} successful")
-            logging.debug(f"ROS topics: {self.client.get_topics()}")
-            logging.debug(f"ROS services: {self.client.get_services()}")
-            logging.debug(f"ROS nodes: {self.client.get_nodes()}")
-            for callback in self.on_connect_callbacks:
-                try:
-                    callback()
-                except Exception as e:
-                    logging.error(f"Error in on_connect_callback: {e}")
-                    logging.exception(e)
-            for smart_topic in self.smart_topics:
-                smart_topic.set_client(self.client)
-                # smart_topic.connect()
-            for callback in self.future_callbacks:
-                self.client.on_ready(callback)
-
-    def drive(self, forward=0.0, turn=0.0):
-        state = self.get_state("primrose/cmd_vel")
-        state.value = {"linear": {"x": forward, "y": 0, "z": 0},
-                       "angular": {"x": 0, "y": 0, "z": turn}}
-        # logging.info(f"Driving forward: {forward}, turn: {turn}")
+        while not self.client.is_connected:
+            try:
+                self.client.run()
+            except roslibpy.core.RosTimeoutError:
+                logging.error(f"Connection to ROS bridge at {self.address}:{self.port} timed out, retrying...")
+            except Exception as e:
+                logging.error(f"Connection to ROS bridge failed: {e}")
+                logging.exception(e)
 
     def get_services(self):
         return self.client.get_services()
@@ -173,4 +181,7 @@ class ROSInterface:
         for smart_topic in self.smart_topics:
             if smart_topic.disp_name == name:
                 return smart_topic
-        return None
+        # Create a new SmartTopic
+        new_topic = SmartTopic(name, allow_update=True)
+        self.smart_topics.append(new_topic)
+        return new_topic

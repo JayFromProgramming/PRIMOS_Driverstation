@@ -1,9 +1,7 @@
 import ctypes
-import multiprocessing
 import os
+import json
 import sys
-import asyncio
-import threading
 
 import roslibpy
 from PyQt5 import QtGui
@@ -22,11 +20,25 @@ logging.basicConfig(level=logging.INFO)
 
 if __name__ == '__main__':
 
-    parser = argparse.ArgumentParser(description='PRIMROSE Driver Station')
-    parser.add_argument('--ros-address', type=str, default="141.219.122.11", help='ROS Bridge IP Address')
-    parser.add_argument('--ros-port', type=int, default=9090, help='ROS Bridge Port')
+    if os.path.exists("configs/target_address.json"):
+        values = json.load(open("configs/target_address.json"))
+        target_address = values["address"]
+        target_port = values["port"]
+    else:
+        os.mkdir("configs")
+        target_address = None
+        target_port = None
 
+    parser = argparse.ArgumentParser(description='PRIMROSE Driver Station')
+    parser.add_argument('--ros-address', type=str, default=target_address, help='ROS Bridge IP Address',
+                        required=True if target_address is None else False)
+    parser.add_argument('--ros-port', type=int, default=target_port, help='ROS Bridge Port',
+                        required=True if target_port is None else False)
     args = parser.parse_args()
+
+    # Save the new target address and port
+    with open("configs/target_address.json", "w") as f:
+        json.dump({"address": args.ros_address, "port": args.ros_port}, f, indent=4)
 
     print(f"Main started with PID {os.getpid()} Address: {args.ros_address}:{args.ros_port}")
     app = QApplication([])
@@ -41,16 +53,17 @@ if __name__ == '__main__':
 
     # while pioneer.client.is_connecting:
     #     pass
-    pioneer = ROSInterface(args)  # MAC: a0:a8:cd:be:8d:2c
+    primrose = ROSInterface(args)  # MAC: a0:a8:cd:be:8d:2c
     # while pioneer.client.is_connecting:
     #     pass
-    gui = DriverStatonUI.DriverStationUI(pioneer)
+    gui = DriverStatonUI.DriverStationUI(primrose)
     # threading.Thread(target=gui.run, daemon=True).start()
 
     app.exec_()
     # gui.run()
     # while pioneer.client.is_connected:
     #     pass
-    pioneer.terminate()
-    # Set qt event loop
+    primrose.disconnect()
+    # Terminate the process PID
+    os.kill(os.getpid(), 9)
 

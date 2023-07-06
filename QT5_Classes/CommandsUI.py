@@ -2,6 +2,7 @@ from PyQt5 import Qt
 from PyQt5.QtWidgets import QWidget, QLabel
 
 from QT5_Classes.CommandUIClusters.BatteryCharge import BatteryCharge
+from QT5_Classes.CommandUIClusters.DrivetrainControls import DriveTrainControls
 from QT5_Classes.CommandUIClusters.EStopButton import EStopButton
 from QT5_Classes.CommandUIClusters.EStopControls import AutomaticEStopControls
 from QT5_Classes.CommandUIClusters.HopperControls import HopperDoorControls, HopperLoadSensors
@@ -43,6 +44,7 @@ class CommandsUI(QWidget):
         self.trencher = TrencherControls(self.robot, self)
         self.battery = BatteryCharge(self.robot, self)
         self.laser_power = LaserPowerControls(self.robot, self)
+        self.drivetrain = DriveTrainControls(self.robot, self)
 
         # Column 1
         self.steering_mode_cluster.move(10, 40)
@@ -64,3 +66,4 @@ class CommandsUI(QWidget):
         # Column 3
         self.battery.move(self.auto_estop_controls.x() + self.auto_estop_controls.width() + 5, 40)
         self.laser_power.move(self.battery.x(), self.battery.y() + self.battery.height() + 5)
+        self.drivetrain.move(self.battery.x(), self.laser_power.y() + self.laser_power.height() + 5)
