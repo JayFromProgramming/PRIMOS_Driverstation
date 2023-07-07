@@ -61,7 +61,7 @@ class DriverStationUI:
             self.window.setWindowTitle(f"PRIMROSE Driver Station - Disconnected")
         elif self.robot.is_connected and not self.xbox_controller.connected:
             # Update the name of the window to indicate the connection status
-            self.window.setWindowTitle(f"PRIMROSE DRiver Station - No Controller")
+            self.window.setWindowTitle(f"PRIMROSE Driver Station - No Controller")
         else:
             # Update the name of the window to indicate the connection status
             self.window.setWindowTitle(f"PRIMROSE Driver Station - Connected")

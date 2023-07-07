@@ -131,7 +131,9 @@ class SmartTopic:
 
     @value.setter
     def value(self, updated_values):
-        if self.client is None or not self.client.is_connected:
+        if self.client is None:
+            raise ConnectionAbortedError("Cannot update value when client is not set")
+        if not self.client.is_connected:
             raise ConnectionError("Cannot update value when client is not connected")
         if self._publisher is None:
             # Create a publisher for the topic if there was an attempt to publish to it

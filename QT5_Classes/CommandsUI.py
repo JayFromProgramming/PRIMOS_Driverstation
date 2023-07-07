@@ -8,6 +8,7 @@ from QT5_Classes.CommandUIClusters.DrivetrainControls import DriveTrainControls
 from QT5_Classes.CommandUIClusters.EStopButton import EStopButton
 from QT5_Classes.CommandUIClusters.EStopControls import AutomaticEStopControls
 from QT5_Classes.CommandUIClusters.HopperControls import HopperDoorControls, HopperLoadSensors
+from QT5_Classes.CommandUIClusters.JetsonSSHControls import JetsonControls
 from QT5_Classes.CommandUIClusters.LaserPowerControls import LaserPowerControls
 from QT5_Classes.CommandUIClusters.MotorCalibControl import MotorCalibrationCluster
 from QT5_Classes.CommandUIClusters.RoverConnectionUI import RoverConnectionUI
@@ -52,6 +53,7 @@ class CommandsUI(QWidget):
         self.laser_power = LaserPowerControls(self.robot, self)
         self.drivetrain = DriveTrainControls(self.robot, self)
         self.suspension = SuspensionModeSelect(self.robot, self, self.xbox_controller)
+        self.jetson = JetsonControls(self.robot, self)
 
         # Column 1
         self.steering_mode_cluster.move(10, 40)
@@ -59,6 +61,7 @@ class CommandsUI(QWidget):
         self.hopper_load_cluster.move(10, self.hopper_door_cluster.y() + self.hopper_door_cluster.height() + 5)
         self.trencher.move(10, self.hopper_load_cluster.y() + self.hopper_load_cluster.height() + 5)
         self.conveyor.move(10, self.trencher.y() + self.trencher.height() + 5)
+        self.jetson.move(10, self.conveyor.y() + self.conveyor.height() + 5)
 
         # Column 2
         self.auto_estop_controls.move(self.steering_mode_cluster.x() + self.steering_mode_cluster.width() + 5, 40)

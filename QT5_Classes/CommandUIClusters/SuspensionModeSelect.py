@@ -1,9 +1,12 @@
 from PyQt5 import Qt
+from PyQt5.QtCore import QTimer
 from PyQt5.QtWidgets import QWidget, QPushButton, QLabel
 
 from loguru import logger as logging
 
 from QT5_Classes.ConfirmationBox import ConfirmationBox
+from QT5_Classes.ErrorBox import ErrorBox
+from Resources.Enumerators import quarter_modules, ActuatorCommands
 
 
 class SuspensionModeSelect(QWidget):
@@ -184,12 +187,68 @@ class SuspensionManualControl(QWidget):
         # self.header.setBaseSize(0, 0)
         self.header.move(round(self.width() / 2 - self.header.width() / 2) - 40, 0)
 
-        self.text = QLabel("<pre>Selected Corner: </pre>", self.surface)
+        self.text = QLabel("<pre>Selected Corner: No Module Selected</pre>", self.surface)
         self.text.setStyleSheet("font-weight: bold; font-size: 12px; border: 0px; "
                                 "background-color: transparent;")
-        self.text.setAlignment(Qt.Qt.AlignCenter)
+        # self.text.setAlignment(Qt.Qt.AlignCenter)
         # self.header.setBaseSize(0, 0)
         self.text.move(10, 20)
+        self.selected_corner = 0
+        self.key_release = False
+
+        # Setup timer to update the UI
+        self.ui_timer = QTimer(self)
+        self.ui_timer.timeout.connect(self.update_ui)
+        self.ui_timer.startTimer(100)
+
+        # Setup timer to read the controller
+        self.controller_timer = QTimer(self)
+        self.controller_timer.timeout.connect(self.read_controller)
+        self.controller_timer.startTimer(100)
+
+    def hide(self) -> None:
+        super().hide()
+        self.ui_timer.stop()
+        self.controller_timer.stop()
+
+    def show(self) -> None:
+        super().show()
+        self.ui_timer.start()
+        self.controller_timer.start()
+
+    def update_ui(self):
+        self.text.setText(f"<pre>Selected Corner: {quarter_modules[self.selected_corner]}</pre>")
+
+    def read_controller(self):
+        try:
+            # Use the dpad left and right to change the selected corner
+            # Use the dpad up and down to move the selected corner
+
+            if not self.key_release:
+                if self.controller.LeftDPad:
+                    self.selected_corner = (self.selected_corner - 1) % 4
+                    self.key_release = True
+                elif self.controller.RightDPad:
+                    self.selected_corner = (self.selected_corner + 1) % 4
+                    self.key_release = True
+                elif self.controller.UpDPad:
+                    self.robot.get_state(f"/mciu/{quarter_modules[self.selected_corner]}/actuators/input").value = \
+                        [ActuatorCommands.SET_INPUT_VALUE, 100, 1]
+                    self.key_release = True
+                elif self.controller.DownDPad:
+                    self.robot.get_state(f"/mciu/{quarter_modules[self.selected_corner]}/actuators/input").value = \
+                        [ActuatorCommands.SET_INPUT_VALUE, -100, 1]
+                    self.key_release = True
+            else:
+                if not self.controller.LeftDPad and not self.controller.RightDPad and \
+                        not self.controller.UpDPad and not self.controller.DownDPad:
+                    self.key_release = False
+                    self.robot.get_state(f"/mciu/{quarter_modules[self.selected_corner]}/actuators/input").value = \
+                        [ActuatorCommands.SET_INPUT_VALUE, 0, 1]
+        except Exception as e:
+            logging.error(e)
+            ErrorBox(self, title="Manual Suspension Control Error",
+                     message="Error reading controller input or sending command to rover", error=e)
 
 
 class MaxExtension(QWidget):

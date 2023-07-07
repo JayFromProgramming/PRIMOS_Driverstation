@@ -131,8 +131,28 @@ class XboxController(object):
                     self.UpDPad = event.state
                 elif event.code == 'BTN_TRIGGER_HAPPY4':
                     self.DownDPad = event.state
+                elif event.code == 'ABS_HAT0Y':
+                    if event.state == -1:
+                        self.UpDPad = 1
+                        self.DownDPad = 0
+                    elif event.state == 1:
+                        self.DownDPad = 1
+                        self.UpDPad = 0
+                    else:
+                        self.DownDPad = 0
+                        self.UpDPad = 0
+                elif event.code == 'ABS_HAT0X':
+                    if event.state == -1:
+                        self.LeftDPad = 1
+                        self.RightDPad = 0
+                    elif event.state == 1:
+                        self.RightDPad = 1
+                        self.LeftDPad = 0
+                    else:
+                        self.RightDPad = 0
+                        self.LeftDPad = 0
                 elif event.code == 'SYN_REPORT':
                     self.usb_name = event.device
                 else:
-                    logging.warning(f"Joystick returned unknown event: {event.code}")
+                    logging.warning(f"Joystick returned unknown event: {event.code} - {event.state}")
             time.sleep(1/60)

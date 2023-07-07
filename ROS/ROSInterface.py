@@ -207,5 +207,6 @@ class ROSInterface:
                 return smart_topic
         # Create a new SmartTopic
         new_topic = SmartTopic(name, allow_update=True)
+        new_topic.set_client(self.client)
         self.smart_topics.append(new_topic)
         return new_topic

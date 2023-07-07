@@ -57,7 +57,7 @@ class BatteryCharge(QWidget):
             confirm.exec_()
             if confirm.result() == Qt.QMessageBox.Yes:
                 logging.info("Sending command to set battery charge to 100%")
-                self.robot.get_state('/mciu/battery_monitor').value = 1
+                self.robot.get_state('/mciu/battery_monitor').value = [0]
             else:
                 logging.info("Operator cancelled the command to set battery charge to 100%")
         except Exception as e:
@@ -65,13 +65,13 @@ class BatteryCharge(QWidget):
 
     def increase_charge(self):
         try:
-            self.robot.get_state('/mciu/battery_monitor').value = 3
+            self.robot.get_state('/mciu/battery_monitor').value = [1, 5]
         except Exception as e:
             logging.error(e)
 
     def decrease_charge(self):
         try:
-            self.robot.get_state('/mciu/battery_monitor').value = 2
+            self.robot.get_state('/mciu/battery_monitor').value = [2, 5]
         except Exception as e:
             logging.error(e)
 
