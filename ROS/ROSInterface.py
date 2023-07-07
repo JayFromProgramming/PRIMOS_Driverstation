@@ -45,6 +45,7 @@ class ROSInterface:
         self.twister = None
         self.address = arguments.ros_address
         self.port = arguments.ros_port
+        self.password = arguments.ros_password
 
         self.background_thread = None
 

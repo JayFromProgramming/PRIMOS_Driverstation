@@ -50,7 +50,7 @@ class JetsonControls(QWidget):
             try:
                 ssh = paramiko.SSHClient()
                 ssh.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-                ssh.connect(self.robot.address, username="jetson", password="primrosepassword")
+                ssh.connect(self.robot.address, username="jetson", password=self.robot.password)
                 ssh.exec_command(command)
                 ssh.close()
             except Exception as e:

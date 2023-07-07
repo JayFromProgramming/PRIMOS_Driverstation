@@ -20,26 +20,32 @@ logging.basicConfig(level=logging.INFO)
 
 if __name__ == '__main__':
 
+    if not os.path.exists("configs"):
+        os.mkdir("configs")
+
     if os.path.exists("configs/target_address.json"):
         values = json.load(open("configs/target_address.json"))
-        target_address = values["address"]
-        target_port = values["port"]
+        target_address = values["address"] if "address" in values else None
+        target_port = values["port"] if "port" in values else None
+        target_password = values["password"] if "password" in values else None
     else:
-        os.mkdir("configs")
         target_address = None
         target_port = None
+        target_password = None
 
     parser = argparse.ArgumentParser(description='PRIMROSE Driver Station')
     parser.add_argument('--ros-address', type=str, default=target_address, help='ROS Bridge IP Address',
                         required=True if target_address is None else False)
     parser.add_argument('--ros-port', type=int, default=target_port, help='ROS Bridge Port',
                         required=True if target_port is None else False)
+    parser.add_argument('--ros-password', type=str, default=target_password, help='ROS Bridge Password',
+                        required=True if target_password is None else False)
     parser.add_argument('-always-on-top', action='store_true', help='Enable always on top mode')
     args = parser.parse_args()
 
     # Save the new target address and port
     with open("configs/target_address.json", "w") as f:
-        json.dump({"address": args.ros_address, "port": args.ros_port}, f, indent=4)
+        json.dump({"address": args.ros_address, "port": args.ros_port, "password": args.ros_password}, f, indent=4)
 
     print(f"Main started with PID {os.getpid()} Address: {args.ros_address}:{args.ros_port}")
     app = QApplication([])
