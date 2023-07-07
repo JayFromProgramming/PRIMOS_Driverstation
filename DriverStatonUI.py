@@ -46,14 +46,12 @@ class DriverStationUI:
 
         self.window.show()
 
-        threading.Thread(target=self.controller_read_loop).start()
+        threading.Thread(target=self.controller_read_loop, daemon=True).start()
 
         # Start the timer for the connection check loop
         self.connection_check_timer = QtCore.QTimer()
         self.connection_check_timer.timeout.connect(self.connection_check_loop)
         self.connection_check_timer.start(1000)
-        # threading.Thread(target=self.connection_check_loop).start()
-        # multiprocessing.Process(target=self.controller_read_loop).start()
 
     def connection_check_loop(self):
         """Loop to check the connection to the ROS bridge"""

@@ -51,7 +51,7 @@ if __name__ == '__main__':
 
     myappid = 'pstdl.primrose.drivestation'  # arbitrary string
     # Check if the OS is Windows
-    if os.name == 'nt':
+    if os.name == 'nt':  # If so then we need to sent and appID for the taskbar
         ctypes.windll.shell32.SetCurrentProcessExplicitAppUserModelID(myappid)
 
     primrose = ROSInterface(args)
@@ -59,5 +59,5 @@ if __name__ == '__main__':
     app.exec_()
     primrose.disconnect()
     # Terminate the process PID
-    os.kill(os.getpid(), 9)
+    # os.kill(os.getpid(), 9)
 

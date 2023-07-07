@@ -41,7 +41,7 @@ class ControllerConnectionUI(QWidget):
 
     def connection_check_loop(self):
         if self.controller.connected:
-            self.target_address.setText(f"<pre>Layout: {self.controller.mapping}</pre>")
+            self.target_address.setText(f"<pre>Layout: {str(self.controller.mapping).capitalize()}</pre>")
             # logging.debug(f"Controller {self.controller.usb_name} is connected")
             self.connection_status.setText("<pre>Status: Connected</pre>")
             self.connection_status.setStyleSheet("color: green; font-size: 13px; font-weight: bold;")
@@ -55,6 +55,7 @@ class ControllerMappingUI(QWidget):
     def __init__(self, robot, parent=None, controller=None):
         super().__init__(parent)
         self.robot = robot
+        self.controller = controller
 
         self.surface = QWidget(self)
         self.surface.setFixedSize(280, 50)
@@ -85,8 +86,7 @@ class ControllerMappingUI(QWidget):
         self.disable_button.move(190, 20)
         self.disable_button.clicked.connect(self.unused)
         # self.disable_button.setEnabled(False)
-
-        self.controller = controller
+        self.controller.set_mapping("driving")
 
     def driving(self):
         self.controller.set_mapping("driving")
