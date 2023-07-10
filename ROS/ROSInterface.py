@@ -161,12 +161,12 @@ class ROSInterface:
             self.client.run()
         except roslibpy.core.RosTimeoutError:
             logging.error(f"Initial connection attempt to the ROS bridge timed out, automatic retry is enabled")
-            for callback in self.on_connect_callbacks:
-                try:
-                    callback()
-                except Exception as e:
-                    logging.error(f"Error in on_connect_callback: {e}")
-                    logging.exception(e)
+            # for callback in self.on_connect_callbacks:
+            #     try:
+            #         callback()
+            #     except Exception as e:
+            #         logging.error(f"Error in on_connect_callback: {e}")
+            #         logging.exception(e)
         except Exception as e:
             logging.error(f"Connection to ROS bridge failed: {e}")
             logging.exception(e)
