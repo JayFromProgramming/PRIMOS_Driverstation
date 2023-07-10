@@ -67,12 +67,13 @@ class SuspensionModeSelect(QWidget):
         # Create a confirmation dialog box and wait for the user to confirm
         # If the user confirms, then send the commmand to actuate the door
         try:
+            self.robot.execute_custom_service("/trch/arm", {"in_": True}, "primrose_trch/set_armed")
             self.manual_controls.show()
             self.auto_controls.hide()
             self.max_extension.hide()
-            self.robot.execute_custom_service("/trch/arm", {"in_": True}, "primrose_trch/set_armed")
         except Exception as e:
             logging.error(e)
+            ErrorBox(self, title="Service Error", message="Error setting suspension to manual mode.", error=e)
 
     def auto_mode(self):
         try:
@@ -81,21 +82,28 @@ class SuspensionModeSelect(QWidget):
                                       detailed_message="This will map suspension motion to drivetrain velocity.")
             confirm.exec_()
             if confirm.result() == Qt.QMessageBox.Yes:
+                self.robot.execute_custom_service("/trch/arm", {"in_": True}, "primrose_trch/set_armed")
                 self.auto_controls.show()
                 self.manual_controls.hide()
                 self.max_extension.hide()
-                self.robot.execute_custom_service("/trch/arm", {"in_": True}, "primrose_trch/set_armed")
         except Exception as e:
             logging.error(e)
+            ErrorBox(self, title="Service Error", message="Error setting suspension to auto mode.", error=e)
 
     def maximum(self):
         try:
-            self.auto_controls.hide()
-            self.manual_controls.hide()
-            self.max_extension.show()
-            self.robot.execute_custom_service("/trch/arm", {"in_": True}, "primrose_trch/set_armed")
+            confirm = ConfirmationBox(self, title="Confirm Suspension Mode Change",
+                                      message="Are you sure you want set the suspension to maximum extension?",
+                                      detailed_message="This will immediately extend all suspension actuators to their maximum extension.")
+            confirm.exec_()
+            if confirm.result() == Qt.QMessageBox.Yes:
+                self.robot.execute_custom_service("/trch/arm", {"in_": True}, "primrose_trch/set_armed")
+                self.auto_controls.hide()
+                self.manual_controls.hide()
+                self.max_extension.show()
         except Exception as e:
             logging.error(e)
+            ErrorBox(self, title="Service Error", message="Error setting suspension to maximum extension.", error=e)
 
     def update(self):
         pass
