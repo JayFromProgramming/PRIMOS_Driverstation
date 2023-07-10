@@ -47,6 +47,8 @@ class ROSInterface:
         self.port = arguments.ros_port
         self.password = arguments.ros_password
 
+        self.ping_time = 0
+
         self.background_thread = None
 
         self.connection_ready = False
@@ -59,6 +61,25 @@ class ROSInterface:
 
         self.connection_thread = None  # type: threading.Thread
         self.establish_connection()
+
+    def background_ping_thread(self):
+        # Ping the jetson every 5 seconds and calculate the ping time in ms
+        service = roslibpy.Service(self.client, "/trch/arm", "primrose_trch/set_armed")
+        request = roslibpy.ServiceRequest({"in_": False})
+        while True:
+            if not self.is_connected:
+                time.sleep(5)
+                continue
+            try:
+                start = time.time()
+                service.call(request)
+                ping_time = (time.time() - start) * 1000
+                if ping_time != 0:
+                    self.ping_time = ping_time
+                # logging.debug(f"Ping time: {self.ping_time}ms")
+            except Exception as e:
+                logging.error(f"Error in ping thread: {e}")
+            time.sleep(5)
 
     @property
     def is_connected(self):
@@ -93,6 +114,7 @@ class ROSInterface:
         for callback in self.future_callbacks:
             self.client.on_ready(callback)
         self.connection_ready = True
+        # threading.Thread(target=self.background_ping_thread, daemon=True).start()
 
     def on_close(self, event):
         self.connection_ready = False

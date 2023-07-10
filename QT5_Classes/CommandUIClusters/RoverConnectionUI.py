@@ -28,7 +28,7 @@ class RoverConnectionUI(QWidget):
         # self.target_address.setFixedSize(100, 25)
         self.target_address.move(10, 16)
 
-        self.connection_status = QLabel("<pre>Status: Disconnected</pre>", self)
+        self.connection_status = QLabel("<pre>Status: Disconnected      </pre>", self)
         self.connection_status.setStyleSheet("color: red; font-size: 13px; font-weight: bold;")
         # self.connection_status.setFixedSize(150, 25)
         self.connection_status.move(10, 30)
@@ -39,7 +39,7 @@ class RoverConnectionUI(QWidget):
 
     def connection_check_loop(self):
         if self.robot.is_connected:
-            self.connection_status.setText("<pre>Status: Connected</pre>")
+            self.connection_status.setText(f"<pre>Status: Connected {round(self.robot.ping_time, 2)}ms</pre>")
             self.connection_status.setStyleSheet("color: green; font-size: 13px; font-weight: bold;")
         elif self.robot.is_connecting:
             self.connection_status.setText("<pre>Status: Connecting...</pre>")

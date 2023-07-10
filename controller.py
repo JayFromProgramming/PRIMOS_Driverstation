@@ -85,7 +85,8 @@ class XboxController(object):
                 events = get_gamepad()
                 self.connected = True
             except inputs.UnpluggedError:
-                logging.warning("Controller disconnected")
+                if self.connected:
+                    logging.warning("Controller disconnected")
                 events = []
                 self.on_disconnect()
                 time.sleep(5)

@@ -75,7 +75,7 @@ class JetsonControls(QWidget):
         try:
             confirm = ConfirmationBox(self, title="Confirm Restart",
                                       message="Are you sure you want to restart the Jetson?",
-                                      detailed_message="This will restart the Jetson, this action is irreversible.")
+                                      detailed_message="This will restart the PRIMROSE service, this action is irreversible.")
             confirm.exec_()
             if confirm.result() == Qt.QMessageBox.Yes:
                 logging.info("Sending command to restart the Jetson")
