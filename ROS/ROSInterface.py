@@ -64,8 +64,8 @@ class ROSInterface:
 
     def background_ping_thread(self):
         # Ping the jetson every 5 seconds and calculate the ping time in ms
-        service = roslibpy.Service(self.client, "/trch/arm", "primrose_trch/set_armed")
-        request = roslibpy.ServiceRequest({"in_": False})
+        service = roslibpy.Service(self.client, "/qmc/ping_service", "primrose-qmc/ping")
+        request = roslibpy.ServiceRequest()
         while True:
             if not self.is_connected:
                 time.sleep(5)
@@ -79,7 +79,7 @@ class ROSInterface:
                 # logging.debug(f"Ping time: {self.ping_time}ms")
             except Exception as e:
                 logging.error(f"Error in ping thread: {e}")
-            time.sleep(5)
+            time.sleep(2.5)
 
     @property
     def is_connected(self):
@@ -114,7 +114,7 @@ class ROSInterface:
         for callback in self.future_callbacks:
             self.client.on_ready(callback)
         self.connection_ready = True
-        # threading.Thread(target=self.background_ping_thread, daemon=True).start()
+        threading.Thread(target=self.background_ping_thread, daemon=True).start()
 
     def on_close(self, event):
         self.connection_ready = False
@@ -125,6 +125,8 @@ class ROSInterface:
             except Exception as e:
                 logging.error(f"Error in on_disconnect_callback: {e}")
                 logging.exception(e)
+        # Attach on_ready again
+        self.client.on_ready(self.on_ready)
 
     def establish_connection(self):
         self.connection_thread = threading.Thread(target=self.connect, daemon=True)
@@ -183,12 +185,12 @@ class ROSInterface:
             self.client.run()
         except roslibpy.core.RosTimeoutError:
             logging.error(f"Initial connection attempt to the ROS bridge timed out, automatic retry is enabled")
-            # for callback in self.on_connect_callbacks:
-            #     try:
-            #         callback()
-            #     except Exception as e:
-            #         logging.error(f"Error in on_connect_callback: {e}")
-            #         logging.exception(e)
+            for callback in self.on_connect_callbacks:
+                try:
+                    callback()
+                except Exception as e:
+                    logging.error(f"Error in on_connect_callback: {e}")
+                    logging.exception(e)
         except Exception as e:
             logging.error(f"Connection to ROS bridge failed: {e}")
             logging.exception(e)

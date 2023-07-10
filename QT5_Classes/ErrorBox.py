@@ -13,7 +13,9 @@ class ErrorBox(QMessageBox):
             import traceback
             self.setInformativeText(f"{type(error).__name__}\n{error}")
             self.setDetailedText(traceback.format_exc())
-        if detailed_message is not None:
+        elif detailed_message is not None:
             self.setInformativeText(detailed_message)
+        else:
+            self.setInformativeText("No additional information")
         self.setStandardButtons(QMessageBox.Ok)
         self.exec_()
