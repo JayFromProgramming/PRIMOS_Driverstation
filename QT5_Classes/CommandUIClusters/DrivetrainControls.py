@@ -62,14 +62,14 @@ class DriveTrainControls(QWidget):
         # Create a confirmation dialog box and wait for the user to confirm
         # If the user confirms, then send the commmand to actuate the door
         try:
-            self.robot.execute_custom_service("/unknown", {"in_": True}, "primrose_trch/set_armed")
+            self.robot.execute_custom_service("/qmc/drive_service", {"in_": True}, "primrose_qmc/set_armed")
         except Exception as e:
             logging.error(e)
             ErrorBox(self, title="Internal Error", message="Error enabling drivetrain", error=e)
 
     def disable(self):
         try:
-            self.robot.execute_custom_service("/unknown", {"in_": True}, "primrose_trch/set_armed")
+            self.robot.execute_custom_service("/qmc/drive_service", {"in_": False}, "primrose_qmc/set_armed")
         except Exception as e:
             logging.error(e)
             ErrorBox(self, title="Internal Error", message="Error disabling drivetrain", error=e)

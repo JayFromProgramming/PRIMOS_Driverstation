@@ -40,10 +40,10 @@ class JetsonControls(QWidget):
         self.restart_button.move(100, 20)
         self.restart_button.clicked.connect(self.restart)
 
-        self.stop_button = QPushButton("Stop", self)
-        self.stop_button.setFixedSize(80, 25)
-        self.stop_button.move(190, 20)
-        self.stop_button.clicked.connect(self.stop)
+        self.shutdown_button = QPushButton("Shutdown", self)
+        self.shutdown_button.setFixedSize(80, 25)
+        self.shutdown_button.move(190, 20)
+        self.shutdown_button.clicked.connect(self.shutdown)
 
     def send_ssh_command(self, command):
         def execute():
@@ -84,7 +84,7 @@ class JetsonControls(QWidget):
             logging.error(f"Error restarting Jetson: {e}")
             ErrorBox(self, title="Error Restarting Jetson", message="Error restarting Jetson", error=e)
 
-    def stop(self):
+    def shutdown(self):
         try:
             confirm = ConfirmationBox(self, title="Confirm Stop",
                                       message="Are you sure you want to stop the Jetson?",
@@ -92,7 +92,7 @@ class JetsonControls(QWidget):
             confirm.exec_()
             if confirm.result() == Qt.QMessageBox.Yes:
                 logging.info("Sending command to stop the Jetson")
-                self.send_ssh_command("sudo systemctl stop primrose-start.service")
+                self.send_ssh_command("sudo shutdown +0.5")
         except Exception as e:
             logging.error(f"Error stopping Jetson: {e}")
             ErrorBox(self, title="Error Stopping Jetson", message="Error stopping Jetson", error=e)

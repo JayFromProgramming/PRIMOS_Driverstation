@@ -6,6 +6,7 @@ from loguru import logger as logging
 
 from QT5_Classes.ConfirmationBox import ConfirmationBox
 from QT5_Classes.ErrorBox import ErrorBox
+from Resources import Enumerators
 from Resources.Enumerators import quarter_modules, ActuatorCommands
 
 
@@ -77,18 +78,11 @@ class SuspensionModeSelect(QWidget):
 
     def auto_mode(self):
         try:
-            confirm = ConfirmationBox(self, title="Confirm Suspension Mode Change",
-                                      message="Are you sure you want to change the suspension mode to Auto?",
-                                      detailed_message="This will map suspension motion to drivetrain velocity.")
-            confirm.exec_()
-            if confirm.result() == Qt.QMessageBox.Yes:
-                self.robot.execute_custom_service("/trch/arm", {"in_": True}, "primrose_trch/set_armed")
-                self.auto_controls.show()
-                self.manual_controls.hide()
-                self.max_extension.hide()
+            self.auto_controls.show()
+            self.manual_controls.hide()
+            self.max_extension.hide()
         except Exception as e:
             logging.error(e)
-            ErrorBox(self, title="Service Error", message="Error setting suspension to auto mode.", error=e)
 
     def maximum(self):
         try:
@@ -158,21 +152,42 @@ class SuspensionAutoModes(QWidget):
 
     def initial_ramp(self):
         try:
-            self.robot.execute_custom_service("/trch/arm", {"in_": True}, "primrose_trch/set_armed")
+            confirm = ConfirmationBox(self, title="Confirm Suspension Mode Change",
+                                      message="Are you sure you want to change the suspension mode to Auto?",
+                                      detailed_message="This will map suspension motion to drivetrain velocity.")
+            confirm.exec_()
+            if confirm.result() == Qt.QMessageBox.Yes:
+                self.robot.execute_custom_service("/primrose_qmc/set_state", {"state": Enumerators.SuspensionModes.INIT_RAMP},
+                                                  "qmc/susp_service")
         except Exception as e:
             logging.error(e)
+            ErrorBox(self, title="Service Error", message="Error setting suspension to initial ramp.", error=e)
 
     def ramp_entry(self):
         try:
-            self.robot.execute_custom_service("/trch/arm", {"in_": True}, "primrose_trch/set_armed")
+            confirm = ConfirmationBox(self, title="Confirm Suspension Mode Change",
+                                      message="Are you sure you want to change the suspension mode to Auto?",
+                                      detailed_message="This will map suspension motion to drivetrain velocity.")
+            confirm.exec_()
+            if confirm.result() == Qt.QMessageBox.Yes:
+                self.robot.execute_custom_service("/primrose_qmc/set_state", {"state": Enumerators.SuspensionModes.LEVELING_RAMP},
+                                                  "qmc/susp_service")
         except Exception as e:
             logging.error(e)
+            ErrorBox(self, title="Service Error", message="Error setting suspension to ramp entry.", error=e)
 
     def exit(self):
         try:
-            self.robot.execute_custom_service("/trch/arm", {"in_": True}, "primrose_trch/set_armed")
+            confirm = ConfirmationBox(self, title="Confirm Suspension Mode Change",
+                                      message="Are you sure you want to change the suspension mode to Auto?",
+                                      detailed_message="This will map suspension motion to drivetrain velocity.")
+            confirm.exec_()
+            if confirm.result() == Qt.QMessageBox.Yes:
+                self.robot.execute_custom_service("/primrose_qmc/set_state", {"state": Enumerators.SuspensionModes.EXIT_RAMP},
+                                                  "qmc/susp_service")
         except Exception as e:
             logging.error(e)
+            ErrorBox(self, title="Service Error", message="Error setting suspension to exit ramp.", error=e)
 
 
 class SuspensionManualControl(QWidget):

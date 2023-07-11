@@ -35,3 +35,11 @@ class EStopCommands:
     RESET = 1
     ENABLE_AUTO = 2
     DISABLE_AUTO = 3
+
+
+class SuspensionModes:
+    MAXIMUM = 0
+    INIT_RAMP = 1
+    LEVELING_RAMP = 2
+    MANUAL = 3
+    EXIT_RAMP = 4
