@@ -81,6 +81,19 @@ class ROSInterface:
                 logging.error(f"Error in ping thread: {e}")
             time.sleep(2.5)
 
+    def wait_for_reconnect(self):
+        logging.info("Waiting for reconnect")
+        while not self.is_connected:
+            time.sleep(0.1)
+        logging.info("Reconnected")
+        # Call the on_connect callbacks
+        for callback in self.on_connect_callbacks:
+            try:
+                callback()
+            except Exception as e:
+                logging.error(f"Error in on_connect_callback: {e}")
+                logging.exception(e)
+
     @property
     def is_connected(self):
         return self.connection_ready
@@ -94,6 +107,7 @@ class ROSInterface:
 
     def attach_on_disconnect_callback(self, callback):
         self.on_disconnect_callbacks.append(callback)
+        threading.Thread(target=self.wait_for_reconnect, daemon=True).start()
 
     def hook_on_ready(self, callback):
         self.future_callbacks.append(callback)
@@ -159,7 +173,6 @@ class ROSInterface:
         try:
             self.terminate()
             self.client = None
-            # self.client = roslibpy.Ros(host=self.address, port=self.port)
         except Exception as e:
             logging.error(f"Failed to disconnect: {e} {traceback.format_exc()}")
 

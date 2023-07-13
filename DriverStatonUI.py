@@ -13,6 +13,8 @@ from ROS.ROSInterface import ROSInterface
 
 from loguru import logger as logging
 
+from Resources import Enumerators
+
 
 class DriverStationUI:
 
@@ -83,40 +85,39 @@ class DriverStationUI:
                     # self.robot.get_state("/driv/cmd_vel").value = \
                     #     {"linear": {"x": forward, "y": 0, "z": 0}, "angular": {"x": 0, "y": 0, "z": turn}}
                     for quarter_module in modules:
-                        self.robot.get_state(f"/mciu/{quarter_module}/odrive/input").value = [4, int(forward * 1000)]
-                        self.robot.get_state(f"/mciu/{quarter_module}/actuators/input").value = [2, int(lift * 50), 0]
-                        self.robot.get_state(f"/mciu/{quarter_module}/actuators/input").value = [2, int(turn * 50), 1]
+                        self.robot.get_state(f"/mciu/{quarter_module}/odrive/input").value = [4, int(forward * 4000)]
+                        # self.robot.get_state(f"/mciu/{quarter_module}/actuators/input").value = [2, int(lift * 50), 0]
+                        # self.robot.get_state(f"/mciu/{quarter_module}/actuators/input").value = [2, int(turn * 50), 1]
                 except Exception as e:
                     logging.error(f"Error writing to ROS: {e}")
 
-                if self.xbox_controller.B:  # Emergency stop all motors
-                    try:
-                        for quarter_modules in modules:
-                            self.robot.get_state(f"/mciu/{quarter_modules}/odrive/input").value = [0]
-                        self.robot.get_state("/mciu/Trencher/odrive/input").value = [0]
-                        self.robot.get_state("/mciu/Conveyor/odrive/input").value = [0]
-                    except Exception as e:
-                        logging.error(f"Error writing to ROS: {e}")
-                elif self.xbox_controller.A:
-                    try:
-                        for quarter_modules in modules:
-                            self.robot.get_state(f"/mciu/{quarter_modules}/odrive/input").value = [3, 2]
-                    except Exception as e:
-                        logging.error(f"Error writing to ROS: {e}")
+                # if self.xbox_controller.B:  # Emergency stop all motors
+                #     try:
+                #         for quarter_modules in modules:
+                #             self.robot.get_state(f"/mciu/{quarter_modules}/odrive/input").value = [0]
+                #         self.robot.get_state("/mciu/Trencher/odrive/input").value = [0]
+                #         self.robot.get_state("/mciu/Conveyor/odrive/input").value = [0]
+                #     except Exception as e:
+                #         logging.error(f"Error writing to ROS: {e}")
+                # elif self.xbox_controller.A:
+                #     try:
+                #         for quarter_modules in modules:
+                #             self.robot.get_state(f"/mciu/{quarter_modules}/odrive/input").value = [3, 2]
+                #     except Exception as e:
+                #         logging.error(f"Error writing to ROS: {e}")
 
                 # Trencher controls
-                if self.xbox_controller.X:  # Is actually Y for some reason
-                    try:  # Set the control mode for the trencher and conveyor
-                        self.robot.get_state("/mciu/Rear_Left/odrive/input").value = [3, 2, 2]
-                        self.robot.get_state("/mciu/Trencher/odrive/input").value = [3, 2, 2]
-                        self.robot.get_state("/mciu/Conveyor/odrive/input").value = [3, 2, 2]
-                        self.robot.get_state("/mciu/Conveyor/odrive/input").value = [4, 1000]
-                        self.armed = True
-                    except Exception as e:
-                        logging.error(f"Error writing to ROS: {e}")
+                # if self.xbox_controller.X:  # Is actually Y for some reason
+                #     try:  # Set the control mode for the trencher and conveyor
+                #         self.robot.get_state("/mciu/Rear_Left/odrive/input").value = [3, 2, 2]
+                #         self.robot.get_state("/mciu/Trencher/odrive/input").value = [3, 2, 2]
+                #         self.robot.get_state("/mciu/Conveyor/odrive/input").value = [3, 2, 2]
+                #         self.robot.get_state("/mciu/Conveyor/odrive/input").value = [4, 1000]
+                #         self.armed = True
+                #     except Exception as e:
+                #         logging.error(f"Error writing to ROS: {e}")
 
                 if self.xbox_controller.RightTrigger > -0.1 and self.xbox_controller.LeftTrigger > 0.6:
-                    self.robot.get_state("/mciu/Conveyor/odrive/input").value = [4, 5000]
                     try:
                         if self.xbox_controller.LeftBumper:  # Reverse Trencher
                             self.robot.get_state("/driv/Trencher/throttle").value = int(self.xbox_controller.RightTrigger * 100)
@@ -127,7 +128,6 @@ class DriverStationUI:
                 else:
                     try:
                         self.robot.get_state("/driv/Trencher/throttle").value = 0
-                        self.robot.get_state("/mciu/Conveyor/odrive/input").value = [4, 0]
                     except Exception as e:
                         logging.error(f"Error writing to ROS: {e}")
 
@@ -138,6 +138,12 @@ class DriverStationUI:
 
                         self.robot.get_state("/mciu/Conveyor/odrive/input").value = [2]
                         self.robot.get_state("/mciu/Trencher/odrive/input").value = [2]
+                    except Exception as e:
+                        logging.error(f"Error writing to ROS: {e}")
+
+                if self.xbox_controller.Start or self.xbox_controller.Back:
+                    try:
+                        self.robot.get_state('/mciu/estop_controller').value = Enumerators.EStopCommands.TRIGGER
                     except Exception as e:
                         logging.error(f"Error writing to ROS: {e}")
 

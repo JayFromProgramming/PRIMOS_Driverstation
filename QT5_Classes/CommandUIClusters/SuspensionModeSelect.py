@@ -68,7 +68,7 @@ class SuspensionModeSelect(QWidget):
         # Create a confirmation dialog box and wait for the user to confirm
         # If the user confirms, then send the commmand to actuate the door
         try:
-            self.robot.execute_custom_service("/trch/arm", {"in_": True}, "primrose_trch/set_armed")
+            # self.robot.execute_custom_service("/trch/arm", {"in_": True}, "primrose_trch/set_armed")
             self.manual_controls.show()
             self.auto_controls.hide()
             self.max_extension.hide()
@@ -91,7 +91,7 @@ class SuspensionModeSelect(QWidget):
                                       detailed_message="This will immediately extend all suspension actuators to their maximum extension.")
             confirm.exec_()
             if confirm.result() == Qt.QMessageBox.Yes:
-                self.robot.execute_custom_service("/trch/arm", {"in_": True}, "primrose_trch/set_armed")
+                # self.robot.execute_custom_service("/trch/arm", {"in_": True}, "primrose_trch/set_armed")
                 self.auto_controls.hide()
                 self.manual_controls.hide()
                 self.max_extension.show()
@@ -222,12 +222,12 @@ class SuspensionManualControl(QWidget):
         # Setup timer to update the UI
         self.ui_timer = QTimer(self)
         self.ui_timer.timeout.connect(self.update_ui)
-        self.ui_timer.startTimer(100)
+        # self.ui_timer.startTimer(100)
 
         # Setup timer to read the controller
         self.controller_timer = QTimer(self)
         self.controller_timer.timeout.connect(self.read_controller)
-        self.controller_timer.startTimer(100)
+        # self.controller_timer.startTimer(100)
 
     def hide(self) -> None:
         super().hide()
@@ -236,8 +236,8 @@ class SuspensionManualControl(QWidget):
 
     def show(self) -> None:
         super().show()
-        self.ui_timer.start()
-        self.controller_timer.start()
+        self.ui_timer.start(100)
+        self.controller_timer.start(100)
 
     def update_ui(self):
         self.text.setText(f"<pre>Selected Corner: {quarter_modules[self.selected_corner]}</pre>")
@@ -246,6 +246,19 @@ class SuspensionManualControl(QWidget):
         try:
             # Use the dpad left and right to change the selected corner
             # Use the dpad up and down to move the selected corner
+            vert = self.controller.RightJoystickY
+            turn = self.controller.RightJoystickX
+            # logging.info(f"Vert: {vert}, Turn: {turn}")
+            if abs(vert) > 0.1 or abs(turn) > 0.1:
+                self.robot.get_state(f"/mciu/{quarter_modules[self.selected_corner]}/actuators/input").value = \
+                    [ActuatorCommands.SET_DUTY_CYCLE, int(vert * -50), 0]
+                self.robot.get_state(f"/mciu/{quarter_modules[self.selected_corner]}/actuators/input").value = \
+                    [ActuatorCommands.SET_DUTY_CYCLE, int(turn * 50), 1]
+            else:
+                self.robot.get_state(f"/mciu/{quarter_modules[self.selected_corner]}/actuators/input").value = \
+                    [ActuatorCommands.SET_DUTY_CYCLE, 0, 0]
+                self.robot.get_state(f"/mciu/{quarter_modules[self.selected_corner]}/actuators/input").value = \
+                    [ActuatorCommands.SET_DUTY_CYCLE, 0, 1]
 
             if not self.key_release:
                 if self.controller.LeftDPad:
@@ -254,24 +267,15 @@ class SuspensionManualControl(QWidget):
                 elif self.controller.RightDPad:
                     self.selected_corner = (self.selected_corner + 1) % 4
                     self.key_release = True
-                elif self.controller.UpDPad:
-                    self.robot.get_state(f"/mciu/{quarter_modules[self.selected_corner]}/actuators/input").value = \
-                        [ActuatorCommands.SET_INPUT_VALUE, 100, 1]
-                    self.key_release = True
-                elif self.controller.DownDPad:
-                    self.robot.get_state(f"/mciu/{quarter_modules[self.selected_corner]}/actuators/input").value = \
-                        [ActuatorCommands.SET_INPUT_VALUE, -100, 1]
-                    self.key_release = True
             else:
                 if not self.controller.LeftDPad and not self.controller.RightDPad and \
                         not self.controller.UpDPad and not self.controller.DownDPad:
                     self.key_release = False
-                    self.robot.get_state(f"/mciu/{quarter_modules[self.selected_corner]}/actuators/input").value = \
-                        [ActuatorCommands.SET_INPUT_VALUE, 0, 1]
+
         except Exception as e:
             logging.error(e)
-            ErrorBox(self, title="Manual Suspension Control Error",
-                     message="Error reading controller input or sending command to rover", error=e)
+            # ErrorBox(self, title="Manual Suspension Control Error",
+            #          message="Error reading controller input or sending command to rover", error=e)
 
 
 class MaxExtension(QWidget):

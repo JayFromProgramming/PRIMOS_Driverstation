@@ -26,8 +26,8 @@ class ODriveInputModes:
 
 class ActuatorCommands:
     STOP = 0
-    SET_CONTROL_MODE = 1
-    SET_INPUT_VALUE = 2
+    SET_DUTY_CYCLE = 1
+    SET_POSITION = 2
 
 
 class EStopCommands:

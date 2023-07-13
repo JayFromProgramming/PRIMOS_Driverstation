@@ -92,7 +92,7 @@ class JetsonControls(QWidget):
             confirm.exec_()
             if confirm.result() == Qt.QMessageBox.Yes:
                 logging.info("Sending command to stop the Jetson")
-                self.send_ssh_command("sudo shutdown +0.5")
+                self.send_ssh_command("sudo shutdown -h now")
         except Exception as e:
             logging.error(f"Error stopping Jetson: {e}")
             ErrorBox(self, title="Error Stopping Jetson", message="Error stopping Jetson", error=e)

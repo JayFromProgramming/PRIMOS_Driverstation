@@ -138,7 +138,7 @@ class SmartTopic:
         if self._publisher is None:
             # Create a publisher for the topic if there was an attempt to publish to it
             logging.info(f"Creating publisher for {self.disp_name}")
-            self._publisher = roslibpy.Topic(self.client, self.topic_name, self.topic_type)
+            self._publisher = roslibpy.Topic(self.client, self.topic_name, self.topic_type, queue_size=5)
             self._publisher.advertise()
         if self.is_single and self.topic_type != "geometry_msgs/Twist":
             msg = roslibpy.Message({"data": updated_values})
