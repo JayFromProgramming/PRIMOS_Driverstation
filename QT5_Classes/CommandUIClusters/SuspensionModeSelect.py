@@ -37,10 +37,10 @@ class SuspensionModeSelect(QWidget):
         # self.header.setBaseSize(0, 0)
         self.header.move(round(self.width() / 2 - self.header.width() / 2) - 5, 0)
 
-        self.auto_button = QPushButton("Auto", self)
+        self.auto_button = QPushButton("Trench", self)
         self.auto_button.setFixedSize(80, 25)
         self.auto_button.move(10, 20)
-        self.auto_button.clicked.connect(self.auto_mode)
+        self.auto_button.clicked.connect(self.auto_trenching)
         self.auto_button.setDisabled(True)
 
         self.manual_button = QPushButton("Manual", self)
@@ -49,11 +49,11 @@ class SuspensionModeSelect(QWidget):
         self.manual_button.clicked.connect(self.manual_mode)
         self.manual_button.setDisabled(True)
 
-        self.maximum_button = QPushButton("Maximum", self)
-        self.maximum_button.setFixedSize(80, 25)
-        self.maximum_button.move(190, 20)
-        self.maximum_button.clicked.connect(self.maximum)
-        self.maximum_button.setDisabled(True)
+        self.drive_button = QPushButton("Drive", self)
+        self.drive_button.setFixedSize(80, 25)
+        self.drive_button.move(190, 20)
+        self.drive_button.clicked.connect(self.auto_driving)
+        self.drive_button.setDisabled(True)
 
         self.robot.attach_on_connect_callback(self.on_robot_connection)
         self.robot.attach_on_disconnect_callback(self.on_robot_disconnection)
@@ -68,15 +68,20 @@ class SuspensionModeSelect(QWidget):
         # Create a confirmation dialog box and wait for the user to confirm
         # If the user confirms, then send the commmand to actuate the door
         try:
-            # self.robot.execute_custom_service("/trch/arm", {"in_": True}, "primrose_trch/set_armed")
-            self.manual_controls.show()
-            self.auto_controls.hide()
-            self.max_extension.hide()
+            confirm = ConfirmationBox(self, title="Confirm Suspension Mode Change",
+                                      message="Are you sure you want set the suspension to manual control?",
+                                      detailed_message="Use the dpad to select the target quarter module and the "
+                                                       "right joystick to control the height of the suspension.")
+            confirm.exec_()
+            if confirm.result() == Qt.QMessageBox.Yes:
+                self.manual_controls.show()
+                self.auto_controls.hide()
+                self.max_extension.hide()
         except Exception as e:
             logging.error(e)
             ErrorBox(self, title="Service Error", message="Error setting suspension to manual mode.", error=e)
 
-    def auto_mode(self):
+    def auto_trenching(self):
         try:
             self.auto_controls.show()
             self.manual_controls.hide()
@@ -84,17 +89,11 @@ class SuspensionModeSelect(QWidget):
         except Exception as e:
             logging.error(e)
 
-    def maximum(self):
+    def auto_driving(self):
         try:
-            confirm = ConfirmationBox(self, title="Confirm Suspension Mode Change",
-                                      message="Are you sure you want set the suspension to maximum extension?",
-                                      detailed_message="This will immediately extend all suspension actuators to their maximum extension.")
-            confirm.exec_()
-            if confirm.result() == Qt.QMessageBox.Yes:
-                # self.robot.execute_custom_service("/trch/arm", {"in_": True}, "primrose_trch/set_armed")
-                self.auto_controls.hide()
-                self.manual_controls.hide()
-                self.max_extension.show()
+            self.auto_controls.hide()
+            self.manual_controls.hide()
+            self.max_extension.show()
         except Exception as e:
             logging.error(e)
             ErrorBox(self, title="Service Error", message="Error setting suspension to maximum extension.", error=e)
@@ -105,12 +104,12 @@ class SuspensionModeSelect(QWidget):
     def on_robot_connection(self):
         self.auto_button.setDisabled(False)
         self.manual_button.setDisabled(False)
-        self.maximum_button.setDisabled(False)
+        self.drive_button.setDisabled(False)
 
     def on_robot_disconnection(self):
         self.auto_button.setDisabled(True)
         self.manual_button.setDisabled(True)
-        self.maximum_button.setDisabled(True)
+        self.drive_button.setDisabled(True)
 
 
 class SuspensionAutoModes(QWidget):
@@ -243,6 +242,8 @@ class SuspensionManualControl(QWidget):
         self.text.setText(f"<pre>Selected Corner: {quarter_modules[self.selected_corner]}</pre>")
 
     def read_controller(self):
+        if not self.robot.is_connected:
+            return
         try:
             # Use the dpad left and right to change the selected corner
             # Use the dpad up and down to move the selected corner
@@ -290,16 +291,89 @@ class MaxExtension(QWidget):
 
         self.surface.setStyleSheet("border: 1px solid black; border-radius: 5px; background-color: white;")
 
-        self.header = QLabel("Manual Suspension Controls", self.surface)
+        self.header = QLabel("Driving Suspension Controls", self.surface)
         self.header.setStyleSheet("font-weight: bold; font-size: 15px; border: 0px; "
                                   "background-color: transparent;")
         self.header.setAlignment(Qt.Qt.AlignCenter)
         # self.header.setBaseSize(0, 0)
         self.header.move(round(self.width() / 2 - self.header.width() / 2) - 40, 0)
 
-        self.text = QLabel("<pre>Disabled at Max Extension</pre>", self.surface)
-        self.text.setStyleSheet("font-weight: bold; font-size: 12px; border: 0px; "
-                                "background-color: transparent;")
-        self.text.setAlignment(Qt.Qt.AlignCenter)
-        # self.header.setBaseSize(0, 0)
-        self.text.move(10, 20)
+        # self.text = QLabel("<pre>Disabled at Max Extension</pre>", self.surface)
+        # self.text.setStyleSheet("font-weight: bold; font-size: 12px; border: 0px; "
+        #                         "background-color: transparent;")
+        # self.text.setAlignment(Qt.Qt.AlignCenter)
+        # # self.header.setBaseSize(0, 0)
+        # self.text.move(10, 20)
+
+        self.auto_button = QPushButton("Excavate", self)
+        self.auto_button.setFixedSize(80, 25)
+        self.auto_button.move(10, 20)
+        self.auto_button.clicked.connect(self.excavate)
+        # self.auto_button.setDisabled(True)
+
+        self.manual_button = QPushButton("Drive", self)
+        self.manual_button.setFixedSize(80, 25)
+        self.manual_button.move(100, 20)
+        self.manual_button.clicked.connect(self.driving)
+        # self.manual_button.setDisabled(True)
+
+        self.maximum_button = QPushButton("Maximum", self)
+        self.maximum_button.setFixedSize(80, 25)
+        self.maximum_button.move(190, 20)
+        self.maximum_button.clicked.connect(self.maximum)
+
+        self.auto_button.setDisabled(True)
+        self.manual_button.setDisabled(True)
+        self.maximum_button.setDisabled(True)
+
+        self.robot.attach_on_connect_callback(self.on_robot_connection)
+        self.robot.attach_on_disconnect_callback(self.on_robot_disconnection)
+
+    def on_robot_connection(self):
+        self.auto_button.setDisabled(False)
+        self.manual_button.setDisabled(False)
+        self.maximum_button.setDisabled(False)
+
+    def on_robot_disconnection(self):
+        self.auto_button.setDisabled(True)
+        self.manual_button.setDisabled(True)
+        self.maximum_button.setDisabled(True)
+
+    def excavate(self):
+        try:
+            confirm = ConfirmationBox(self, title="Confirm Suspension Mode Change",
+                                      message="Are you sure you want to change the suspension mode to excavate?",
+                                      detailed_message="This will map suspension motion to drivetrain velocity.")
+            confirm.exec_()
+            if confirm.result() == Qt.QMessageBox.Yes:
+                self.robot.execute_custom_service("/primrose_qmc/set_state", {"state": Enumerators.SuspensionModes.INIT_RAMP},
+                                                  "qmc/susp_service")
+        except Exception as e:
+            logging.error(e)
+            ErrorBox(self, title="Service Error", message="Error setting suspension to excavate.", error=e)
+
+    def driving(self):
+        try:
+            confirm = ConfirmationBox(self, title="Confirm Suspension Mode Change",
+                                      message="Are you sure you want to change the suspension mode to drive?",
+                                      detailed_message="This will map suspension motion to drivetrain velocity.")
+            confirm.exec_()
+            if confirm.result() == Qt.QMessageBox.Yes:
+                self.robot.execute_custom_service("/primrose_qmc/set_state", {"state": Enumerators.SuspensionModes.MAXIMUM},
+                                                  "qmc/susp_service")
+        except Exception as e:
+            logging.error(e)
+            ErrorBox(self, title="Service Error", message="Error setting suspension to drive.", error=e)
+
+    def maximum(self):
+        try:
+            confirm = ConfirmationBox(self, title="Confirm Suspension Mode Change",
+                                      message="Are you sure you want to change the suspension mode to maximum?",
+                                      detailed_message="This will map suspension motion to maximum extension.")
+            confirm.exec_()
+            if confirm.result() == Qt.QMessageBox.Yes:
+                self.robot.execute_custom_service("/primrose_qmc/set_state", {"state": Enumerators.SuspensionModes.MAXIMUM},
+                                                  "qmc/susp_service")
+        except Exception as e:
+            logging.error(e)
+            ErrorBox(self, title="Service Error", message="Error setting suspension to maximum.", error=e)

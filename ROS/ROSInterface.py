@@ -107,7 +107,6 @@ class ROSInterface:
 
     def attach_on_disconnect_callback(self, callback):
         self.on_disconnect_callbacks.append(callback)
-        threading.Thread(target=self.wait_for_reconnect, daemon=True).start()
 
     def hook_on_ready(self, callback):
         self.future_callbacks.append(callback)
@@ -141,6 +140,7 @@ class ROSInterface:
                 logging.exception(e)
         # Attach on_ready again
         self.client.on_ready(self.on_ready)
+        threading.Thread(target=self.wait_for_reconnect, daemon=True).start()
 
     def establish_connection(self):
         self.connection_thread = threading.Thread(target=self.connect, daemon=True)

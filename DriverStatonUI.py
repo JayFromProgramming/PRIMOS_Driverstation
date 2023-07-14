@@ -91,31 +91,11 @@ class DriverStationUI:
                 except Exception as e:
                     logging.error(f"Error writing to ROS: {e}")
 
-                # if self.xbox_controller.B:  # Emergency stop all motors
-                #     try:
-                #         for quarter_modules in modules:
-                #             self.robot.get_state(f"/mciu/{quarter_modules}/odrive/input").value = [0]
-                #         self.robot.get_state("/mciu/Trencher/odrive/input").value = [0]
-                #         self.robot.get_state("/mciu/Conveyor/odrive/input").value = [0]
-                #     except Exception as e:
-                #         logging.error(f"Error writing to ROS: {e}")
-                # elif self.xbox_controller.A:
-                #     try:
-                #         for quarter_modules in modules:
-                #             self.robot.get_state(f"/mciu/{quarter_modules}/odrive/input").value = [3, 2]
-                #     except Exception as e:
-                #         logging.error(f"Error writing to ROS: {e}")
-
-                # Trencher controls
-                # if self.xbox_controller.X:  # Is actually Y for some reason
-                #     try:  # Set the control mode for the trencher and conveyor
-                #         self.robot.get_state("/mciu/Rear_Left/odrive/input").value = [3, 2, 2]
-                #         self.robot.get_state("/mciu/Trencher/odrive/input").value = [3, 2, 2]
-                #         self.robot.get_state("/mciu/Conveyor/odrive/input").value = [3, 2, 2]
-                #         self.robot.get_state("/mciu/Conveyor/odrive/input").value = [4, 1000]
-                #         self.armed = True
-                #     except Exception as e:
-                #         logging.error(f"Error writing to ROS: {e}")
+                try:
+                    self.robot.get_state("/driv/cmd_vel").value = \
+                        {"linear": {"x": forward, "y": 0, "z": 0}, "angular": {"x": 0, "y": 0, "z": turn}}
+                except Exception as e:
+                    logging.error(f"Error writing to ROS: {e}")
 
                 if self.xbox_controller.RightTrigger > -0.1 and self.xbox_controller.LeftTrigger > 0.6:
                     try:
