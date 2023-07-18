@@ -6,11 +6,12 @@ from loguru import logger as logging
 from QT5_Classes.ErrorBox import ErrorBox
 
 
-class LaserPowerControls(QWidget):
+class AccessoryPowerControls(QWidget):
 
-    def __init__(self, robot, parent=None):
+    def __init__(self, robot, parent=None, target_name="Laser", target_id=1):
         super().__init__(parent)
         self.robot = robot
+        self.target_id = target_id
 
         self.surface = QWidget(self)
         self.surface.setFixedSize(280, 50)
@@ -18,7 +19,7 @@ class LaserPowerControls(QWidget):
 
         self.surface.setStyleSheet("border: 1px solid black; border-radius: 5px; background-color: white;")
 
-        self.header = QLabel("Laser Controls", self.surface)
+        self.header = QLabel(f"{target_name} Controls", self.surface)
         self.header.setStyleSheet("font-weight: bold; font-size: 15px; border: 0px; "
                                   "background-color: transparent;")
         self.header.setAlignment(Qt.Qt.AlignCenter)
@@ -56,14 +57,14 @@ class LaserPowerControls(QWidget):
         # Create a confirmation dialog box and wait for the user to confirm
         # If the user confirms, then send the commmand to actuate the door
         try:
-            self.robot.get_state('/mciu/accessory_power').value = [0, 1]
+            self.robot.get_state('/mciu/accessory_power').value = [self.target_id, 1]
         except Exception as e:
             logging.error(e)
             ErrorBox(self, title="Internal Error", message="Unable to command laser power on", error=e)
 
     def off(self):
         try:
-            self.robot.get_state('/mciu/accessory_power').value = [0, 0]
+            self.robot.get_state('/mciu/accessory_power').value = [self.target_id, 0]
         except Exception as e:
             ErrorBox(self, title="Internal Error", message="Unable to command laser power off", error=e)
 

@@ -9,7 +9,7 @@ from QT5_Classes.CommandUIClusters.EStopButton import EStopButton
 from QT5_Classes.CommandUIClusters.EStopControls import AutomaticEStopControls
 from QT5_Classes.CommandUIClusters.HopperControls import HopperDoorControls, HopperLoadSensors
 from QT5_Classes.CommandUIClusters.JetsonSSHControls import JetsonControls
-from QT5_Classes.CommandUIClusters.LaserPowerControls import LaserPowerControls
+from QT5_Classes.CommandUIClusters.AccessoryPowerControls import AccessoryPowerControls
 from QT5_Classes.CommandUIClusters.MotorCalibControl import MotorCalibrationCluster
 from QT5_Classes.CommandUIClusters.RoverConnectionUI import RoverConnectionUI
 from QT5_Classes.CommandUIClusters.SensorResets import SensorCalibrationCluster
@@ -46,11 +46,12 @@ class CommandsUI(QWidget):
         self.estop_button = EStopButton(self.robot, self)
         self.connection_status = RoverConnectionUI(self.robot, self)
         self.controller_status = ControllerConnectionUI(self.robot, self, self.xbox_controller)
-        self.controller_mapping = ControllerMappingUI(self.robot, self, self.xbox_controller)
+        # self.controller_mapping = ControllerMappingUI(self.robot, self, self.xbox_controller)
         self.trencher = TrencherControls(self.robot, self)
         self.conveyor = ConveyorControls(self.robot, self)
         self.battery = BatteryCharge(self.robot, self)
-        self.laser_power = LaserPowerControls(self.robot, self)
+        self.laser_power = AccessoryPowerControls(self.robot, self, target_name="Laser", target_id=0)
+        self.camera_power = AccessoryPowerControls(self.robot, self, target_name="Camera", target_id=1)
         self.drivetrain = DriveTrainControls(self.robot, self)
         self.suspension = SuspensionModeSelect(self.robot, self, self.xbox_controller)
         self.jetson = JetsonControls(self.robot, self)
@@ -71,11 +72,12 @@ class CommandsUI(QWidget):
                                     self.estop_button.y() + self.estop_button.height() + 5)
         self.controller_status.move(self.auto_estop_controls.x(),
                                     self.connection_status.y() + self.connection_status.height() + 5)
-        self.controller_mapping.move(self.auto_estop_controls.x(),
-                                     self.controller_status.y() + self.controller_status.height() + 5)
+        # self.controller_mapping.move(self.auto_estop_controls.x(),
+        #                              self.controller_status.y() + self.controller_status.height() + 5)
 
         # Column 3
         self.battery.move(self.auto_estop_controls.x() + self.auto_estop_controls.width() + 5, 40)
         self.laser_power.move(self.battery.x(), self.battery.y() + self.battery.height() + 5)
-        self.drivetrain.move(self.battery.x(), self.laser_power.y() + self.laser_power.height() + 5)
+        self.camera_power.move(self.battery.x(), self.laser_power.y() + self.laser_power.height() + 5)
+        self.drivetrain.move(self.battery.x(), self.camera_power.y() + self.camera_power.height() + 5)
         self.suspension.moved(self.battery.x(), self.drivetrain.y() + self.drivetrain.height() + 5)

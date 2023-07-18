@@ -37,7 +37,7 @@ class SuspensionModeSelect(QWidget):
         # self.header.setBaseSize(0, 0)
         self.header.move(round(self.width() / 2 - self.header.width() / 2) - 5, 0)
 
-        self.auto_button = QPushButton("Trench", self)
+        self.auto_button = QPushButton("Ramp", self)
         self.auto_button.setFixedSize(80, 25)
         self.auto_button.move(10, 20)
         self.auto_button.clicked.connect(self.auto_trenching)
@@ -346,8 +346,10 @@ class MaxExtension(QWidget):
                                       detailed_message="This will map suspension motion to drivetrain velocity.")
             confirm.exec_()
             if confirm.result() == Qt.QMessageBox.Yes:
-                self.robot.execute_custom_service("/primrose_qmc/set_state", {"state": Enumerators.SuspensionModes.INIT_RAMP},
-                                                  "qmc/susp_service")
+                # self.robot.execute_custom_service("/primrose_qmc/set_state", {"state": Enumerators.SuspensionModes.INIT_RAMP},
+                #                                   "qmc/susp_service")
+                self.robot.get_state("/mciu/Front_Left/actuators/input").value = \
+                    [ActuatorCommands.SET_POSITION, 0, 1]
         except Exception as e:
             logging.error(e)
             ErrorBox(self, title="Service Error", message="Error setting suspension to excavate.", error=e)

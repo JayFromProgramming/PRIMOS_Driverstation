@@ -73,6 +73,7 @@ class DriverStationUI:
         modules = ["Front_Left", "Front_Right", "Rear_Left", "Rear_Right"]
         # Read the controller while the window is open
         while True:
+            time.sleep(0.1)
             try:
                 if not self.robot.is_connected:
                     continue
@@ -86,8 +87,6 @@ class DriverStationUI:
                     #     {"linear": {"x": forward, "y": 0, "z": 0}, "angular": {"x": 0, "y": 0, "z": turn}}
                     for quarter_module in modules:
                         self.robot.get_state(f"/mciu/{quarter_module}/odrive/input").value = [4, int(forward * 4000)]
-                        # self.robot.get_state(f"/mciu/{quarter_module}/actuators/input").value = [2, int(lift * 50), 0]
-                        # self.robot.get_state(f"/mciu/{quarter_module}/actuators/input").value = [2, int(turn * 50), 1]
                 except Exception as e:
                     logging.error(f"Error writing to ROS: {e}")
 
@@ -126,8 +125,6 @@ class DriverStationUI:
                         self.robot.get_state('/mciu/estop_controller').value = Enumerators.EStopCommands.TRIGGER
                     except Exception as e:
                         logging.error(f"Error writing to ROS: {e}")
-
-                time.sleep(0.1)
             except Exception as e:
                 logging.error(f"Error reading controller: {e}")
 
