@@ -11,6 +11,7 @@ from QT5_Classes.CommandUIClusters.HopperControls import HopperDoorControls, Hop
 from QT5_Classes.CommandUIClusters.JetsonSSHControls import JetsonControls
 from QT5_Classes.CommandUIClusters.AccessoryPowerControls import AccessoryPowerControls
 from QT5_Classes.CommandUIClusters.MotorCalibControl import MotorCalibrationCluster
+from QT5_Classes.CommandUIClusters.RosbagControls import RosbagControls
 from QT5_Classes.CommandUIClusters.RoverConnectionUI import RoverConnectionUI
 from QT5_Classes.CommandUIClusters.SensorResets import SensorCalibrationCluster
 from QT5_Classes.CommandUIClusters.SteeringModesCluster import SteeringModesCluster
@@ -55,6 +56,7 @@ class CommandsUI(QWidget):
         self.drivetrain = DriveTrainControls(self.robot, self)
         self.suspension = SuspensionModeSelect(self.robot, self, self.xbox_controller)
         self.jetson = JetsonControls(self.robot, self)
+        self.rosbag = RosbagControls(self.robot, self)
 
         # Column 1
         self.steering_mode_cluster.move(10, 40)
@@ -62,7 +64,6 @@ class CommandsUI(QWidget):
         self.hopper_load_cluster.move(10, self.hopper_door_cluster.y() + self.hopper_door_cluster.height() + 5)
         self.trencher.move(10, self.hopper_load_cluster.y() + self.hopper_load_cluster.height() + 5)
         self.conveyor.move(10, self.trencher.y() + self.trencher.height() + 5)
-        self.jetson.move(10, self.conveyor.y() + self.conveyor.height() + 5)
 
         # Column 2
         self.auto_estop_controls.move(self.steering_mode_cluster.x() + self.steering_mode_cluster.width() + 5, 40)
@@ -72,8 +73,9 @@ class CommandsUI(QWidget):
                                     self.estop_button.y() + self.estop_button.height() + 5)
         self.controller_status.move(self.auto_estop_controls.x(),
                                     self.connection_status.y() + self.connection_status.height() + 5)
-        # self.controller_mapping.move(self.auto_estop_controls.x(),
-        #                              self.controller_status.y() + self.controller_status.height() + 5)
+        self.rosbag.move(self.auto_estop_controls.x(),
+                         self.controller_status.y() + self.controller_status.height() + 5)
+        self.jetson.move(self.auto_estop_controls.x(), self.rosbag.y() + self.rosbag.height() + 5)
 
         # Column 3
         self.battery.move(self.auto_estop_controls.x() + self.auto_estop_controls.width() + 5, 40)

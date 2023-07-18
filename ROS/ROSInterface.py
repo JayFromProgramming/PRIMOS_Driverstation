@@ -63,7 +63,7 @@ class ROSInterface:
         self.establish_connection()
 
     def background_ping_thread(self):
-        # Ping the jetson every 5 seconds and calculate the ping time in ms
+        # Ping the jetson every second and calculate the ping time in ms
         service = roslibpy.Service(self.client, "/qmc/ping_service", "primrose-qmc/ping")
         request = roslibpy.ServiceRequest()
         while True:
@@ -79,7 +79,7 @@ class ROSInterface:
                 # logging.debug(f"Ping time: {self.ping_time}ms")
             except Exception as e:
                 logging.error(f"Error in ping thread: {e}")
-            time.sleep(2.5)
+            time.sleep(1)
 
     def wait_for_reconnect(self):
         logging.info("Waiting for reconnect")
@@ -197,12 +197,12 @@ class ROSInterface:
             self.client.run()
         except roslibpy.core.RosTimeoutError:
             logging.error(f"Initial connection attempt to the ROS bridge timed out, automatic retry is enabled")
-            for callback in self.on_connect_callbacks:
-                try:
-                    callback()
-                except Exception as e:
-                    logging.error(f"Error in on_connect_callback: {e}")
-                    logging.exception(e)
+            # for callback in self.on_connect_callbacks:
+            #     try:
+            #         callback()
+            #     except Exception as e:
+            #         logging.error(f"Error in on_connect_callback: {e}")
+            #         logging.exception(e)
         except Exception as e:
             logging.error(f"Connection to ROS bridge failed: {e}")
             logging.exception(e)

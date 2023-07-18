@@ -30,24 +30,24 @@ class ConveyorControls(QWidget):
         self.auto_button.clicked.connect(self.auto)
         self.auto_button.setEnabled(False)
 
-        self.manual_button = QPushButton("Manual", self)
-        self.manual_button.setFixedSize(80, 25)
-        self.manual_button.move(100, 20)
-        self.manual_button.clicked.connect(self.manual)
-        self.manual_button.setEnabled(False)
-
         self.disable_button = QPushButton("Disable", self)
         self.disable_button.setFixedSize(80, 25)
-        self.disable_button.move(190, 20)
-        self.disable_button.clicked.connect(self.disabled)
+        self.disable_button.move(100, 20)
+        self.disable_button.clicked.connect(self.manual)
         self.disable_button.setEnabled(False)
+
+        self.reverse_button = QPushButton("Reverse", self)
+        self.reverse_button.setFixedSize(80, 25)
+        self.reverse_button.move(190, 20)
+        self.reverse_button.clicked.connect(self.disabled)
+        self.reverse_button.setEnabled(False)
 
         self.robot.attach_on_connect_callback(self.on_robot_connected)
         self.robot.attach_on_disconnect_callback(self.on_robot_disconnected)
 
     def on_robot_connected(self):
         self.auto_button.setEnabled(True)
-        self.manual_button.setEnabled(True)
+        self.reverse_button.setEnabled(True)
         self.disable_button.setEnabled(True)
 
     def on_robot_disconnected(self):
