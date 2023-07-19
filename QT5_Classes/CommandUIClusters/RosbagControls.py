@@ -1,5 +1,6 @@
 import os
 import threading
+import time
 
 from PyQt5 import Qt
 from PyQt5.QtWidgets import QWidget, QPushButton, QLabel
@@ -11,6 +12,7 @@ from QT5_Classes.ConfirmationBox import ConfirmationBox
 import paramiko
 
 from QT5_Classes.ErrorBox import ErrorBox
+from QT5_Classes.ProgressBar import ProgressBar
 
 
 class RosbagControls(QWidget):
@@ -20,6 +22,9 @@ class RosbagControls(QWidget):
         self.robot = robot
         self.bag_file_location = "/home/jetson/bag_files/"
         self.save_location = "copied_bag_files"  # The location on the local machine to save the bag files to
+
+        if not os.path.exists(self.save_location):
+            os.mkdir(self.save_location)
 
         self.surface = QWidget(self)
         self.surface.setFixedSize(280, 50)
@@ -45,16 +50,16 @@ class RosbagControls(QWidget):
         self.copy_new_button.move(100, 20)
         self.copy_new_button.clicked.connect(self.copy_new)
 
-        self.delete_all_button = QPushButton("Delete.A", self)
-        self.delete_all_button.setFixedSize(80, 25)
-        self.delete_all_button.move(190, 20)
-        self.delete_all_button.clicked.connect(self.delete_all)
+        self.reindex_button = QPushButton("Reindex", self)
+        self.reindex_button.setFixedSize(80, 25)
+        self.reindex_button.move(190, 20)
+        self.reindex_button.clicked.connect(self.reindex_all)
 
     def establish_connection(self):
         try:
             self.ssh_client = paramiko.SSHClient()
             self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            self.ssh_client.connect(self.robot.ip, username="jetson", password=self.robot.password)
+            self.ssh_client.connect(self.robot.address, username="jetson", password=self.robot.password)
             self.sftp = self.ssh_client.open_sftp()
         except Exception as e:
             logging.error(f"Error establishing connection: {e}")
@@ -73,14 +78,39 @@ class RosbagControls(QWidget):
         try:
             if self.sftp is None:
                 self.establish_connection()
+            index = 0
             for file in files:
-                self.sftp.get(self.bag_file_location + file, self.save_location + file)
+                logging.info(f"Copying {file}")
+                # progress_box.update_progress(index, f"Copying {file}...")
+                self.sftp.get(self.bag_file_location + file, os.path.join(self.save_location, file))
+                index += 1
+                logging.info(f"Finished copying {file}")
+            # progress_box.close()
         except Exception as e:
             logging.error(f"Error copying files: {e}")
             ErrorBox(self, title="SFTP Copy Error", message="Error copying files", error=e)
 
+    def reindex_thread(self, files):
+        try:
+            if self.sftp is None:
+                self.establish_connection()
+            for file in files:
+                # Run rosbag reindex on any files that end in .active
+                if file.endswith(".active"):
+                    logging.info(f"Reindexing {file}")
+                    self.sftp.exec_command(f"rosbag reindex {self.bag_file_location + file} -f")
+                    logging.info(f"Finished reindexing {file}")
+        except Exception as e:
+            logging.error(f"Error reindexing files: {e}")
+            ErrorBox(self, title="SFTP Reindex Error", message="Error reindexing files", error=e)
+
     def copy_all(self):
         try:
+            # progress = ProgressBar(self, title="Copying Files", message="Copying files...")
+            # for i in range(100):
+            #     progress.set_progress(i, f"Copying file {i}...")
+            #     time.sleep(1)
+
             confirm = ConfirmationBox(self, title="Confirm SFTP Connection",
                                       message="Are you sure you want to establish an SFTP connection?",
                                       detailed_message="While the connection is being established, the GUI will be unresponsive.")
@@ -96,8 +126,9 @@ class RosbagControls(QWidget):
                                           detailed_message=f"This will copy {len(files)} files, with a total size of {total_size} bytes.")
                 confirm.exec_()
                 if confirm.result() == Qt.QMessageBox.Yes:
+                    progress = ProgressBar(self, title="Copying Files", message="Copying files...", max_value=len(files))
                     # Create a thread to copy the files so that the GUI doesn't freeze
-                    thread = threading.Thread(target=self.copy_thread, args=(files,), daemon=True)
+                    thread = threading.Thread(target=self.copy_thread, args=(files, progress), daemon=True)
                     thread.start()
         except Exception as e:
             logging.error(f"Error in copy_all: {e}")
@@ -132,15 +163,16 @@ class RosbagControls(QWidget):
             logging.error(f"Error in copy_new: {e}")
             ErrorBox(self, title="Error Copying Files", message="Error copying files", error=e)
 
-    def delete_all(self):
+    def reindex_all(self):
         try:
-            confirm = ConfirmationBox(self, title="Confirm Stop",
-                                      message="Are you sure you want to stop the Jetson?",
-                                      detailed_message="This will stop the Jetson, this action is irreversible.")
+            confirm = ConfirmationBox(self, title="Confirm Reindex",
+                                      message="Are you sure you want to reindex all files?",
+                                      detailed_message="This will reindex all files in the save location.")
             confirm.exec_()
             if confirm.result() == Qt.QMessageBox.Yes:
-                logging.info("Sending command to stop the Jetson")
-                self.send_ssh_command("sudo shutdown -h now")
+                # Create a thread to reindex the files so that the GUI doesn't freeze
+                thread = threading.Thread(target=self.reindex_thread, args=(os.listdir(self.save_location),), daemon=True)
+                thread.start()
         except Exception as e:
-            logging.error(f"Error stopping Jetson: {e}")
-            ErrorBox(self, title="Error Stopping Jetson", message="Error stopping Jetson", error=e)
+            logging.error(f"Error in reindex_all: {e}")
+            ErrorBox(self, title="Error Reindexing Files", message="Error reindexing files", error=e)

@@ -59,11 +59,12 @@ class CommandsUI(QWidget):
         self.rosbag = RosbagControls(self.robot, self)
 
         # Column 1
-        self.steering_mode_cluster.move(10, 40)
-        self.hopper_door_cluster.move(10, self.steering_mode_cluster.y() + self.steering_mode_cluster.height() + 5)
-        self.hopper_load_cluster.move(10, self.hopper_door_cluster.y() + self.hopper_door_cluster.height() + 5)
-        self.trencher.move(10, self.hopper_load_cluster.y() + self.hopper_load_cluster.height() + 5)
-        self.conveyor.move(10, self.trencher.y() + self.trencher.height() + 5)
+        self.hopper_door_cluster.move(10, 40)
+        self.drivetrain.move(self.hopper_door_cluster.x(),
+                             self.hopper_door_cluster.y() + self.hopper_door_cluster.height() + 5)
+        self.steering_mode_cluster.move(self.drivetrain.x(),
+                                        self.drivetrain.y() + self.drivetrain.height() + 5)
+        self.suspension.moved(self.drivetrain.x(), self.steering_mode_cluster.y() + self.steering_mode_cluster.height() + 5)
 
         # Column 2
         self.auto_estop_controls.move(self.steering_mode_cluster.x() + self.steering_mode_cluster.width() + 5, 40)
@@ -81,5 +82,7 @@ class CommandsUI(QWidget):
         self.battery.move(self.auto_estop_controls.x() + self.auto_estop_controls.width() + 5, 40)
         self.laser_power.move(self.battery.x(), self.battery.y() + self.battery.height() + 5)
         self.camera_power.move(self.battery.x(), self.laser_power.y() + self.laser_power.height() + 5)
-        self.drivetrain.move(self.battery.x(), self.camera_power.y() + self.camera_power.height() + 5)
-        self.suspension.moved(self.battery.x(), self.drivetrain.y() + self.drivetrain.height() + 5)
+        self.hopper_load_cluster.move(self.battery.x(), self.camera_power.y() + self.camera_power.height() + 5)
+        self.trencher.move(self.battery.x(), self.hopper_load_cluster.y() + self.hopper_load_cluster.height() + 5)
+        self.conveyor.move(self.battery.x(), self.trencher.y() + self.trencher.height() + 5)
+

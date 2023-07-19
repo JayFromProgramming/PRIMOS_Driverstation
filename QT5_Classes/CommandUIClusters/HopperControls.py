@@ -22,7 +22,7 @@ class HopperDoorControls(QWidget):
         self.header.setStyleSheet("font-weight: bold; font-size: 15px; border: 0px; "
                                   "background-color: transparent;")
         self.header.setAlignment(Qt.Qt.AlignCenter)
-        self.header.move(round(self.width() / 2 - self.header.width() / 2) - 5, 0)
+        self.header.move(round(self.width() / 2 - self.header.width() / 2) + 5, 0)
 
         self.open_button = QPushButton("Open", self)
         self.open_button.setFixedSize(80, 25)

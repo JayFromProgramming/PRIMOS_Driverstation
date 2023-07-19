@@ -24,7 +24,7 @@ class BatteryCharge(QWidget):
         self.header.setAlignment(Qt.Qt.AlignCenter)
         self.header.move(round(self.width() / 2 - self.header.width() / 2) - 5, 0)
 
-        self.add_charge_button = QPushButton("+5%", self)
+        self.add_charge_button = QPushButton("+1%", self)
         self.add_charge_button.setFixedSize(80, 25)
         self.add_charge_button.move(10, 20)
         self.add_charge_button.clicked.connect(self.increase_charge)
@@ -36,7 +36,7 @@ class BatteryCharge(QWidget):
         self.charge_button.clicked.connect(self.set_fully_charged)
         self.charge_button.setDisabled(True)
 
-        self.del_charge_button = QPushButton("-5%", self)
+        self.del_charge_button = QPushButton("-1%", self)
         self.del_charge_button.setFixedSize(80, 25)
         self.del_charge_button.move(190, 20)
         self.del_charge_button.clicked.connect(self.decrease_charge)
@@ -65,13 +65,13 @@ class BatteryCharge(QWidget):
 
     def increase_charge(self):
         try:
-            self.robot.get_state('/mciu/battery_monitor').value = [1, 5]
+            self.robot.get_state('/mciu/battery_monitor').value = [1, 1]
         except Exception as e:
             logging.error(e)
 
     def decrease_charge(self):
         try:
-            self.robot.get_state('/mciu/battery_monitor').value = [2, 5]
+            self.robot.get_state('/mciu/battery_monitor').value = [2, 1]
         except Exception as e:
             logging.error(e)
 

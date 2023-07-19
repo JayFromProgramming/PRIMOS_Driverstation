@@ -112,11 +112,13 @@ class DriverStationUI:
 
                 if self.xbox_controller.Y:  # Is actually X for some reason
                     try:
-                        for quarter_modules in modules:
-                            self.robot.get_state(f"/mciu/{quarter_modules}/odrive/input").value = [2]  # Clear errors
+                        self.robot.execute_custom_service("/trch/arm", {"in_": True}, "primrose_trch/set_armed")
+                    except Exception as e:
+                        logging.error(f"Error writing to ROS: {e}")
 
-                        self.robot.get_state("/mciu/Conveyor/odrive/input").value = [2]
-                        self.robot.get_state("/mciu/Trencher/odrive/input").value = [2]
+                if self.xbox_controller.B:  # Is actually B for some reason
+                    try:
+                        self.robot.execute_custom_service("/trch/arm", {"in_": False}, "primrose_trch/set_armed")
                     except Exception as e:
                         logging.error(f"Error writing to ROS: {e}")
 
