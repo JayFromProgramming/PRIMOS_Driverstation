@@ -4,6 +4,8 @@ from PyQt5.QtWidgets import QWidget, QPushButton, QLabel
 from loguru import logger as logging
 
 from QT5_Classes.ErrorBox import ErrorBox
+from Resources import Enumerators
+from Resources.Enumerators import ActuatorCommands
 
 
 class SteeringModesCluster(QWidget):
@@ -57,9 +59,12 @@ class SteeringModesCluster(QWidget):
             logging.error(error)
 
         try:
-            self.robot.execute_custom_service("/qmc/steer_service", {"state": 2}, "primrose_qmc/set_state",
-                                              callback=on_success, errback=on_failure)
-            self.on_point_steering_button.setEnabled(False)
+            # self.robot.execute_custom_service("/qmc/steer_service", {"state": 2}, "primrose_qmc/set_state",
+            #                                   callback=on_success, errback=on_failure)
+            # self.on_point_steering_button.setEnabled(False)
+            self.robot.execute_custom_service("/qmc/drive_service", {"in_": False}, "primrose_qmc/set_armed")
+            self.robot.steering_enabled = True
+            self.robot.driving_enabled = False
             logging.info("Sent steering mode request.")
         except Exception as e:
             logging.error(e)
@@ -78,8 +83,11 @@ class SteeringModesCluster(QWidget):
             logging.error(error)
 
         try:
-            self.robot.execute_custom_service("/qmc/steer_service", {"state": 1}, "primrose_qmc/set_state",
-                                              callback=on_success, errback=on_failure)
+            # self.robot.execute_custom_service("/qmc/steer_service", {"state": 1}, "primrose_qmc/set_state",
+            #                                   callback=on_success, errback=on_failure)
+            self.robot.execute_custom_service("/qmc/drive_service", {"in_": False}, "primrose_qmc/set_armed")
+            self.robot.steering_enabled = False
+            self.robot.driving_enabled = True
         except Exception as e:
             logging.error(e)
             ErrorBox(self, title="Service Error", message="Was unable to execute steering_mode service.", error=e)
@@ -96,8 +104,11 @@ class SteeringModesCluster(QWidget):
             logging.error(error)
 
         try:
-            self.robot.execute_custom_service("/qmc/steer_service", {"state": 0}, "primrose_qmc/set_state",
-                                              callback=on_success, errback=on_failure)
+            # self.robot.execute_custom_service("/qmc/steer_service", {"state": 0}, "primrose_qmc/set_state",
+            #                                   callback=on_success, errback=on_failure)
+            self.robot.steering_enabled = False
+            self.robot.driving_enabled = False
+            self.robot.execute_custom_service("/qmc/drive_service", {"in_": False}, "primrose_qmc/set_armed")
         except Exception as e:
             logging.error(e)
             ErrorBox(self, title="Service Error", message="Was unable to execute steering_mode service.", error=e)

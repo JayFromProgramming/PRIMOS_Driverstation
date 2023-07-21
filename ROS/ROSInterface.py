@@ -53,6 +53,9 @@ class ROSInterface:
 
         self.connection_ready = False
 
+        self.driving_enabled = False
+        self.steering_enabled = False
+
         self.smart_topics = topic_targets
         self.future_callbacks = []
 

@@ -38,8 +38,12 @@ class EStopCommands:
 
 
 class SuspensionModes:
-    MAXIMUM = 0
-    INIT_RAMP = 1
-    LEVELING_RAMP = 2
-    MANUAL = 3
-    EXIT_RAMP = 4
+    DEFAULT = 0
+    INITIAL_RAMP = 1
+    FIRST_WHEEL_ENTERING = 2
+    SECOND_WHEEL_ENTERING = 3
+    FIRST_WHEEL_EXITING = 4
+    SECOND_WHEEL_EXITING = 5
+    LEVELING = 6
+    MANUAL = 7
+    EXCAVATING = 8

@@ -14,6 +14,7 @@ from ROS.ROSInterface import ROSInterface
 from loguru import logger as logging
 
 from Resources import Enumerators
+from Resources.Enumerators import ActuatorCommands
 
 
 class DriverStationUI:
@@ -68,12 +69,19 @@ class DriverStationUI:
             # Update the name of the window to indicate the connection status
             self.window.setWindowTitle(f"PRIMROSE Driver Station - Connected")
 
+    def calculate_turn_position(self, turn_percent, max_left, center, max_right) -> int:
+        """Calculate the position of the turn servo"""
+        if turn_percent < 0:
+            return int(center - (center - max_left) * abs(turn_percent))
+        else:
+            return int(center + (max_right - center) * abs(turn_percent))
+
     def controller_read_loop(self):
         """Loop for the joystick"""
         modules = ["Front_Left", "Front_Right", "Rear_Left", "Rear_Right"]
         # Read the controller while the window is open
         while True:
-            time.sleep(0.1)
+            time.sleep(0.2)
             try:
                 if not self.robot.is_connected:
                     continue
@@ -85,16 +93,47 @@ class DriverStationUI:
                 try:
                     # self.robot.get_state("/driv/cmd_vel").value = \
                     #     {"linear": {"x": forward, "y": 0, "z": 0}, "angular": {"x": 0, "y": 0, "z": turn}}
-                    for quarter_module in modules:
-                        self.robot.get_state(f"/mciu/{quarter_module}/odrive/input").value = [4, int(forward * 4000)]
+                    # for quarter_module in modules:
+                    if self.robot.driving_enabled:
+                        self.robot.get_state(f"/mciu/Front_Left/odrive/input").value = [4, int(forward * 4000)]
+                        self.robot.get_state(f"/mciu/Front_Right/odrive/input").value = [4, int(forward * -4000)]
+                        self.robot.get_state(f"/mciu/Rear_Left/odrive/input").value = [4, int(forward * 4000)]
+                        self.robot.get_state(f"/mciu/Rear_Right/odrive/input").value = [4, int(forward * -4000)]
+                    elif self.robot.steering_enabled:
+                        self.robot.get_state(f"/mciu/Front_Left/odrive/input").value = [4, int(turn * 1000)]
+                        self.robot.get_state(f"/mciu/Front_Right/odrive/input").value = [4, int(turn * 1000)]
+                        self.robot.get_state(f"/mciu/Rear_Left/odrive/input").value = [4, int(turn * 1000)]
+                        self.robot.get_state(f"/mciu/Rear_Right/odrive/input").value = [4, int(turn * 1000)]
                 except Exception as e:
                     logging.error(f"Error writing to ROS: {e}")
 
                 try:
-                    self.robot.get_state("/driv/cmd_vel").value = \
-                        {"linear": {"x": forward, "y": 0, "z": 0}, "angular": {"x": 0, "y": 0, "z": turn}}
+                    if self.robot.driving_enabled:
+                        self.robot.get_state("/mciu/Front_Left/actuators/input").value = \
+                            [ActuatorCommands.SET_POSITION, self.calculate_turn_position(turn, -295, -323, -370), 1]
+                        self.robot.get_state("/mciu/Front_Right/actuators/input").value = \
+                            [ActuatorCommands.SET_POSITION, self.calculate_turn_position(turn, -510, -540, -575), 1]
+                        self.robot.get_state("/mciu/Rear_Left/actuators/input").value = \
+                            [ActuatorCommands.SET_POSITION, self.calculate_turn_position(-turn, -510, -540, -575), 1]
+                        self.robot.get_state("/mciu/Rear_Right/actuators/input").value = \
+                            [ActuatorCommands.SET_POSITION, self.calculate_turn_position(-turn, -470, -510, -530), 1]
+                    elif self.robot.steering_enabled:
+                        self.robot.get_state("/mciu/Front_Left/actuators/input").value = \
+                            [ActuatorCommands.SET_POSITION, -650, 1]
+                        self.robot.get_state("/mciu/Front_Right/actuators/input").value = \
+                            [ActuatorCommands.SET_POSITION, -30, 1]
+                        self.robot.get_state("/mciu/Rear_Left/actuators/input").value = \
+                            [ActuatorCommands.SET_POSITION, -50, 1]
+                        self.robot.get_state("/mciu/Rear_Right/actuators/input").value = \
+                            [ActuatorCommands.SET_POSITION, -850, 1]
                 except Exception as e:
                     logging.error(f"Error writing to ROS: {e}")
+
+                # try:
+                #     # self.robot.get_state("/driv/cmd_vel").value = \
+                #     #     {"linear": {"x": forward, "y": 0, "z": 0}, "angular": {"x": 0, "y": 0, "z": turn}}
+                # except Exception as e:
+                #     logging.error(f"Error writing to ROS: {e}")
 
                 if self.xbox_controller.RightTrigger > -0.1 and self.xbox_controller.LeftTrigger > 0.6:
                     try:

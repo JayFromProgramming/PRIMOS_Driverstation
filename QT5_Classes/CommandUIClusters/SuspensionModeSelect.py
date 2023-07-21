@@ -6,6 +6,7 @@ from loguru import logger as logging
 
 from QT5_Classes.ConfirmationBox import ConfirmationBox
 from QT5_Classes.ErrorBox import ErrorBox
+from QT5_Classes.QuickButton import QuickButton
 from Resources import Enumerators
 from Resources.Enumerators import quarter_modules, ActuatorCommands
 
@@ -30,14 +31,14 @@ class SuspensionModeSelect(QWidget):
 
         self.surface.setStyleSheet("border: 1px solid black; border-radius: 5px; background-color: white;")
 
-        self.header = QLabel("Suspension Height", self.surface)
+        self.header = QLabel("Suspension Mode Select", self.surface)
         self.header.setStyleSheet("font-weight: bold; font-size: 15px; border: 0px; "
                                   "background-color: transparent;")
         self.header.setAlignment(Qt.Qt.AlignCenter)
         # self.header.setBaseSize(0, 0)
-        self.header.move(round(self.width() / 2 - self.header.width() / 2) - 5, 0)
+        self.header.move(round(self.width() / 2 - self.header.width() / 2) - 30, 0)
 
-        self.auto_button = QPushButton("Ramp", self)
+        self.auto_button = QPushButton("Excavation", self)
         self.auto_button.setFixedSize(80, 25)
         self.auto_button.move(10, 20)
         self.auto_button.clicked.connect(self.auto_trenching)
@@ -119,74 +120,102 @@ class SuspensionAutoModes(QWidget):
         self.robot = robot
 
         self.surface = QWidget(self)
-        self.surface.setFixedSize(280, 50)
-        super().setFixedSize(280, 50)
+        self.surface.setFixedSize(280, 105)
+        super().setFixedSize(280, 105)
 
         self.surface.setStyleSheet("border: 1px solid black; border-radius: 5px; background-color: white;")
 
-        self.header = QLabel("Suspension Mode", self.surface)
+        self.header = QLabel("Excavation Modes", self.surface)
         self.header.setStyleSheet("font-weight: bold; font-size: 15px; border: 0px; "
                                   "background-color: transparent;")
         self.header.setAlignment(Qt.Qt.AlignCenter)
         # self.header.setBaseSize(0, 0)
         self.header.move(round(self.width() / 2 - self.header.width() / 2) - 5, 0)
 
-        self.auto_button = QPushButton("Initial Ramp", self)
-        self.auto_button.setFixedSize(80, 25)
-        self.auto_button.move(10, 20)
-        self.auto_button.clicked.connect(self.initial_ramp)
-        # self.auto_button.setDisabled(True)
-
-        self.manual_button = QPushButton("Ramp Entry", self)
-        self.manual_button.setFixedSize(80, 25)
-        self.manual_button.move(100, 20)
-        self.manual_button.clicked.connect(self.ramp_entry)
-        # self.manual_button.setDisabled(True)
-
-        self.maximum_button = QPushButton("Exit", self)
-        self.maximum_button.setFixedSize(80, 25)
-        self.maximum_button.move(190, 20)
-        self.maximum_button.clicked.connect(self.exit)
-        # self.maximum_button.setDisabled(True)
+        self.initial_ramp_button = QuickButton("Initial Ramp", self, (10, 20), self.initial_ramp)
+        self.excavating_button = QuickButton("Excavating", self, (100, 20), self.excavating)
+        self.first_in_button = QuickButton("First In", self, (10, 46), self.first_wheel_in)
+        self.second_in_button = QuickButton("Second In", self, (100, 46), self.second_wheel_in)
+        self.first_out_button = QuickButton("First Out", self, (10, 72), self.first_wheel_out)
+        self.second_out_button = QuickButton("Second Out", self, (100, 72), self.second_wheel_out)
 
     def initial_ramp(self):
         try:
             confirm = ConfirmationBox(self, title="Confirm Suspension Mode Change",
-                                      message="Are you sure you want to change the suspension mode to Auto?",
+                                      message="Are you sure you want to change the suspension mode to Initial Ramp?",
                                       detailed_message="This will map suspension motion to drivetrain velocity.")
             confirm.exec_()
             if confirm.result() == Qt.QMessageBox.Yes:
-                self.robot.execute_custom_service("/primrose_qmc/set_state", {"state": Enumerators.SuspensionModes.INIT_RAMP},
+                self.robot.execute_custom_service("/primrose_qmc/set_state", {"state": Enumerators.SuspensionModes.INITIAL_RAMP},
                                                   "qmc/susp_service")
         except Exception as e:
             logging.error(e)
-            ErrorBox(self, title="Service Error", message="Error setting suspension to initial ramp.", error=e)
+            ErrorBox(self, title="Service Error", message="Error setting suspension mode to initial ramp.", error=e)
 
-    def ramp_entry(self):
+    def excavating(self):
         try:
             confirm = ConfirmationBox(self, title="Confirm Suspension Mode Change",
-                                      message="Are you sure you want to change the suspension mode to Auto?",
+                                      message="Are you sure you want to change the suspension mode to Excavating?",
                                       detailed_message="This will map suspension motion to drivetrain velocity.")
             confirm.exec_()
             if confirm.result() == Qt.QMessageBox.Yes:
-                self.robot.execute_custom_service("/primrose_qmc/set_state", {"state": Enumerators.SuspensionModes.LEVELING_RAMP},
+                self.robot.execute_custom_service("/primrose_qmc/set_state", {"state": Enumerators.SuspensionModes.EXCAVATING},
                                                   "qmc/susp_service")
         except Exception as e:
             logging.error(e)
-            ErrorBox(self, title="Service Error", message="Error setting suspension to ramp entry.", error=e)
+            ErrorBox(self, title="Service Error", message="Error setting suspension mode to excavating.", error=e)
 
-    def exit(self):
+    def first_wheel_in(self):
         try:
             confirm = ConfirmationBox(self, title="Confirm Suspension Mode Change",
-                                      message="Are you sure you want to change the suspension mode to Auto?",
+                                      message="Are you sure you want to change the suspension mode to First In?",
                                       detailed_message="This will map suspension motion to drivetrain velocity.")
             confirm.exec_()
             if confirm.result() == Qt.QMessageBox.Yes:
-                self.robot.execute_custom_service("/primrose_qmc/set_state", {"state": Enumerators.SuspensionModes.EXIT_RAMP},
+                self.robot.execute_custom_service("/primrose_qmc/set_state", {"state": Enumerators.SuspensionModes.FIRST_WHEEL_ENTERING},
                                                   "qmc/susp_service")
         except Exception as e:
             logging.error(e)
-            ErrorBox(self, title="Service Error", message="Error setting suspension to exit ramp.", error=e)
+            ErrorBox(self, title="Service Error", message="Error setting suspension mode to first wheel in.", error=e)
+
+    def second_wheel_in(self):
+        try:
+            confirm = ConfirmationBox(self, title="Confirm Suspension Mode Change",
+                                      message="Are you sure you want to change the suspension mode to Second In?",
+                                      detailed_message="This will map suspension motion to drivetrain velocity.")
+            confirm.exec_()
+            if confirm.result() == Qt.QMessageBox.Yes:
+                self.robot.execute_custom_service("/primrose_qmc/set_state", {"state": Enumerators.SuspensionModes.SECOND_WHEEL_ENTERING},
+                                                  "qmc/susp_service")
+        except Exception as e:
+            logging.error(e)
+            ErrorBox(self, title="Service Error", message="Error setting suspension mode to second wheel in.", error=e)
+
+    def first_wheel_out(self):
+        try:
+            confirm = ConfirmationBox(self, title="Confirm Suspension Mode Change",
+                                      message="Are you sure you want to change the suspension mode to First Out?",
+                                      detailed_message="This will map suspension motion to drivetrain velocity.")
+            confirm.exec_()
+            if confirm.result() == Qt.QMessageBox.Yes:
+                self.robot.execute_custom_service("/primrose_qmc/set_state", {"state": Enumerators.SuspensionModes.FIRST_WHEEL_EXITING},
+                                                  "qmc/susp_service")
+        except Exception as e:
+            logging.error(e)
+            ErrorBox(self, title="Service Error", message="Error setting suspension mode to first wheel out.", error=e)
+
+    def second_wheel_out(self):
+        try:
+            confirm = ConfirmationBox(self, title="Confirm Suspension Mode Change",
+                                      message="Are you sure you want to change the suspension mode to Second Out?",
+                                      detailed_message="This will map suspension motion to drivetrain velocity.")
+            confirm.exec_()
+            if confirm.result() == Qt.QMessageBox.Yes:
+                self.robot.execute_custom_service("/primrose_qmc/set_state", {"state": Enumerators.SuspensionModes.SECOND_WHEEL_EXITING},
+                                                  "qmc/susp_service")
+        except Exception as e:
+            logging.error(e)
+            ErrorBox(self, title="Service Error", message="Error setting suspension mode to second wheel out.", error=e)
 
 
 class SuspensionManualControl(QWidget):
@@ -197,8 +226,8 @@ class SuspensionManualControl(QWidget):
         self.controller = controller
 
         self.surface = QWidget(self)
-        self.surface.setFixedSize(280, 50)
-        super().setFixedSize(280, 50)
+        self.surface.setFixedSize(280, 105)
+        super().setFixedSize(280, 105)
 
         self.surface.setStyleSheet("border: 1px solid black; border-radius: 5px; background-color: white;")
 
@@ -250,11 +279,11 @@ class SuspensionManualControl(QWidget):
             vert = self.controller.RightJoystickY
             turn = self.controller.RightJoystickX
             # logging.info(f"Vert: {vert}, Turn: {turn}")
-            if abs(vert) > 0.1 or abs(turn) > 0.1:
+            if abs(vert) > 0.2 or abs(turn) > 0.2:
                 self.robot.get_state(f"/mciu/{quarter_modules[self.selected_corner]}/actuators/input").value = \
-                    [ActuatorCommands.SET_DUTY_CYCLE, int(vert * -50), 0]
+                    [ActuatorCommands.SET_DUTY_CYCLE, int(vert * -100), 0]
                 self.robot.get_state(f"/mciu/{quarter_modules[self.selected_corner]}/actuators/input").value = \
-                    [ActuatorCommands.SET_DUTY_CYCLE, int(turn * 50), 1]
+                    [ActuatorCommands.SET_DUTY_CYCLE, int(turn * 100), 1]
             else:
                 self.robot.get_state(f"/mciu/{quarter_modules[self.selected_corner]}/actuators/input").value = \
                     [ActuatorCommands.SET_DUTY_CYCLE, 0, 0]
@@ -286,8 +315,8 @@ class MaxExtension(QWidget):
         self.robot = robot
 
         self.surface = QWidget(self)
-        self.surface.setFixedSize(280, 50)
-        super().setFixedSize(280, 50)
+        self.surface.setFixedSize(280, 105)
+        super().setFixedSize(280, 105)
 
         self.surface.setStyleSheet("border: 1px solid black; border-radius: 5px; background-color: white;")
 
@@ -346,10 +375,10 @@ class MaxExtension(QWidget):
                                       detailed_message="This will map suspension motion to drivetrain velocity.")
             confirm.exec_()
             if confirm.result() == Qt.QMessageBox.Yes:
-                # self.robot.execute_custom_service("/primrose_qmc/set_state", {"state": Enumerators.SuspensionModes.INIT_RAMP},
-                #                                   "qmc/susp_service")
-                self.robot.get_state("/mciu/Front_Left/actuators/input").value = \
-                    [ActuatorCommands.SET_POSITION, 0, 1]
+                self.robot.execute_custom_service("/primrose_qmc/set_state", {"state": Enumerators.SuspensionModes.INIT_RAMP},
+                                                  "qmc/susp_service")
+                # self.robot.get_state("/mciu/Rear_Left/actuators/input").value = \
+                #     [ActuatorCommands.SET_POSITION, -845, 1]
         except Exception as e:
             logging.error(e)
             ErrorBox(self, title="Service Error", message="Error setting suspension to excavate.", error=e)
@@ -363,6 +392,8 @@ class MaxExtension(QWidget):
             if confirm.result() == Qt.QMessageBox.Yes:
                 self.robot.execute_custom_service("/primrose_qmc/set_state", {"state": Enumerators.SuspensionModes.MAXIMUM},
                                                   "qmc/susp_service")
+                # self.robot.get_state("/mciu/Rear_Left/actuators/input").value = \
+                #     [ActuatorCommands.SET_POSITION, -510, 1]
         except Exception as e:
             logging.error(e)
             ErrorBox(self, title="Service Error", message="Error setting suspension to drive.", error=e)
@@ -374,8 +405,10 @@ class MaxExtension(QWidget):
                                       detailed_message="This will map suspension motion to maximum extension.")
             confirm.exec_()
             if confirm.result() == Qt.QMessageBox.Yes:
-                self.robot.execute_custom_service("/primrose_qmc/set_state", {"state": Enumerators.SuspensionModes.MAXIMUM},
-                                                  "qmc/susp_service")
+                # self.robot.execute_custom_service("/primrose_qmc/set_state", {"state": Enumerators.SuspensionModes.MAXIMUM},
+                #                                   "qmc/susp_service")
+                self.robot.get_state("/mciu/Rear_Left/actuators/input").value = \
+                    [ActuatorCommands.SET_POSITION, -470, 1]
         except Exception as e:
             logging.error(e)
             ErrorBox(self, title="Service Error", message="Error setting suspension to maximum.", error=e)

@@ -30,7 +30,7 @@ class SmartTopic:
 
         self.client = kwargs.get("client", None)
         self.topic_type = kwargs.get("topic_type", None)
-        self.throttle_rate = kwargs.get("throttle_rate", 0)
+        self.throttle_rate = kwargs.get("throttle_rate", 10)
         self.queue_size = kwargs.get("queue_size", 5)
         self.auto_reconnect = kwargs.get("auto_reconnect", True)
         self.allow_update = kwargs.get("allow_update", False)
@@ -78,7 +78,7 @@ class SmartTopic:
                 logging.info(f"Acquired type {self.topic_type} for topic {self.topic_name}")
                 self.exists = True
 
-        self._listener = roslibpy.Topic(self.client, self.topic_name, self.topic_type, queue_size=5,
+        self._listener = roslibpy.Topic(self.client, self.topic_name, self.topic_type, queue_size=0, queue_length=5,
                                         throttle_rate=self.throttle_rate, reconnect_on_close=self.auto_reconnect,
                                         compression=self._compression)
         self._listener.subscribe(self._update)
@@ -138,7 +138,7 @@ class SmartTopic:
         if self._publisher is None:
             # Create a publisher for the topic if there was an attempt to publish to it
             logging.info(f"Creating publisher for {self.disp_name}")
-            self._publisher = roslibpy.Topic(self.client, self.topic_name, self.topic_type, queue_size=5)
+            self._publisher = roslibpy.Topic(self.client, self.topic_name, self.topic_type, queue_size=0, queue_length=0)
             self._publisher.advertise()
         if self.is_single and self.topic_type != "geometry_msgs/Twist":
             msg = roslibpy.Message({"data": updated_values})
