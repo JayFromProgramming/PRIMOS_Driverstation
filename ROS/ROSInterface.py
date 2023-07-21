@@ -86,17 +86,17 @@ class ROSInterface:
 
     def wait_for_reconnect(self):
         logging.info("Waiting for reconnect")
-        while not self.is_connected:
-            self.connection_ready = True
-            time.sleep(0.1)
-        logging.info("Reconnected")
-        # Call the on_connect callbacks
-        for callback in self.on_connect_callbacks:
-            try:
-                callback()
-            except Exception as e:
-                logging.error(f"Error in on_connect_callback: {e}")
-                logging.exception(e)
+        # while not self.is_connected:
+        #     self.connection_ready = True
+        #     time.sleep(0.1)
+        # logging.info("Reconnected")
+        # # Call the on_connect callbacks
+        # for callback in self.on_connect_callbacks:
+        #     try:
+        #         callback()
+        #     except Exception as e:
+        #         logging.error(f"Error in on_connect_callback: {e}")
+        #         logging.exception(e)
 
     @property
     def is_connected(self):
@@ -137,12 +137,12 @@ class ROSInterface:
         self.connection_ready = False
         logging.info(f"Connection to ROS bridge at {self.address}:{self.port} was lost")
         threading.Thread(target=self.wait_for_reconnect, daemon=True).start()
-        for callback in self.on_disconnect_callbacks:
-            try:
-                callback()
-            except Exception as e:
-                logging.error(f"Error in on_disconnect_callback: {e}")
-                logging.exception(e)
+        # for callback in self.on_disconnect_callbacks:
+        #     try:
+        #         callback()
+        #     except Exception as e:
+        #         logging.error(f"Error in on_disconnect_callback: {e}")
+        #         logging.exception(e)
 
     def establish_connection(self):
         self.connection_thread = threading.Thread(target=self.connect, daemon=True)
