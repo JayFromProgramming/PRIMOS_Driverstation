@@ -62,10 +62,10 @@ class DriveTrainControls(QWidget):
         # Create a confirmation dialog box and wait for the user to confirm
         # If the user confirms, then send the commmand to actuate the door
         try:
-            for quarter_module in Enumerators.quarter_modules:
-                logging.info(f"Commanding {quarter_module} to enable drivetrain")
-                self.robot.get_state(f'/mciu/{quarter_module}/odrive/input').value = [3, 2, 1]
-            # self.robot.execute_custom_service("/qmc/drive_service", {"in_": True}, "primrose_qmc/set_armed")
+            self.robot.execute_custom_service("/qmc/drive_service", {"in_": True}, "primrose_qmc/set_armed")
+            # for quarter_module in Enumerators.quarter_modules:
+            #     logging.info(f"Commanding {quarter_module} to enable drivetrain")
+            #     self.robot.get_state(f'/mciu/{quarter_module}/odrive/input').value = [3, 2, 1]
         except Exception as e:
             logging.error(e)
             ErrorBox(self, title="Internal Error", message="Error enabling drivetrain", error=e)
@@ -75,6 +75,7 @@ class DriveTrainControls(QWidget):
             for quarter_module in Enumerators.quarter_modules:
                 logging.info(f"Commanding {quarter_module} to enable drivetrain")
                 self.robot.get_state(f'/mciu/{quarter_module}/odrive/input').value = [1]
+            self.robot.execute_custom_service("/qmc/drive_service", {"in_": False}, "primrose_qmc/set_armed")
         except Exception as e:
             logging.error(e)
             ErrorBox(self, title="Internal Error", message="Error disabling drivetrain", error=e)
@@ -88,9 +89,11 @@ class DriveTrainControls(QWidget):
                                                "if the rover is power cycled.")
             confirmation_box.exec_()
             if confirmation_box.result() == Qt.QMessageBox.Yes:
-                for quarter_module in Enumerators.quarter_modules:
-                    logging.info(f"Commanding {quarter_module} to begin calibration sequence")
-                    self.robot.get_state(f'/mciu/{quarter_module}/odrive/input').value = [Enumerators.ODriveCommands.BEGIN_CALIBRATION]
+                # for quarter_module in Enumerators.quarter_modules:
+                #     logging.info(f"Commanding {quarter_module} to begin calibration sequence")
+                #     self.robot.get_state(f'/mciu/{quarter_module}/odrive/input').value = [Enumerators.ODriveCommands.BEGIN_CALIBRATION]
+                self.robot.get_state(f'/mciu/Trencher/odrive/input').value = [Enumerators.ODriveCommands.BEGIN_CALIBRATION]
+                self.robot.get_state('/mciu/Conveyor/odrive/input').value = [Enumerators.ODriveCommands.BEGIN_CALIBRATION]
             else:
                 logging.info("Operator cancelled calibration sequence")
         except Exception as e:

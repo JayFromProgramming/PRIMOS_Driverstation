@@ -47,3 +47,8 @@ class SuspensionModes:
     LEVELING = 6
     MANUAL = 7
     EXCAVATING = 8
+
+class SteeringStates:
+    PARKED = 0
+    DRIVING = 1
+    TURNING = 2
