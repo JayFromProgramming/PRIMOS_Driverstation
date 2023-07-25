@@ -59,7 +59,7 @@ class SteeringModesCluster(QWidget):
             logging.error(error)
 
         try:
-            self.robot.execute_custom_service("/qmc/steer_service", {"state": SteeringStates.PARKED}, "primrose_qmc/set_state",
+            self.robot.execute_custom_service("/qmc/steer_service", {"state": SteeringStates.TURNING}, "primrose_qmc/set_state",
                                               callback=on_success, errback=on_failure)
             # self.on_point_steering_button.setEnabled(False)
             # self.robot.execute_custom_service("/qmc/drive_service", {"in_": False}, "primrose_qmc/set_armed")

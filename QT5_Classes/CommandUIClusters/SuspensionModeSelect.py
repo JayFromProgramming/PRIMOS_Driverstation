@@ -268,7 +268,10 @@ class SuspensionManualControl(QWidget):
         self.controller_timer.start(100)
 
     def update_ui(self):
-        self.text.setText(f"<pre>Selected Corner: {quarter_modules[self.selected_corner]}</pre>")
+        if self.selected_corner != 4:
+            self.text.setText(f"<pre>Selected Corner: {quarter_modules[self.selected_corner]}</pre>")
+        else:
+            self.text.setText(f"<pre>Selected Corner: All Corners</pre>")
 
     def read_controller(self):
         if not self.robot.is_connected:
@@ -279,23 +282,40 @@ class SuspensionManualControl(QWidget):
             vert = self.controller.RightJoystickY
             turn = self.controller.RightJoystickX
             # logging.info(f"Vert: {vert}, Turn: {turn}")
-            if abs(vert) > 0.2 or abs(turn) > 0.2:
-                self.robot.get_state(f"/mciu/{quarter_modules[self.selected_corner]}/actuators/input").value = \
-                    [ActuatorCommands.SET_DUTY_CYCLE, int(vert * -100), 0]
-                self.robot.get_state(f"/mciu/{quarter_modules[self.selected_corner]}/actuators/input").value = \
-                    [ActuatorCommands.SET_DUTY_CYCLE, int(turn * 100), 1]
+            if self.selected_corner != 4:
+                if abs(vert) > 0.2 or abs(turn) > 0.2:
+                    self.robot.get_state(f"/mciu/{quarter_modules[self.selected_corner]}/actuators/input").value = \
+                        [ActuatorCommands.SET_DUTY_CYCLE, int(vert * -100), 0]
+                    self.robot.get_state(f"/mciu/{quarter_modules[self.selected_corner]}/actuators/input").value = \
+                        [ActuatorCommands.SET_DUTY_CYCLE, int(turn * 100), 1]
+                else:
+                    self.robot.get_state(f"/mciu/{quarter_modules[self.selected_corner]}/actuators/input").value = \
+                        [ActuatorCommands.SET_DUTY_CYCLE, 0, 0]
+                    self.robot.get_state(f"/mciu/{quarter_modules[self.selected_corner]}/actuators/input").value = \
+                        [ActuatorCommands.SET_DUTY_CYCLE, 0, 1]
             else:
-                self.robot.get_state(f"/mciu/{quarter_modules[self.selected_corner]}/actuators/input").value = \
-                    [ActuatorCommands.SET_DUTY_CYCLE, 0, 0]
-                self.robot.get_state(f"/mciu/{quarter_modules[self.selected_corner]}/actuators/input").value = \
-                    [ActuatorCommands.SET_DUTY_CYCLE, 0, 1]
+                # pass
+                # self.robot.get_state(f"/mciu/Front_Right/actuators/input").value = \
+                #     [ActuatorCommands.SET_POSITION, -1070, 0]
+                if abs(vert) > 0.2 or abs(turn) > 0.2:
+                    for i in range(4):
+                        self.robot.get_state(f"/mciu/{quarter_modules[i]}/actuators/input").value = \
+                            [ActuatorCommands.SET_DUTY_CYCLE, int(vert * -100), 0]
+                        self.robot.get_state(f"/mciu/{quarter_modules[i]}/actuators/input").value = \
+                            [ActuatorCommands.SET_DUTY_CYCLE, int(turn * 100), 1]
+                else:
+                    for i in range(4):
+                        self.robot.get_state(f"/mciu/{quarter_modules[i]}/actuators/input").value = \
+                            [ActuatorCommands.SET_DUTY_CYCLE, 0, 0]
+                        self.robot.get_state(f"/mciu/{quarter_modules[i]}/actuators/input").value = \
+                            [ActuatorCommands.SET_DUTY_CYCLE, 0, 1]
 
             if not self.key_release:
                 if self.controller.LeftDPad:
-                    self.selected_corner = (self.selected_corner - 1) % 4
+                    self.selected_corner = (self.selected_corner - 1) % 5
                     self.key_release = True
                 elif self.controller.RightDPad:
-                    self.selected_corner = (self.selected_corner + 1) % 4
+                    self.selected_corner = (self.selected_corner + 1) % 5
                     self.key_release = True
             else:
                 if not self.controller.LeftDPad and not self.controller.RightDPad and \

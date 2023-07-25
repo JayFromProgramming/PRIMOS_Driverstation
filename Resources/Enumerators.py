@@ -48,6 +48,7 @@ class SuspensionModes:
     MANUAL = 7
     EXCAVATING = 8
 
+
 class SteeringStates:
     PARKED = 0
     DRIVING = 1
