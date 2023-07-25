@@ -91,43 +91,43 @@ class DriverStationUI:
                 lift = self.xbox_controller.RightJoystickY if abs(self.xbox_controller.RightJoystickY) > 0.15 else 0
 
                 try:
-                    pass
-                    # self.robot.get_state("/driv/cmd_vel").value = \
-                    #     {"linear": {"x": forward, "y": 0, "z": 0}, "angular": {"x": 0, "y": 0, "z": turn}}
+                    # pass
+                    self.robot.get_state("/driv/cmd_vel").value = \
+                        {"linear": {"x": forward, "y": 0, "z": 0}, "angular": {"x": 0, "y": 0, "z": turn}}
                     # for quarter_module in modules:
-                    # if self.robot.driving_enabled:
-                    #     self.robot.get_state(f"/mciu/Front_Left/odrive/input").value = [4, int(forward * 4000)]
-                    #     self.robot.get_state(f"/mciu/Front_Right/odrive/input").value = [4, int(forward * -4000)]
-                    #     self.robot.get_state(f"/mciu/Rear_Left/odrive/input").value = [4, int(forward * 4000)]
-                    #     self.robot.get_state(f"/mciu/Rear_Right/odrive/input").value = [4, int(forward * -4000)]
-                    # elif self.robot.steering_enabled:
-                    #     self.robot.get_state(f"/mciu/Front_Left/odrive/input").value = [4, int(turn * 1000)]
-                    #     self.robot.get_state(f"/mciu/Front_Right/odrive/input").value = [4, int(turn * 1000)]
-                    #     self.robot.get_state(f"/mciu/Rear_Left/odrive/input").value = [4, int(turn * 1000)]
-                    #     self.robot.get_state(f"/mciu/Rear_Right/odrive/input").value = [4, int(turn * 1000)]
+                    if self.robot.driving_enabled:
+                        self.robot.get_state(f"/mciu/Front_Left/odrive/input").value = [4, int(forward * 500)]
+                        self.robot.get_state(f"/mciu/Front_Right/odrive/input").value = [4, int(forward * -500)]
+                        self.robot.get_state(f"/mciu/Rear_Left/odrive/input").value = [4, int(forward * 500)]
+                        self.robot.get_state(f"/mciu/Rear_Right/odrive/input").value = [4, int(forward * -500)]
+                    elif self.robot.steering_enabled:
+                        self.robot.get_state(f"/mciu/Front_Left/odrive/input").value = [4, int(turn * 1000)]
+                        self.robot.get_state(f"/mciu/Front_Right/odrive/input").value = [4, int(turn * 1000)]
+                        self.robot.get_state(f"/mciu/Rear_Left/odrive/input").value = [4, int(turn * 1000)]
+                        self.robot.get_state(f"/mciu/Rear_Right/odrive/input").value = [4, int(turn * 1000)]
                 except Exception as e:
                     logging.error(f"Error writing to ROS: {e}")
 
                 try:
-                    pass
-                    # if self.robot.driving_enabled:
-                    #     self.robot.get_state("/mciu/Front_Left/actuators/input").value = \
-                    #         [ActuatorCommands.SET_POSITION, self.calculate_turn_position(turn, -295, -323, -370), 1]
-                    #     self.robot.get_state("/mciu/Front_Right/actuators/input").value = \
-                    #         [ActuatorCommands.SET_POSITION, self.calculate_turn_position(turn, -510, -540, -575), 1]
-                    #     self.robot.get_state("/mciu/Rear_Left/actuators/input").value = \
-                    #         [ActuatorCommands.SET_POSITION, self.calculate_turn_position(-turn, -510, -540, -575), 1]
-                    #     self.robot.get_state("/mciu/Rear_Right/actuators/input").value = \
-                    #         [ActuatorCommands.SET_POSITION, self.calculate_turn_position(-turn, -470, -510, -530), 1]
-                    # elif self.robot.steering_enabled:
-                    #     self.robot.get_state("/mciu/Front_Left/actuators/input").value = \
-                    #         [ActuatorCommands.SET_POSITION, -650, 1]
-                    #     self.robot.get_state("/mciu/Front_Right/actuators/input").value = \
-                    #         [ActuatorCommands.SET_POSITION, -30, 1]
-                    #     self.robot.get_state("/mciu/Rear_Left/actuators/input").value = \
-                    #         [ActuatorCommands.SET_POSITION, -50, 1]
-                    #     self.robot.get_state("/mciu/Rear_Right/actuators/input").value = \
-                    #         [ActuatorCommands.SET_POSITION, -850, 1]
+                    # pass
+                    if self.robot.driving_enabled:
+                        self.robot.get_state("/mciu/Front_Left/actuators/input").value = \
+                            [ActuatorCommands.SET_POSITION, self.calculate_turn_position(turn, -295, -323, -370), 1]
+                        self.robot.get_state("/mciu/Front_Right/actuators/input").value = \
+                            [ActuatorCommands.SET_POSITION, self.calculate_turn_position(turn, -510, -540, -575), 1]
+                        self.robot.get_state("/mciu/Rear_Left/actuators/input").value = \
+                            [ActuatorCommands.SET_POSITION, self.calculate_turn_position(-turn, -510, -540, -575), 1]
+                        self.robot.get_state("/mciu/Rear_Right/actuators/input").value = \
+                            [ActuatorCommands.SET_POSITION, self.calculate_turn_position(-turn, -470, -510, -530), 1]
+                    elif self.robot.steering_enabled:
+                        self.robot.get_state("/mciu/Front_Left/actuators/input").value = \
+                            [ActuatorCommands.SET_POSITION, -750, 1]
+                        self.robot.get_state("/mciu/Front_Right/actuators/input").value = \
+                            [ActuatorCommands.SET_POSITION, -30, 1]
+                        self.robot.get_state("/mciu/Rear_Left/actuators/input").value = \
+                            [ActuatorCommands.SET_POSITION, -50, 1]
+                        self.robot.get_state("/mciu/Rear_Right/actuators/input").value = \
+                            [ActuatorCommands.SET_POSITION, -900, 1]
                 except Exception as e:
                     logging.error(f"Error writing to ROS: {e}")
 
@@ -140,14 +140,20 @@ class DriverStationUI:
                 if self.xbox_controller.RightTrigger > -0.1 and self.xbox_controller.LeftTrigger > 0.6:
                     try:
                         if self.xbox_controller.LeftBumper:  # Reverse Trencher
-                            self.robot.get_state("/driv/Trencher/throttle").value = int(self.xbox_controller.RightTrigger * -100)
+                            # self.robot.get_state("/driv/Trencher/throttle").value = int(self.xbox_controller.RightTrigger * -100)
+                            self.robot.get_state("/mciu/Trencher/odrive/input").value = [4, int(self.xbox_controller.RightTrigger * 4250)]
+                            self.robot.get_state("/mciu/Conveyor/odrive/input").value = [4, -5000]
                         else:
-                            self.robot.get_state("/driv/Trencher/throttle").value = int(self.xbox_controller.RightTrigger * 100)
+                            # self.robot.get_state("/driv/Trencher/throttle").value = int(self.xbox_controller.RightTrigger * 100)
+                            self.robot.get_state("/mciu/Trencher/odrive/input").value = [4, int(self.xbox_controller.RightTrigger * -4250)]
+                            self.robot.get_state("/mciu/Conveyor/odrive/input").value = [4, -5000]
                     except Exception as e:
                         logging.error(f"Error writing to ROS: {e}")
                 else:
                     try:
-                        self.robot.get_state("/driv/Trencher/throttle").value = 0
+                        # self.robot.get_state("/driv/Trencher/throttle").value = 0
+                        self.robot.get_state("/mciu/Trencher/odrive/input").value = [4, 0]
+                        self.robot.get_state("/mciu/Conveyor/odrive/input").value = [4, -5000]
                     except Exception as e:
                         logging.error(f"Error writing to ROS: {e}")
 

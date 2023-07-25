@@ -74,11 +74,12 @@ class ROSInterface:
                 time.sleep(5)
                 continue
             try:
-                start = time.time()
-                service.call(request)
-                ping_time = (time.time() - start) * 1000
-                if ping_time != 0:
-                    self.ping_time = ping_time
+                pass
+                # start = time.time()
+                # service.call(request)
+                # ping_time = (time.time() - start) * 1000
+                # if ping_time != 0:
+                #     self.ping_time = ping_time
                 # logging.debug(f"Ping time: {self.ping_time}ms")
             except Exception as e:
                 logging.error(f"Error in ping thread: {e}")

@@ -49,14 +49,18 @@ class TrencherControls(QWidget):
 
     def arm(self):
         try:
-            self.robot.execute_custom_service("/trch/arm", {"in_": True}, "primrose_trch/set_armed")
+            # self.robot.execute_custom_service("/trch/arm", {"in_": True}, "primrose_trch/set_armed")
+            self.robot.get_state("/mciu/Trencher/odrive/input").value = [3, 2, 2]
+            self.robot.get_state("/mciu/Conveyor/odrive/input").value = [3, 2, 1]
         except Exception as e:
             logging.error(e)
             ErrorBox(self, title="Service Error", message="Could not arm trencher.", error=e)
 
     def disarm(self):
         try:
-            self.robot.execute_custom_service("/trch/arm", {"in_": False}, "primrose_trch/set_armed")
+            # self.robot.execute_custom_service("/trch/arm", {"in_": False}, "primrose_trch/set_armed")
+            self.robot.get_state("/mciu/Trencher/odrive/input").value = [1]
+            self.robot.get_state("/mciu/Conveyor/odrive/input").value = [1]
         except Exception as e:
             logging.error(e)
             ErrorBox(self, title="Service Error", message="Could not disarm trencher.", error=e)
