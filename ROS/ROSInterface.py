@@ -75,14 +75,16 @@ class ROSInterface:
                 continue
             try:
                 start = time.time()
-                service.call(request)
+                service.call(request, timeout=5)
                 ping_time = (time.time() - start) * 1000
                 if ping_time != 0:
                     self.ping_time = ping_time
-                # logging.debug(f"Ping time: {self.ping_time}ms")
+                logging.debug(f"Ping time: {self.ping_time}ms")
             except Exception as e:
+                self.ping_time = -1
                 logging.error(f"Error in ping thread: {e}")
             time.sleep(1)
+        logging.warning("Ping thread stopped for some reason")
 
     def wait_for_reconnect(self):
         logging.info("Waiting for reconnect")

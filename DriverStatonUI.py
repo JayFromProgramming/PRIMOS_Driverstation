@@ -85,6 +85,8 @@ class DriverStationUI:
             try:
                 if not self.robot.is_connected:
                     continue
+                if not self.xbox_controller.connected:
+                    continue
                 # Apply deadbands to the joystick
                 forward = self.xbox_controller.LeftJoystickY if abs(self.xbox_controller.LeftJoystickY) > 0.15 else 0
                 turn = self.xbox_controller.RightJoystickX if abs(self.xbox_controller.RightJoystickX) > 0.15 else 0
