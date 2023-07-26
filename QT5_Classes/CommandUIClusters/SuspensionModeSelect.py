@@ -76,7 +76,7 @@ class SuspensionModeSelect(QWidget):
             confirm.exec_()
             if confirm.result() == Qt.QMessageBox.Yes:
                 self.robot.execute_custom_service("/primrose_qmc/set_state", {"state": Enumerators.SuspensionModes.MANUAL},
-                                                  "qmc/susp_service")
+                                                  "/qmc/susp_service")
                 self.manual_controls.show()
                 self.auto_controls.hide()
                 self.max_extension.hide()
@@ -149,7 +149,7 @@ class SuspensionAutoModes(QWidget):
             confirm.exec_()
             if confirm.result() == Qt.QMessageBox.Yes:
                 self.robot.execute_custom_service("/primrose_qmc/set_state", {"state": Enumerators.SuspensionModes.INITIAL_RAMP},
-                                                  "qmc/susp_service")
+                                                  "/qmc/susp_service")
         except Exception as e:
             logging.error(e)
             ErrorBox(self, title="Service Error", message="Error setting suspension mode to initial ramp.", error=e)
@@ -162,7 +162,7 @@ class SuspensionAutoModes(QWidget):
             confirm.exec_()
             if confirm.result() == Qt.QMessageBox.Yes:
                 self.robot.execute_custom_service("/primrose_qmc/set_state", {"state": Enumerators.SuspensionModes.EXCAVATING},
-                                                  "qmc/susp_service")
+                                                  "/qmc/susp_service")
         except Exception as e:
             logging.error(e)
             ErrorBox(self, title="Service Error", message="Error setting suspension mode to excavating.", error=e)
@@ -175,7 +175,7 @@ class SuspensionAutoModes(QWidget):
             confirm.exec_()
             if confirm.result() == Qt.QMessageBox.Yes:
                 self.robot.execute_custom_service("/primrose_qmc/set_state", {"state": Enumerators.SuspensionModes.FIRST_WHEEL_ENTERING},
-                                                  "qmc/susp_service")
+                                                  "/qmc/susp_service")
         except Exception as e:
             logging.error(e)
             ErrorBox(self, title="Service Error", message="Error setting suspension mode to first wheel in.", error=e)
@@ -188,7 +188,7 @@ class SuspensionAutoModes(QWidget):
             confirm.exec_()
             if confirm.result() == Qt.QMessageBox.Yes:
                 self.robot.execute_custom_service("/primrose_qmc/set_state", {"state": Enumerators.SuspensionModes.SECOND_WHEEL_ENTERING},
-                                                  "qmc/susp_service")
+                                                  "/qmc/susp_service")
         except Exception as e:
             logging.error(e)
             ErrorBox(self, title="Service Error", message="Error setting suspension mode to second wheel in.", error=e)
@@ -201,7 +201,7 @@ class SuspensionAutoModes(QWidget):
             confirm.exec_()
             if confirm.result() == Qt.QMessageBox.Yes:
                 self.robot.execute_custom_service("/primrose_qmc/set_state", {"state": Enumerators.SuspensionModes.FIRST_WHEEL_EXITING},
-                                                  "qmc/susp_service")
+                                                  "/qmc/susp_service")
         except Exception as e:
             logging.error(e)
             ErrorBox(self, title="Service Error", message="Error setting suspension mode to first wheel out.", error=e)
@@ -214,7 +214,7 @@ class SuspensionAutoModes(QWidget):
             confirm.exec_()
             if confirm.result() == Qt.QMessageBox.Yes:
                 self.robot.execute_custom_service("/primrose_qmc/set_state", {"state": Enumerators.SuspensionModes.SECOND_WHEEL_EXITING},
-                                                  "qmc/susp_service")
+                                                  "/qmc/susp_service")
         except Exception as e:
             logging.error(e)
             ErrorBox(self, title="Service Error", message="Error setting suspension mode to second wheel out.", error=e)
@@ -398,7 +398,7 @@ class MaxExtension(QWidget):
             confirm.exec_()
             if confirm.result() == Qt.QMessageBox.Yes:
                 self.robot.execute_custom_service("/primrose_qmc/set_state", {"state": Enumerators.SuspensionModes.INIT_RAMP},
-                                                  "qmc/susp_service")
+                                                  "/qmc/susp_service")
                 # self.robot.get_state("/mciu/Rear_Left/actuators/input").value = \
                 #     [ActuatorCommands.SET_POSITION, -845, 1]
         except Exception as e:
@@ -413,7 +413,7 @@ class MaxExtension(QWidget):
             confirm.exec_()
             if confirm.result() == Qt.QMessageBox.Yes:
                 self.robot.execute_custom_service("/primrose_qmc/set_state", {"state": Enumerators.SuspensionModes.MAXIMUM},
-                                                  "qmc/susp_service")
+                                                  "/qmc/susp_service")
                 # self.robot.get_state("/mciu/Rear_Left/actuators/input").value = \
                 #     [ActuatorCommands.SET_POSITION, -510, 1]
         except Exception as e:
@@ -427,10 +427,8 @@ class MaxExtension(QWidget):
                                       detailed_message="This will map suspension motion to maximum extension.")
             confirm.exec_()
             if confirm.result() == Qt.QMessageBox.Yes:
-                # self.robot.execute_custom_service("/primrose_qmc/set_state", {"state": Enumerators.SuspensionModes.MAXIMUM},
-                #                                   "qmc/susp_service")
-                self.robot.get_state("/mciu/Rear_Left/actuators/input").value = \
-                    [ActuatorCommands.SET_POSITION, -470, 1]
+                self.robot.execute_custom_service("/primrose_qmc/set_state", {"state": Enumerators.SuspensionModes.MAXIMUM},
+                                                  "qmc/susp_service")
         except Exception as e:
             logging.error(e)
             ErrorBox(self, title="Service Error", message="Error setting suspension to maximum.", error=e)
