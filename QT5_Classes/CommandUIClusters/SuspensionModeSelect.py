@@ -75,8 +75,8 @@ class SuspensionModeSelect(QWidget):
                                                        "right joystick to control the height of the suspension.")
             confirm.exec_()
             if confirm.result() == Qt.QMessageBox.Yes:
-                self.robot.execute_custom_service("/primrose_qmc/set_state", {"state": Enumerators.SuspensionModes.MANUAL},
-                                                  "/qmc/susp_service")
+                self.robot.execute_custom_service("/qmc/susp_service", {"state": Enumerators.SuspensionModes.MANUAL},
+                                                  "/primrose_qmc/set_state")
                 self.manual_controls.show()
                 self.auto_controls.hide()
                 self.max_extension.hide()

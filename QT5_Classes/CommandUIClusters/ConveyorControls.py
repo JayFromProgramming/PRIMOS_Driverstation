@@ -30,13 +30,13 @@ class ConveyorControls(QWidget):
         self.auto_button.clicked.connect(self.auto)
         self.auto_button.setEnabled(False)
 
-        self.disable_button = QPushButton("Disable", self)
+        self.disable_button = QPushButton("Manual fwd", self)
         self.disable_button.setFixedSize(80, 25)
         self.disable_button.move(100, 20)
         self.disable_button.clicked.connect(self.manual)
         self.disable_button.setEnabled(False)
 
-        self.reverse_button = QPushButton("Reverse", self)
+        self.reverse_button = QPushButton("Manual rev", self)
         self.reverse_button.setFixedSize(80, 25)
         self.reverse_button.move(190, 20)
         self.reverse_button.clicked.connect(self.disabled)
@@ -57,21 +57,31 @@ class ConveyorControls(QWidget):
 
     def auto(self):
         try:
-            self.robot.execute_custom_service("/trch/arm", {"in_": True}, "primrose_conv/set_state")
+            self.robot.execute_custom_service("/conv/state", {"state": 1}, "primrose_conv/set_state")
         except Exception as e:
             logging.error(e)
             ErrorBox(self, title="Service Error", message="Could not change conveyor state.", error=e)
 
     def manual(self):
         try:
-            self.robot.execute_custom_service("/trch/arm", {"in_": False}, "primrose_conv/set_state")
+            self.robot.execute_custom_service("/conv/state", {"state": 0}, "primrose_conv/set_state")
+        except Exception as e:
+            logging.error(e)
+            ErrorBox(self, title="Service Error", message="Could not change conveyor state.", error=e)
+        try:
+            self.robot.get_state("/driv/Conveyor/throttle").value = -1;
         except Exception as e:
             logging.error(e)
             ErrorBox(self, title="Service Error", message="Could not change conveyor state.", error=e)
 
     def disabled(self):
         try:
-            self.robot.execute_custom_service("/trch/arm", {"in_": False}, "primrose_conv/set_state")
+            self.robot.execute_custom_service("/conv/state", {"state": 0}, "primrose_conv/set_state")
+        except Exception as e:
+            logging.error(e)
+            ErrorBox(self, title="Service Error", message="Could not change conveyor state.", error=e)
+        try:
+            self.robot.get_state("/driv/Conveyor/throttle").value = 1;
         except Exception as e:
             logging.error(e)
             ErrorBox(self, title="Service Error", message="Could not change conveyor state.", error=e)
