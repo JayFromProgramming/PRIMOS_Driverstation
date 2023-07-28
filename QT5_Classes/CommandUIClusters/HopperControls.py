@@ -62,19 +62,19 @@ class HopperDoorControls(QWidget):
             confirm = ConfirmationBox(self, title="Open Hopper Door", message="Are you sure you want to open the hopper door?",
                                       detailed_message="This one is pretty self explanatory.")
             if confirm.exec_():
-                self.robot.get_state('/mciu/Hopper/door').value = [2]
+                self.robot.get_state('/mciu/Hopper/door').value = 2
         except Exception as e:
             logging.error(e)
 
     def stop_door(self):
         try:
-            self.robot.get_state('/mciu/Hopper/door').value = [1]
+            self.robot.get_state('/mciu/Hopper/door').value = 1
         except Exception as e:
             logging.error(e)
 
     def close_door(self):
         try:
-            self.robot.get_state('/mciu/Hopper/door').value = [0]
+            self.robot.get_state('/mciu/Hopper/door').value = 0
         except Exception as e:
             logging.error(e)
 
@@ -133,7 +133,7 @@ class HopperLoadSensors(QWidget):
                                                                 "it is carrying no load. This action is irreversible.")
             confirmation_box.exec_()
             if confirmation_box.result() == Qt.QMessageBox.Yes:
-                self.robot.get_state('/mciu/Hopper/tare').value = [1]
+                self.robot.get_state('/mciu/Hopper/tare').value = 1
         except Exception as e:
             logging.error(e)
 
@@ -147,6 +147,6 @@ class HopperLoadSensors(QWidget):
                                                                 "it is carrying no load. This action is irreversible.")
             confirmation_box.exec_()
             if confirmation_box.result() == Qt.QMessageBox.Yes:
-                self.robot.get_state('/mciu/Suspension/tare').value = [1]
+                self.robot.get_state('/mciu/Suspension/tare').value = 1
         except Exception as e:
             logging.error(e)
