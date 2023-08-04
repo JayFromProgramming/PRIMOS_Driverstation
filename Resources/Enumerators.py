@@ -40,13 +40,9 @@ class EStopCommands:
 class SuspensionModes:
     DEFAULT = 0
     INITIAL_RAMP = 1
-    FIRST_WHEEL_ENTERING = 2
-    SECOND_WHEEL_ENTERING = 3
-    FIRST_WHEEL_EXITING = 4
-    SECOND_WHEEL_EXITING = 5
-    LEVELING = 6
-    MANUAL = 7
-    EXCAVATING = 8
+    EXTRA_RAMP_1 = 2
+    EXTRA_RAMP_2 = 3
+    MANUAL = 4
 
 
 class SteeringStates:

@@ -38,7 +38,7 @@ class CommandsUI(QWidget):
         self.header.setAlignment(Qt.Qt.AlignCenter)
         self.header.move(round(self.width() / 2 - self.header.width() / 2), 0)
 
-        self.steering_mode_cluster = SteeringModesCluster(self.robot, self)
+        self.steering_mode_cluster = SteeringModesCluster(self.robot, self, self.xbox_controller)
         self.hopper_door_cluster = HopperDoorControls(self.robot, self)
         self.hopper_load_cluster = HopperLoadSensors(self.robot, self)
         # self.motor_calibration_cluster = MotorCalibrationCluster(self.robot, self)
