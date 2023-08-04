@@ -20,7 +20,7 @@ class RosbagControls(QWidget):
     def __init__(self, robot, parent=None):
         super().__init__(parent)
         self.robot = robot
-        self.bag_file_location = "/home/ubuntu/bag_files/"
+        self.bag_file_location = "/home/ubuntu/ssd/fdr"
         self.save_location = "copied_bag_files"  # The location on the local machine to save the bag files to
 
         if not os.path.exists(self.save_location):
