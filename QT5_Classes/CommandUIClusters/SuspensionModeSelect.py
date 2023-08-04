@@ -79,6 +79,14 @@ class SuspensionModeSelect(QWidget):
                     self.drive_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
                     self.manual_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
                     self.auto_button.setStyleSheet(f"color: {selected}; font-weight: bold;")
+                case SuspensionModes.EXTRA_RAMP_1:
+                    self.drive_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.manual_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.auto_button.setStyleSheet(f"color: {selected}; font-weight: bold;")
+                case SuspensionModes.EXTRA_RAMP_2:
+                    self.drive_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.manual_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.auto_button.setStyleSheet(f"color: {selected}; font-weight: bold;")
                 case SuspensionModes.MANUAL:
                     self.drive_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
                     self.manual_button.setStyleSheet(f"color: {selected}; font-weight: bold;")
@@ -175,11 +183,38 @@ class SuspensionAutoModes(QWidget):
         self.header.move(round(self.width() / 2 - self.header.width() / 2) - 5, 0)
 
         self.initial_ramp_button = QuickButton("Initial Ramp", self, (10, 20), self.initial_ramp)
-        self.excavating_button = QuickButton("Excavating", self, (100, 20), self.excavating)
-        self.first_in_button = QuickButton("First In", self, (10, 46), self.first_wheel_in)
-        self.second_in_button = QuickButton("Second In", self, (100, 46), self.second_wheel_in)
-        self.first_out_button = QuickButton("First Out", self, (10, 72), self.first_wheel_out)
-        self.second_out_button = QuickButton("Second Out", self, (100, 72), self.second_wheel_out)
+        self.extra_ramp_1_button = QuickButton("Extra Ramp FR", self, (100, 20), self.extra_ramp_1)
+        self.extra_ramp_2_button = QuickButton("Extra Ramp BR", self, (100, 20), self.extra_ramp_2)
+
+        self.connection_check_timer = Qt.QTimer(self)
+        self.connection_check_timer.timeout.connect(self.state_loop)
+        self.connection_check_timer.start(1000)
+
+    def state_loop(self):
+        font_weight = 500
+        deselected = "red"
+        selected = "green"
+        try:
+            susp_state = self.robot.get_state('/qmc/susp_state').value
+            match susp_state:
+                case SuspensionModes.INITIAL_RAMP:
+                    self.initial_ramp_button.setStyleSheet(f"color: {selected}; font-weight: bold;")
+                    self.extra_ramp_1_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.extra_ramp_2_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                case SuspensionModes.EXTRA_RAMP_1:
+                    self.initial_ramp_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.extra_ramp_1_button.setStyleSheet(f"color: {selected}; font-weight: bold;")
+                    self.extra_ramp_2_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                case SuspensionModes.EXTRA_RAMP_2:
+                    self.initial_ramp_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.extra_ramp_1_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.extra_ramp_2_button.setStyleSheet(f"color: {selected}; font-weight: bold;")
+                case _:
+                    self.initial_ramp_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.extra_ramp_1_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.extra_ramp_2_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+        except Exception as e:
+            logging.exception(e)
 
     def initial_ramp(self):
         try:
@@ -194,70 +229,31 @@ class SuspensionAutoModes(QWidget):
             logging.error(e)
             ErrorBox(self, title="Service Error", message="Error setting suspension mode to initial ramp.", error=e)
 
-    def excavating(self):
+    def extra_ramp_1(self):
         try:
             confirm = ConfirmationBox(self, title="Confirm Suspension Mode Change",
-                                      message="Are you sure you want to change the suspension mode to Excavating?",
-                                      detailed_message="This will map suspension motion to drivetrain velocity.")
+                                      message="Are you sure you want to change the suspension mode to Extra Ramp FR?",
+                                      detailed_message="This will map suspension motion to drivetrain velocity with manual control of the front right wheel.")
             confirm.exec_()
             if confirm.result() == Qt.QMessageBox.Yes:
-                self.robot.execute_custom_service("/qmc/susp_service", {"state": Enumerators.SuspensionModes.EXCAVATING},
+                self.robot.execute_custom_service("/qmc/susp_service", {"state": Enumerators.SuspensionModes.EXTRA_RAMP_1},
                                                   "/primrose_qmc/set_state")
         except Exception as e:
             logging.error(e)
-            ErrorBox(self, title="Service Error", message="Error setting suspension mode to excavating.", error=e)
+            ErrorBox(self, title="Service Error", message="Error setting suspension mode to extra ramp.", error=e)
 
-    def first_wheel_in(self):
+    def extra_ramp_2(self):
         try:
             confirm = ConfirmationBox(self, title="Confirm Suspension Mode Change",
-                                      message="Are you sure you want to change the suspension mode to First In?",
-                                      detailed_message="This will map suspension motion to drivetrain velocity.")
+                                      message="Are you sure you want to change the suspension mode to Extra Ramp BR?",
+                                      detailed_message="This will map suspension motion to drivetrain velocity with manual control of the back right wheel.")
             confirm.exec_()
             if confirm.result() == Qt.QMessageBox.Yes:
-                self.robot.execute_custom_service("/qmc/susp_service", {"state": Enumerators.SuspensionModes.FIRST_WHEEL_ENTERING},
+                self.robot.execute_custom_service("/qmc/susp_service", {"state": Enumerators.SuspensionModes.EXTRA_RAMP_2},
                                                   "/primrose_qmc/set_state")
         except Exception as e:
             logging.error(e)
             ErrorBox(self, title="Service Error", message="Error setting suspension mode to first wheel in.", error=e)
-
-    def second_wheel_in(self):
-        try:
-            confirm = ConfirmationBox(self, title="Confirm Suspension Mode Change",
-                                      message="Are you sure you want to change the suspension mode to Second In?",
-                                      detailed_message="This will map suspension motion to drivetrain velocity.")
-            confirm.exec_()
-            if confirm.result() == Qt.QMessageBox.Yes:
-                self.robot.execute_custom_service("/qmc/susp_service", {"state": Enumerators.SuspensionModes.SECOND_WHEEL_ENTERING},
-                                                  "/primrose_qmc/set_state")
-        except Exception as e:
-            logging.error(e)
-            ErrorBox(self, title="Service Error", message="Error setting suspension mode to second wheel in.", error=e)
-
-    def first_wheel_out(self):
-        try:
-            confirm = ConfirmationBox(self, title="Confirm Suspension Mode Change",
-                                      message="Are you sure you want to change the suspension mode to First Out?",
-                                      detailed_message="This will map suspension motion to drivetrain velocity.")
-            confirm.exec_()
-            if confirm.result() == Qt.QMessageBox.Yes:
-                self.robot.execute_custom_service("/qmc/susp_service", {"state": Enumerators.SuspensionModes.FIRST_WHEEL_EXITING},
-                                                  "/primrose_qmc/set_state")
-        except Exception as e:
-            logging.error(e)
-            ErrorBox(self, title="Service Error", message="Error setting suspension mode to first wheel out.", error=e)
-
-    def second_wheel_out(self):
-        try:
-            confirm = ConfirmationBox(self, title="Confirm Suspension Mode Change",
-                                      message="Are you sure you want to change the suspension mode to Second Out?",
-                                      detailed_message="This will map suspension motion to drivetrain velocity.")
-            confirm.exec_()
-            if confirm.result() == Qt.QMessageBox.Yes:
-                self.robot.execute_custom_service("/qmc/susp_service", {"state": Enumerators.SuspensionModes.SECOND_WHEEL_EXITING},
-                                                  "/primrose_qmc/set_state")
-        except Exception as e:
-            logging.error(e)
-            ErrorBox(self, title="Service Error", message="Error setting suspension mode to second wheel out.", error=e)
 
 
 class SuspensionManualControl(QWidget):

@@ -10,9 +10,10 @@ from Resources.Enumerators import ActuatorCommands, SteeringStates
 
 class SteeringModesCluster(QWidget):
 
-    def __init__(self, robot, parent=None):
+    def __init__(self, robot, parent=None, controller=None):
         super().__init__(parent)
         self.robot = robot
+        self.controller = controller
 
         self.surface = QWidget(self)
         self.surface.setFixedSize(280, 50)
@@ -52,10 +53,38 @@ class SteeringModesCluster(QWidget):
         self.connection_check_timer.start(1000)
 
     def state_loop(self):
+        def on_success(response):
+            self.on_point_steering_button.setEnabled(True)
+            logging.info("Successfully executed steering_mode service.")
+
+        def on_failure(error):
+            # ErrorBox(title="Service Failure", message="Was unable to execute steering_mode service.", detailed_message=error)
+            self.on_point_steering_button.setEnabled(True)
+            logging.error(error)
+
+
         font_weight = 500
         deselected = "red"
         selected = "green"
         try:
+            # handle controller input:
+            a = self.controller.A;
+            x = self.controller.X;
+            b = self.controller.B;
+            if a == 1:
+                self.robot.execute_custom_service("/qmc/steer_service", {"state": SteeringStates.DRIVING}, "primrose_qmc/set_state",
+                                                  callback=on_success, errback=on_failure)
+                logging.info("Sent steering mode request.")
+            elif x == 1:
+                self.robot.execute_custom_service("/qmc/steer_service", {"state": SteeringStates.PARKED}, "primrose_qmc/set_state",
+                                                  callback=on_success, errback=on_failure)
+                logging.info("Sent steering mode request.")
+            elif b == 1:
+                self.robot.execute_custom_service("/qmc/steer_service", {"state": SteeringStates.TURNING}, "primrose_qmc/set_state",
+                                                  callback=on_success, errback=on_failure)
+                logging.info("Sent steering mode request.")
+
+            # handle colors
             steer_state = self.robot.get_state('/qmc/steer_state').value
             match steer_state:
                 case SteeringStates.PARKED:
@@ -64,12 +93,12 @@ class SteeringModesCluster(QWidget):
                     self.on_point_steering_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
                 case SteeringStates.TURNING:
                     self.parked_steering_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
-                    self.fused_steering_button.setStyleSheet(f"color: {selected}; font-weight: bold;")
-                    self.on_point_steering_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
-                case SteeringStates.DRIVING:
-                    self.parked_steering_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
                     self.fused_steering_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
                     self.on_point_steering_button.setStyleSheet(f"color: {selected}; font-weight: bold;")
+                case SteeringStates.DRIVING:
+                    self.parked_steering_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.fused_steering_button.setStyleSheet(f"color: {selected}; font-weight: bold;")
+                    self.on_point_steering_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
                 case _:
                     self.parked_steering_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
                     self.fused_steering_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
