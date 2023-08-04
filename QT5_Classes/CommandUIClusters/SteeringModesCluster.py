@@ -86,26 +86,25 @@ class SteeringModesCluster(QWidget):
 
             # handle colors
             steer_state = self.robot.get_state('/qmc/steer_state').value
-            if steer_state == 0:
-                self.parked_steering_button.setStyleSheet(f"background-color: {selected}; font-weight: bold;")
-                self.fused_steering_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
-                self.on_point_steering_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
-            elif steer_state == 1:
-                self.parked_steering_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
-                self.fused_steering_button.setStyleSheet(f"background-color: {selected}; font-weight: bold;")
-                self.on_point_steering_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
-            elif steer_state == 2:
-                self.parked_steering_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
-                self.fused_steering_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
-                self.on_point_steering_button.setStyleSheet(f"background-color: {selected}; font-weight: bold;")
-            else:
-                self.parked_steering_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
-                self.fused_steering_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
-                self.on_point_steering_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
+            match steer_state:
+                case SteeringStates.PARKED:
+                    self.parked_steering_button.setStyleSheet(f"color: {selected}; font-weight: bold;")
+                    self.fused_steering_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.on_point_steering_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                case SteeringStates.TURNING:
+                    self.parked_steering_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.fused_steering_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.on_point_steering_button.setStyleSheet(f"color: {selected}; font-weight: bold;")
+                case SteeringStates.DRIVING:
+                    self.parked_steering_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.fused_steering_button.setStyleSheet(f"color: {selected}; font-weight: bold;")
+                    self.on_point_steering_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                case _:
+                    self.parked_steering_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.fused_steering_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.on_point_steering_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
         except Exception as e:
-            logging.error(e)
-            ErrorBox(self, title="Service Error", message="Was unable to execute steering_mode service.", error=e)
-            self.on_point_steering_button.setEnabled(True)
+            logging.exception(e)
 
     def in_point_steering(self):
 

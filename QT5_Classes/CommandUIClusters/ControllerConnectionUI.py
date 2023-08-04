@@ -49,9 +49,13 @@ class ControllerConnectionUI(QWidget):
         else:
             self.connection_status.setText("<pre>Status: Disconnected</pre>")
             self.connection_status.setStyleSheet("color: red; font-size: 13px; font-weight: bold;")
-
-        self.state_status.setText(f"<pre>Steer-state: {self.robot.get_state('/qmc/steer_state').value} Susp-state: {self.robot.get_state('/qmc/susp_state').value}</pre>")
-        self.state_status.setStyleSheet("color: green; font-size: 13px; font-weight: bold;")
+        if self.robot.is_connected:
+            self.state_status.setText(f"<pre>Steer-state: {self.robot.get_state('/qmc/steer_state').value}"
+                                      f" Susp-state: {self.robot.get_state('/qmc/susp_state').value}</pre>")
+            self.state_status.setStyleSheet("color: green; font-size: 13px; font-weight: bold;")
+        else:
+            self.state_status.setText("<pre>Steer-state:N/A Susp-state:N/A</pre>")
+            self.state_status.setStyleSheet("color: red; font-size: 13px; font-weight: bold;")
 
 
 class ControllerMappingUI(QWidget):

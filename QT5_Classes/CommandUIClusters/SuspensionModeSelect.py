@@ -8,7 +8,7 @@ from QT5_Classes.ConfirmationBox import ConfirmationBox
 from QT5_Classes.ErrorBox import ErrorBox
 from QT5_Classes.QuickButton import QuickButton
 from Resources import Enumerators
-from Resources.Enumerators import quarter_modules, ActuatorCommands
+from Resources.Enumerators import quarter_modules, ActuatorCommands, SuspensionModes
 
 
 class SuspensionModeSelect(QWidget):
@@ -69,26 +69,34 @@ class SuspensionModeSelect(QWidget):
         deselected = "red"
         selected = "green"
         try:
-            # handle colors
-            steer_state = self.robot.get_state('/qmc/susp_state').value
-            if steer_state == 0:
-                self.drive_button.setStyleSheet(f"background-color: {selected}; font-weight: bold;")
-                self.manual_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
-                self.auto_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
-            elif steer_state == 1:
-                self.drive_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
-                self.manual_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
-                self.auto_button.setStyleSheet(f"background-color: {selected}; font-weight: bold;")
-            elif steer_state == 7:
-                self.drive_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
-                self.manual_button.setStyleSheet(f"background-color: {selected}; font-weight: bold;")
-                self.auto_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
-            else:
-                self.drive_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
-                self.manual_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
-                self.auto_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
-        except:
-            pass
+            susp_state = self.robot.get_state('/qmc/susp_state').value
+            match susp_state:
+                case SuspensionModes.DEFAULT:
+                    self.drive_button.setStyleSheet(f"color: {selected}; font-weight: bold;")
+                    self.manual_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.auto_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                case SuspensionModes.INITIAL_RAMP:
+                    self.drive_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.manual_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.auto_button.setStyleSheet(f"color: {selected}; font-weight: bold;")
+                case SuspensionModes.EXTRA_RAMP_1:
+                    self.drive_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.manual_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.auto_button.setStyleSheet(f"color: {selected}; font-weight: bold;")
+                case SuspensionModes.EXTRA_RAMP_2:
+                    self.drive_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.manual_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.auto_button.setStyleSheet(f"color: {selected}; font-weight: bold;")
+                case SuspensionModes.MANUAL:
+                    self.drive_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.manual_button.setStyleSheet(f"color: {selected}; font-weight: bold;")
+                    self.auto_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                case _:
+                    self.drive_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.manual_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.auto_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+        except Exception as e:
+            logging.exception(e)
 
     def moved(self, x, y):
         self.move(x, y)
@@ -175,7 +183,38 @@ class SuspensionAutoModes(QWidget):
         self.header.move(round(self.width() / 2 - self.header.width() / 2) - 5, 0)
 
         self.initial_ramp_button = QuickButton("Initial Ramp", self, (10, 20), self.initial_ramp)
-        self.extra_ramp_button = QuickButton("Extra Ramp", self, (100, 20), self.extra_ramp)
+        self.extra_ramp_1_button = QuickButton("Extra Ramp FR", self, (100, 20), self.extra_ramp_1)
+        self.extra_ramp_2_button = QuickButton("Extra Ramp BR", self, (100, 20), self.extra_ramp_2)
+
+        self.connection_check_timer = Qt.QTimer(self)
+        self.connection_check_timer.timeout.connect(self.state_loop)
+        self.connection_check_timer.start(1000)
+
+    def state_loop(self):
+        font_weight = 500
+        deselected = "red"
+        selected = "green"
+        try:
+            susp_state = self.robot.get_state('/qmc/susp_state').value
+            match susp_state:
+                case SuspensionModes.INITIAL_RAMP:
+                    self.initial_ramp_button.setStyleSheet(f"color: {selected}; font-weight: bold;")
+                    self.extra_ramp_1_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.extra_ramp_2_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                case SuspensionModes.EXTRA_RAMP_1:
+                    self.initial_ramp_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.extra_ramp_1_button.setStyleSheet(f"color: {selected}; font-weight: bold;")
+                    self.extra_ramp_2_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                case SuspensionModes.EXTRA_RAMP_2:
+                    self.initial_ramp_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.extra_ramp_1_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.extra_ramp_2_button.setStyleSheet(f"color: {selected}; font-weight: bold;")
+                case _:
+                    self.initial_ramp_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.extra_ramp_1_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.extra_ramp_2_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+        except Exception as e:
+            logging.exception(e)
 
     def initial_ramp(self):
         try:
@@ -190,7 +229,7 @@ class SuspensionAutoModes(QWidget):
             logging.error(e)
             ErrorBox(self, title="Service Error", message="Error setting suspension mode to initial ramp.", error=e)
 
-    def extra_ramp(self):
+    def extra_ramp_1(self):
         try:
             confirm = ConfirmationBox(self, title="Confirm Suspension Mode Change",
                                       message="Are you sure you want to change the suspension mode to Extra Ramp FR?",
