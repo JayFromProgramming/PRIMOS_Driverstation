@@ -3,6 +3,7 @@ from PyQt5.QtWidgets import QWidget, QPushButton, QLabel
 
 from loguru import logger as logging
 
+from ROS.RobotState import SmartTopic
 
 class RoverConnectionUI(QWidget):
 
@@ -41,6 +42,7 @@ class RoverConnectionUI(QWidget):
         if self.robot.is_connected:
             self.connection_status.setText(f"<pre>Status: Connected {round(self.robot.ping_time, 2)}ms</pre>")
             self.connection_status.setStyleSheet("color: green; font-size: 13px; font-weight: bold;")
+
         elif self.robot.is_connecting:
             self.connection_status.setText("<pre>Status: Connecting...</pre>")
             self.connection_status.setStyleSheet("color: orange; font-size: 13px; font-weight: bold;")

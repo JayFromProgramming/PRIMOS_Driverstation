@@ -89,6 +89,7 @@ class DriverStationUI:
                     continue
                 # Apply deadbands to the joystick
                 forward = self.xbox_controller.LeftJoystickY if abs(self.xbox_controller.LeftJoystickY) > 0.15 else 0
+                left_right = self.xbox_controller.LeftJoystickX if abs(self.xbox_controller.LeftJoystickX) > 0.15 else 0
                 turn = self.xbox_controller.RightJoystickX if abs(self.xbox_controller.RightJoystickX) > 0.15 else 0
                 lift = self.xbox_controller.RightJoystickY if abs(self.xbox_controller.RightJoystickY) > 0.15 else 0
 
@@ -134,7 +135,7 @@ class DriverStationUI:
 
                 try:
                     self.robot.get_state("/driv/cmd_vel").value = \
-                        {"linear": {"x": 0, "y": forward, "z": 0}, "angular": {"x": 0, "y": 0, "z": turn}}
+                        {"linear": {"x": 0, "y": forward, "z": left_right}, "angular": {"x": 0, "y": 0, "z": turn}}
                 except Exception as e:
                     logging.error(f"Error writing to ROS: {e}")
 

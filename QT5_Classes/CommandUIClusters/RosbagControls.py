@@ -20,7 +20,7 @@ class RosbagControls(QWidget):
     def __init__(self, robot, parent=None):
         super().__init__(parent)
         self.robot = robot
-        self.bag_file_location = "/home/jetson/bag_files/"
+        self.bag_file_location = "/home/ubuntu/bag_files/"
         self.save_location = "copied_bag_files"  # The location on the local machine to save the bag files to
 
         if not os.path.exists(self.save_location):
@@ -59,7 +59,7 @@ class RosbagControls(QWidget):
         try:
             self.ssh_client = paramiko.SSHClient()
             self.ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            self.ssh_client.connect(self.robot.address, username="jetson", password=self.robot.password)
+            self.ssh_client.connect(self.robot.address, username="ubuntu", password=self.robot.password)
             self.sftp = self.ssh_client.open_sftp()
         except Exception as e:
             logging.error(f"Error establishing connection: {e}")

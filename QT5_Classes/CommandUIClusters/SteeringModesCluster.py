@@ -47,6 +47,35 @@ class SteeringModesCluster(QWidget):
         self.robot.attach_on_connect_callback(self.on_robot_connected)
         self.robot.attach_on_disconnect_callback(self.on_robot_disconnected)
 
+        self.connection_check_timer = Qt.QTimer(self)
+        self.connection_check_timer.timeout.connect(self.state_loop)
+        self.connection_check_timer.start(1000)
+
+    def state_loop(self):
+        font_weight = 500
+        deselected = "red"
+        selected = "green"
+        try:
+            steer_state = self.robot.get_state('/qmc/steer_state').value
+            if steer_state == 0:
+                self.parked_steering_button.setStyleSheet(f"background-color: {selected}; font-weight: bold;")
+                self.fused_steering_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
+                self.on_point_steering_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
+            elif steer_state == 1:
+                self.parked_steering_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
+                self.fused_steering_button.setStyleSheet(f"background-color: {selected}; font-weight: bold;")
+                self.on_point_steering_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
+            elif steer_state == 2:
+                self.parked_steering_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
+                self.fused_steering_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
+                self.on_point_steering_button.setStyleSheet(f"background-color: {selected}; font-weight: bold;")
+            else:
+                self.parked_steering_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
+                self.fused_steering_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
+                self.on_point_steering_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
+        except:
+            pass
+
     def in_point_steering(self):
 
         def on_success(response):
@@ -114,7 +143,7 @@ class SteeringModesCluster(QWidget):
             ErrorBox(self, title="Service Error", message="Was unable to execute steering_mode service.", error=e)
 
     def update(self):
-        pass
+        print("test")
 
     def on_robot_connected(self):
         self.on_point_steering_button.setEnabled(True)

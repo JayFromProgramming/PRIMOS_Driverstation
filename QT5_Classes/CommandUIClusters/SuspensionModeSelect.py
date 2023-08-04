@@ -28,6 +28,7 @@ class SuspensionModeSelect(QWidget):
         # Hide the manual controls by default
         self.auto_controls.hide()
         self.manual_controls.hide()
+        self.max_extension.hide()
 
         self.surface.setStyleSheet("border: 1px solid black; border-radius: 5px; background-color: white;")
 
@@ -58,6 +59,35 @@ class SuspensionModeSelect(QWidget):
 
         self.robot.attach_on_connect_callback(self.on_robot_connection)
         self.robot.attach_on_disconnect_callback(self.on_robot_disconnection)
+
+        self.connection_check_timer = Qt.QTimer(self)
+        self.connection_check_timer.timeout.connect(self.state_loop)
+        self.connection_check_timer.start(1000)
+
+    def state_loop(self):
+        font_weight = 500
+        deselected = "red"
+        selected = "green"
+        try:
+            steer_state = self.robot.get_state('/qmc/susp_state').value
+            if steer_state == 0:
+                self.drive_button.setStyleSheet(f"background-color: {selected}; font-weight: bold;")
+                self.manual_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
+                self.auto_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
+            elif steer_state == 1:
+                self.drive_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
+                self.manual_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
+                self.auto_button.setStyleSheet(f"background-color: {selected}; font-weight: bold;")
+            elif steer_state == 7:
+                self.drive_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
+                self.manual_button.setStyleSheet(f"background-color: {selected}; font-weight: bold;")
+                self.auto_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
+            else:
+                self.drive_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
+                self.manual_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
+                self.auto_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
+        except:
+            pass
 
     def moved(self, x, y):
         self.move(x, y)
@@ -94,12 +124,21 @@ class SuspensionModeSelect(QWidget):
 
     def auto_driving(self):
         try:
-            self.auto_controls.hide()
-            self.manual_controls.hide()
-            self.max_extension.show()
+            confirm = ConfirmationBox(self, title="Confirm Suspension Mode Change",
+                                      message="Are you sure you want set the suspension to maximum extension?",
+                                      detailed_message="Use the dpad to select the target quarter module and the "
+                                                       "right joystick to control the height of the suspension.")
+            confirm.exec_()
+            if confirm.result() == Qt.QMessageBox.Yes:
+                self.robot.execute_custom_service("/qmc/susp_service", {"state": Enumerators.SuspensionModes.DEFAULT},
+                                                  "/primrose_qmc/set_state")
+                self.manual_controls.hide()
+                self.auto_controls.hide()
+                self.max_extension.hide()
         except Exception as e:
             logging.error(e)
-            ErrorBox(self, title="Service Error", message="Error setting suspension to maximum extension.", error=e)
+            ErrorBox(self, title="Service Error", message="Error setting suspension to manual mode.", error=e)
+
 
     def update(self):
         pass
@@ -281,11 +320,11 @@ class SuspensionManualControl(QWidget):
         try:
             # Use the dpad left and right to change the selected corner
             # Use the dpad up and down to move the selected corner
-            vert = self.controller.RightJoystickY
+            vert = self.controller.LeftJoystickY
             turn = self.controller.RightJoystickX
             # logging.info(f"Vert: {vert}, Turn: {turn}")
             if self.selected_corner != 4:
-                if abs(vert) > 0.2 or abs(turn) > 0.2:
+                if abs(vert) > 0.1 or abs(turn) > 0.1:
                     self.robot.get_state(f"/mciu/{quarter_modules[self.selected_corner]}/actuators/input").value = \
                         [ActuatorCommands.SET_DUTY_CYCLE, int(vert * -100), 0]
                     self.robot.get_state(f"/mciu/{quarter_modules[self.selected_corner]}/actuators/input").value = \
@@ -299,7 +338,7 @@ class SuspensionManualControl(QWidget):
                 # pass
                 # self.robot.get_state(f"/mciu/Front_Right/actuators/input").value = \
                 #     [ActuatorCommands.SET_POSITION, -1070, 0]
-                if abs(vert) > 0.2 or abs(turn) > 0.2:
+                if abs(vert) > 0.1 or abs(turn) > 0.1:
                     for i in range(4):
                         self.robot.get_state(f"/mciu/{quarter_modules[i]}/actuators/input").value = \
                             [ActuatorCommands.SET_DUTY_CYCLE, int(vert * -100), 0]

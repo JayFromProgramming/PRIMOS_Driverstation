@@ -25,10 +25,11 @@ class ControllerConnectionUI(QWidget):
 
         # This element contains no controls, it just displays the current connection status of the xbox controller
         # it displays if the controller is connected and when the
-        self.target_address = QLabel(f"<pre>Layout: No Controller</pre>", self)
-        self.target_address.setStyleSheet("color: black; font-size: 13px; font-weight: bold;")
-        # self.target_address.setFixedSize(100, 25)
-        self.target_address.move(10, 16)
+
+        self.state_status = QLabel("<pre>Steer-state: -1 Susp-state: -1</pre>", self)
+        self.state_status.setStyleSheet("color: red; font-size: 13px; font-weight: bold;")
+        # self.connection_status.setFixedSize(150, 25)
+        self.state_status.move(10, 16)
 
         self.connection_status = QLabel("<pre>Status: Disconnected</pre>", self)
         self.connection_status.setStyleSheet("color: red; font-size: 13px; font-weight: bold;")
@@ -41,13 +42,16 @@ class ControllerConnectionUI(QWidget):
 
     def connection_check_loop(self):
         if self.controller.connected:
-            self.target_address.setText(f"<pre>Layout: {str(self.controller.mapping).capitalize()}</pre>")
             # logging.debug(f"Controller {self.controller.usb_name} is connected")
             self.connection_status.setText("<pre>Status: Connected</pre>")
             self.connection_status.setStyleSheet("color: green; font-size: 13px; font-weight: bold;")
+
         else:
             self.connection_status.setText("<pre>Status: Disconnected</pre>")
             self.connection_status.setStyleSheet("color: red; font-size: 13px; font-weight: bold;")
+
+        self.state_status.setText(f"<pre>Steer-state: {self.robot.get_state('/qmc/steer_state').value} Susp-state: {self.robot.get_state('/qmc/susp_state').value}</pre>")
+        self.state_status.setStyleSheet("color: green; font-size: 13px; font-weight: bold;")
 
 
 class ControllerMappingUI(QWidget):
