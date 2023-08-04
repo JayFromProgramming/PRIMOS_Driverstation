@@ -57,24 +57,25 @@ class SteeringModesCluster(QWidget):
         selected = "green"
         try:
             steer_state = self.robot.get_state('/qmc/steer_state').value
-            if steer_state == 0:
-                self.parked_steering_button.setStyleSheet(f"background-color: {selected}; font-weight: bold;")
-                self.fused_steering_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
-                self.on_point_steering_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
-            elif steer_state == 1:
-                self.parked_steering_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
-                self.fused_steering_button.setStyleSheet(f"background-color: {selected}; font-weight: bold;")
-                self.on_point_steering_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
-            elif steer_state == 2:
-                self.parked_steering_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
-                self.fused_steering_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
-                self.on_point_steering_button.setStyleSheet(f"background-color: {selected}; font-weight: bold;")
-            else:
-                self.parked_steering_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
-                self.fused_steering_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
-                self.on_point_steering_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
-        except:
-            pass
+            match steer_state:
+                case 0:
+                    self.parked_steering_button.setStyleSheet(f"color: {selected}; font-weight: bold;")
+                    self.fused_steering_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.on_point_steering_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                case 1:
+                    self.parked_steering_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.fused_steering_button.setStyleSheet(f"color: {selected}; font-weight: bold;")
+                    self.on_point_steering_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                case 2:
+                    self.parked_steering_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.fused_steering_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.on_point_steering_button.setStyleSheet(f"color: {selected}; font-weight: bold;")
+                case _:
+                    self.parked_steering_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.fused_steering_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.on_point_steering_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+        except Exception as e:
+            logging.exception(e)
 
     def in_point_steering(self):
 

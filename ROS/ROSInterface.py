@@ -8,14 +8,14 @@ import paramiko
 import roslibpy
 import threading
 import logging
-import rospy
+# import rospy
 
 # from roslibpy.core import RosTimeoutError
 
 from ROS.RobotState import SmartTopic
 
 from loguru import logger as logging
-from std_msgs.msg import Int32
+# from std_msgs.msg import Int32
 
 topic_targets = [
     SmartTopic("/driv/cmd_vel", topic_type="geometry_msgs/Twist", allow_update=True),

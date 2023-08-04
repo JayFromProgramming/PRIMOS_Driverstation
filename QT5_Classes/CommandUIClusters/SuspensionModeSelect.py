@@ -69,25 +69,26 @@ class SuspensionModeSelect(QWidget):
         deselected = "red"
         selected = "green"
         try:
-            steer_state = self.robot.get_state('/qmc/susp_state').value
-            if steer_state == 0:
-                self.drive_button.setStyleSheet(f"background-color: {selected}; font-weight: bold;")
-                self.manual_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
-                self.auto_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
-            elif steer_state == 1:
-                self.drive_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
-                self.manual_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
-                self.auto_button.setStyleSheet(f"background-color: {selected}; font-weight: bold;")
-            elif steer_state == 7:
-                self.drive_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
-                self.manual_button.setStyleSheet(f"background-color: {selected}; font-weight: bold;")
-                self.auto_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
-            else:
-                self.drive_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
-                self.manual_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
-                self.auto_button.setStyleSheet(f"background-color: {deselected}; font-weight: {font_weight};")
-        except:
-            pass
+            susp_state = self.robot.get_state('/qmc/susp_state').value
+            match susp_state:
+                case 0:
+                    self.drive_button.setStyleSheet(f"color: {selected}; font-weight: bold;")
+                    self.manual_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.auto_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                case 1:
+                    self.drive_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.manual_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.auto_button.setStyleSheet(f"color: {selected}; font-weight: bold;")
+                case 7:
+                    self.drive_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.manual_button.setStyleSheet(f"color: {selected}; font-weight: bold;")
+                    self.auto_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                case _:
+                    self.drive_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.manual_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+                    self.auto_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
+        except Exception as e:
+            logging.exception(e)
 
     def moved(self, x, y):
         self.move(x, y)
