@@ -58,15 +58,15 @@ class SteeringModesCluster(QWidget):
         try:
             steer_state = self.robot.get_state('/qmc/steer_state').value
             match steer_state:
-                case 0:
+                case SteeringStates.PARKED:
                     self.parked_steering_button.setStyleSheet(f"color: {selected}; font-weight: bold;")
                     self.fused_steering_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
                     self.on_point_steering_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
-                case 1:
+                case SteeringStates.TURNING:
                     self.parked_steering_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
                     self.fused_steering_button.setStyleSheet(f"color: {selected}; font-weight: bold;")
                     self.on_point_steering_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
-                case 2:
+                case SteeringStates.DRIVING:
                     self.parked_steering_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
                     self.fused_steering_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
                     self.on_point_steering_button.setStyleSheet(f"color: {selected}; font-weight: bold;")

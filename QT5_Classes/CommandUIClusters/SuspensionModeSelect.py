@@ -8,7 +8,7 @@ from QT5_Classes.ConfirmationBox import ConfirmationBox
 from QT5_Classes.ErrorBox import ErrorBox
 from QT5_Classes.QuickButton import QuickButton
 from Resources import Enumerators
-from Resources.Enumerators import quarter_modules, ActuatorCommands
+from Resources.Enumerators import quarter_modules, ActuatorCommands, SuspensionModes
 
 
 class SuspensionModeSelect(QWidget):
@@ -71,15 +71,15 @@ class SuspensionModeSelect(QWidget):
         try:
             susp_state = self.robot.get_state('/qmc/susp_state').value
             match susp_state:
-                case 0:
+                case SuspensionModes.DEFAULT:
                     self.drive_button.setStyleSheet(f"color: {selected}; font-weight: bold;")
                     self.manual_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
                     self.auto_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
-                case 1:
+                case SuspensionModes.INITIAL_RAMP:
                     self.drive_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
                     self.manual_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
                     self.auto_button.setStyleSheet(f"color: {selected}; font-weight: bold;")
-                case 7:
+                case SuspensionModes.MANUAL:
                     self.drive_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
                     self.manual_button.setStyleSheet(f"color: {selected}; font-weight: bold;")
                     self.auto_button.setStyleSheet(f"color: {deselected}; font-weight: {font_weight};")
