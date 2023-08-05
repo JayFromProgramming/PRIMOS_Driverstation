@@ -99,7 +99,7 @@ class XboxController(object):
                 elif event.code == 'ABS_RY':
                     self.RightJoystickY = -event.state / XboxController.MAX_JOY_VAL  # normalize between -1 and 1
                 elif event.code == 'ABS_RX':
-                    self.RightJoystickX = -event.state / XboxController.MAX_JOY_VAL  # normalize between -1 and 1
+                    self.RightJoystickX = event.state / XboxController.MAX_JOY_VAL  # normalize between -1 and 1
                 elif event.code == 'ABS_Z':
                     self.LeftTrigger = event.state / XboxController.MAX_TRIG_VAL  # normalize between 0 and 1
                 elif event.code == 'ABS_RZ':
