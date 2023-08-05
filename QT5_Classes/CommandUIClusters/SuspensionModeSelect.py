@@ -183,8 +183,11 @@ class SuspensionAutoModes(QWidget):
         self.header.move(round(self.width() / 2 - self.header.width() / 2) - 5, 0)
 
         self.initial_ramp_button = QuickButton("Initial Ramp", self, (10, 20), self.initial_ramp)
-        self.extra_ramp_1_button = QuickButton("Extra Ramp FR", self, (100, 20), self.extra_ramp_1)
-        self.extra_ramp_2_button = QuickButton("Extra Ramp BR", self, (100, 20), self.extra_ramp_2)
+        self.extra_ramp_1_button = QuickButton("Extra Ramp FR", self, (10, 50), self.extra_ramp_1)
+        self.extra_ramp_2_button = QuickButton("Extra Ramp BR", self, (10, 80), self.extra_ramp_2)
+        self.initial_ramp_button.setFixedSize(250,25)
+        self.extra_ramp_1_button.setFixedSize(250,25)
+        self.extra_ramp_2_button.setFixedSize(250,25)
 
         self.connection_check_timer = Qt.QTimer(self)
         self.connection_check_timer.timeout.connect(self.state_loop)
