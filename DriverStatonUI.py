@@ -135,7 +135,7 @@ class DriverStationUI:
 
                 try:
                     self.robot.get_state("/driv/cmd_vel").value = \
-                        {"linear": {"x": 0, "y": forward, "z": left_right}, "angular": {"x": 0, "y": 0, "z": turn}}
+                        {"linear": {"x": 0, "y": forward, "z": left_right}, "angular": {"x": 0, "y": lift, "z": turn}}
                 except Exception as e:
                     logging.error(f"Error writing to ROS: {e}")
 
