@@ -94,19 +94,19 @@ class HopperLoadSensors(QWidget):
 
         self.surface.setStyleSheet("border: 1px solid black; border-radius: 5px; background-color: white;")
 
-        self.header = QLabel("Load Cell Resets", self.surface)
+        self.header = QLabel("Nitrous Control", self.surface)
         self.header.setStyleSheet("font-weight: bold; font-size: 15px; border: 0px; "
                                   "background-color: transparent;")
         self.header.setAlignment(Qt.Qt.AlignCenter)
         self.header.move(round(self.width() / 2 - self.header.width() / 2) - 10, 0)
 
-        self.hopper_tare_button = QPushButton("Hopper Tare", self)
+        self.hopper_tare_button = QPushButton("Enable", self)
         self.hopper_tare_button.setFixedSize(125, 25)
         self.hopper_tare_button.move(10, 20)
         self.hopper_tare_button.clicked.connect(self.tare_hopper)
         self.hopper_tare_button.setDisabled(True)
 
-        self.suspen_tare_button = QPushButton("Suspension Tare", self)
+        self.suspen_tare_button = QPushButton("Disable", self)
         self.suspen_tare_button.setFixedSize(125, 25)
         self.suspen_tare_button.move(145, 20)
         self.suspen_tare_button.clicked.connect(self.tare_suspension)
@@ -126,27 +126,23 @@ class HopperLoadSensors(QWidget):
     def tare_hopper(self):
         try:
             # Create a confirmation dialog box and when the users confirms, reset the load cells (don't block while waiting)
-            confirmation_box = ConfirmationBox(self, title="Load Cell Reset",
-                                               message="Are you sure you want to reset the hopper load cells?",
-                                               detailed_message="Resetting the load cells will set the current load as the "
-                                                                "zero point. This will cause the hopper to think that "
-                                                                "it is carrying no load. This action is irreversible.")
+            confirmation_box = ConfirmationBox(self, title="Nitrous Set",
+                                               message="Are you sure you want to enable nitrous mode?",
+                                               detailed_message="Enabling Nitrous will make Primrose move very quickly")
             confirmation_box.exec_()
             if confirmation_box.result() == Qt.QMessageBox.Yes:
-                self.robot.get_state('/mciu/Hopper/tare').value = 1
+                self.robot.get_state('/trch/speed_limit').value = 4000
         except Exception as e:
             logging.error(e)
 
     def tare_suspension(self):
         try:
             # Create a confirmation dialog box and when the users confirms, reset the load cells (don't block while waiting)
-            confirmation_box = ConfirmationBox(self, title="Load Cell Reset",
-                                               message="Are you sure you want to reset the suspension load cells?",
-                                               detailed_message="Resetting the load cells will set the current load as the "
-                                                                "zero point. This will cause the suspension to think that "
-                                                                "it is carrying no load. This action is irreversible.")
+            confirmation_box = ConfirmationBox(self, title="Nitrous Set",
+                                               message="Are you sure you want to disable nitrous mode?",
+                                               detailed_message="Disabling Nitrous will make Primrose move slower")
             confirmation_box.exec_()
             if confirmation_box.result() == Qt.QMessageBox.Yes:
-                self.robot.get_state('/mciu/Suspension/tare').value = 1
+                self.robot.get_state('/trch/speed_limit').value = 1000
         except Exception as e:
             logging.error(e)
