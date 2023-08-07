@@ -14,18 +14,18 @@ class SensorCalibrationCluster(QWidget):
 
         self.surface.setStyleSheet("border: 1px solid black; border-radius: 5px; background-color: white;")
 
-        self.header = QLabel("Sensor Calibrations", self.surface)
+        self.header = QLabel("Nitrous Mode", self.surface)
         self.header.setStyleSheet("font-weight: bold; font-size: 15px; border: 0px; "
                                   "background-color: transparent;")
         self.header.setAlignment(Qt.Qt.AlignCenter)
         self.header.move(round(self.width() / 2 - self.header.width() / 2) - 5, 0)
 
-        self.open_button = QPushButton("Hopper Tare", self)
+        self.open_button = QPushButton("Nitrous", self)
         self.open_button.setFixedSize(80, 25)
         self.open_button.move(10, 20)
         self.open_button.clicked.connect(self.hopper)
 
-        self.close_button = QPushButton("Suspen Tar", self)
+        self.close_button = QPushButton("Disable", self)
         self.close_button.setFixedSize(80, 25)
         self.close_button.move(100, 20)
         self.close_button.clicked.connect(self.suspension)
@@ -37,13 +37,13 @@ class SensorCalibrationCluster(QWidget):
 
     def hopper(self):
         try:
-            self.robot.get_state('/mciu/Hopper/loadcells/control').value = [0]
+            self.robot.get_state('/trch/speed_limit').value = 2000
         except Exception as e:
             print(e)
 
     def suspension(self):
         try:
-            self.robot.get_state('/mciu/Suspension/loadcells/control').value = [0]
+            self.robot.get_state('/trch/speed_limit').value = 1000
         except Exception as e:
             print(e)
 
