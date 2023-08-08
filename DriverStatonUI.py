@@ -81,7 +81,7 @@ class DriverStationUI:
         modules = ["Front_Left", "Front_Right", "Rear_Left", "Rear_Right"]
         # Read the controller while the window is open
         while True:
-            time.sleep(0.2)
+            time.sleep(0.05)
             try:
                 if not self.robot.is_connected:
                     continue
