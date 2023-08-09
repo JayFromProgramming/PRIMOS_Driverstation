@@ -20,7 +20,7 @@ class RosbagControls(QWidget):
     def __init__(self, robot, parent=None):
         super().__init__(parent)
         self.robot = robot
-        self.bag_file_location = "/home/ubuntu/ssd/fdr"
+        self.bag_file_location = "/home/ubuntu/ssd/fdr/"
         self.save_location = "copied_bag_files"  # The location on the local machine to save the bag files to
 
         if not os.path.exists(self.save_location):
@@ -161,6 +161,7 @@ class RosbagControls(QWidget):
                     thread.start()
         except Exception as e:
             logging.error(f"Error in copy_new: {e}")
+            logging.exception(e)
             ErrorBox(self, title="Error Copying Files", message="Error copying files", error=e)
 
     def reindex_all(self):
