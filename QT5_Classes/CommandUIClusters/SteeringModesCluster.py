@@ -5,7 +5,7 @@ from loguru import logger as logging
 
 from QT5_Classes.ErrorBox import ErrorBox
 from Resources import Enumerators
-from Resources.Enumerators import ActuatorCommands, SteeringStates
+from Resources.Enumerators import ActuatorCommands, SteeringStates, SuspensionModes
 
 
 class SteeringModesCluster(QWidget):
