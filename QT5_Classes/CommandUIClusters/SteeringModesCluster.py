@@ -75,7 +75,7 @@ class SteeringModesCluster(QWidget):
             if a == 1:
                 self.robot.execute_custom_service("/qmc/steer_service", {"state": SteeringStates.DRIVING}, "primrose_qmc/set_state",
                                                   callback=on_success, errback=on_failure)
-                self.robot.execute_custom_service("/qmc/susp_service", {"state": SuspensionStates.DEFAULT}, "primrose_qmc/set_state",
+                self.robot.execute_custom_service("/qmc/susp_service", {"state": SuspensionModes.DEFAULT}, "primrose_qmc/set_state",
                                                   callback=on_success, errback=on_failure)
                 logging.info("Sent steering mode request.")
                 logging.info("Sent suspension mode request.")
@@ -88,7 +88,7 @@ class SteeringModesCluster(QWidget):
                                                   callback=on_success, errback=on_failure)
                 logging.info("Sent steering mode request.")
             elif y == 1:
-                self.robot.execute_custom_service("/qmc/susp_service", {"state": SuspensionStates.MANUAL}, "primrose_qmc/set_state",
+                self.robot.execute_custom_service("/qmc/susp_service", {"state": SuspensionModes.MANUAL}, "primrose_qmc/set_state",
                                                   callback=on_success, errback=on_failure)
                 self.robot.execute_custom_service("/qmc/steer_service", {"state": SteeringStates.PARKED}, "primrose_qmc/set_state",
                                                   callback=on_success, errback=on_failure)
