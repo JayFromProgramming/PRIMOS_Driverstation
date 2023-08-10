@@ -67,12 +67,12 @@ class SuspensionModeSelect(QWidget):
 
     def state_loop(self):
         def on_success(response):
-            self.on_point_steering_button.setEnabled(True)
+            # self.on_point_steering_button.setEnabled(True)
             logging.info("Successfully executed steering_mode service.")
 
         def on_failure(error):
             # ErrorBox(title="Service Failure", message="Was unable to execute steering_mode service.", detailed_message=error)
-            self.on_point_steering_button.setEnabled(True)
+            # self.on_point_steering_button.setEnabled(True)
             logging.error(error)
         font_weight = 500
         deselected = "red"
