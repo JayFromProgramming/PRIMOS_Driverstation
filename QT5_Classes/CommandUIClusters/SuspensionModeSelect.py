@@ -69,6 +69,31 @@ class SuspensionModeSelect(QWidget):
         deselected = "red"
         selected = "green"
         try:
+            a = self.controller.A
+            x = self.controller.X
+            b = self.controller.B
+            y = self.controller.Y
+            if a == 1:
+                self.robot.execute_custom_service("/qmc/susp_service", {"state": SuspensionModes.DEFAULT}, "primrose_qmc/set_state",
+                                                  callback=on_success, errback=on_failure)
+                logging.info("Sent suspension mode request.")
+                self.manual_controls.hide()
+                self.auto_controls.hide()
+                self.max_extension.hide()
+            elif x == 1:
+                pass
+            elif b == 1:
+                self.robot.execute_custom_service("/qmc/susp_service", {"state": SuspensionModes.DEFAULT}, "primrose_qmc/set_state",
+                                                  callback=on_success, errback=on_failure)
+                logging.info("Sent suspension mode request.")
+            elif y == 1:
+                self.robot.execute_custom_service("/qmc/susp_service", {"state": SuspensionModes.MANUAL}, "primrose_qmc/set_state",
+                                                  callback=on_success, errback=on_failure)
+                logging.info("Sent suspension mode request.")
+                self.manual_controls.show()
+                self.auto_controls.hide()
+                self.max_extension.hide()
+
             susp_state = self.robot.get_state('/qmc/susp_state').value
             match susp_state:
                 case SuspensionModes.DEFAULT:
