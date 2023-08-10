@@ -153,11 +153,11 @@ class DriverStationUI:
                     except Exception as e:
                         logging.error(f"Error writing to ROS: {e}")
 
-                if self.xbox_controller.B:  # Is actually B for some reason
-                    try:
-                        self.robot.execute_custom_service("/trch/arm", {"in_": False}, "primrose_trch/set_armed")
-                    except Exception as e:
-                        logging.error(f"Error writing to ROS: {e}")
+                # if self.xbox_controller.B:  # Is actually B for some reason
+                #     try:
+                #         self.robot.execute_custom_service("/trch/arm", {"in_": False}, "primrose_trch/set_armed")
+                #     except Exception as e:
+                #         logging.error(f"Error writing to ROS: {e}")
 
                 if self.xbox_controller.Start or self.xbox_controller.Back:
                     try:
