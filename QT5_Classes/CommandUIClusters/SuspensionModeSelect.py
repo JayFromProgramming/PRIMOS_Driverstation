@@ -16,6 +16,7 @@ class SuspensionModeSelect(QWidget):
     def __init__(self, robot, parent=None, controller=None):
         super().__init__(parent)
         self.robot = robot
+        self.controller = controller
 
         self.surface = QWidget(self)
         self.surface.setFixedSize(280, 50)
