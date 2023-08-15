@@ -45,6 +45,8 @@ class HopperDoorControls(QWidget):
         self.robot.attach_on_connect_callback(self.on_robot_connection)
         self.robot.attach_on_disconnect_callback(self.on_robot_disconnection)
 
+        self.robot.get_state('/trch/speed_limit').value = 1500
+
     def on_robot_connection(self):
         self.open_button.setEnabled(True)
         self.stop_button.setEnabled(True)
@@ -131,7 +133,7 @@ class HopperLoadSensors(QWidget):
                                                detailed_message="Enabling Nitrous will make Primrose move very quickly")
             confirmation_box.exec_()
             if confirmation_box.result() == Qt.QMessageBox.Yes:
-                self.robot.get_state('/trch/speed_limit').value = 4000
+                self.robot.get_state('/trch/speed_limit').value = 2000
         except Exception as e:
             logging.error(e)
 
@@ -143,6 +145,6 @@ class HopperLoadSensors(QWidget):
                                                detailed_message="Disabling Nitrous will make Primrose move slower")
             confirmation_box.exec_()
             if confirmation_box.result() == Qt.QMessageBox.Yes:
-                self.robot.get_state('/trch/speed_limit').value = 1000
+                self.robot.get_state('/trch/speed_limit').value = 1500
         except Exception as e:
             logging.error(e)

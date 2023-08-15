@@ -43,7 +43,7 @@ class SensorCalibrationCluster(QWidget):
 
     def suspension(self):
         try:
-            self.robot.get_state('/trch/speed_limit').value = 1000
+            self.robot.get_state('/trch/speed_limit').value = 1500
         except Exception as e:
             print(e)
 
